@@ -1,0 +1,181 @@
+#overview-panel-stats {
+    grid-template-columns: 1fr 1fr;
+    padding: .5rem;
+    box-sizing: border-box;
+    gap: 1rem;
+}
+
+.overview-control {
+    display: flex;
+    background-color: var(--color-light-grey);
+    padding: .5rem;
+    font-size: .875rem;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-border);
+    box-sizing: border-box;
+    gap: .5rem;
+}
+
+.overview-control p {
+    width: 3rem;
+}
+
+.overview-control p.end {
+    text-align: end;
+}
+
+.overview-list {
+    display: grid;
+    grid-template-columns: 1fr 2.2rem 2.2rem;
+    grid-template-rows: .625rem .875rem repeat(7, .625rem);
+    width: 100%;
+    font-size: .625rem;
+    gap: .3rem 0rem;
+}
+
+.overview-list div {
+    text-align: end;
+    color: var(--color-light-text);
+}
+
+.overview-list div.main {
+    font-size: .75rem;
+    color: var(--color-main-text);
+    font-weight: 600;
+}
+
+.overview-list div.left {
+    text-align: start;
+}
+
+.overview-airport-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: .5rem;
+    max-height: 10rem;
+    background-color: var(--color-light-grey);
+}
+
+.overview-airport-item {
+    display: grid;
+    grid-template-columns: .2rem 2.25rem 1fr auto;
+    grid-template-rows: 3rem;
+    height: 3rem;
+    background-color: white;
+    gap: .5rem;
+    align-items: center;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    user-select: none;
+    cursor: pointer;
+    padding-right: .5rem;
+    box-sizing: border-box;
+}
+
+.overview-airport-item:hover {
+    background-color: var(--color-green);
+}
+
+.overview-airport-atc {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.overview-airport-atc-station {
+    height: 100%;
+    background-color: rgb(183, 190, 206);
+}
+
+.overview-airport-atc-station.atis {
+    background-color: var(--color-orange);
+}
+
+.overview-airport-atc-station.del {
+    background-color: var(--color-light-blue);
+}
+
+.overview-airport-atc-station.gnd {
+    background-color: var(--color-green);
+}
+
+.overview-airport-atc-station.twr {
+    background-color: var(--color-red);
+}
+
+.overview-airport-atc-station.trac {
+    background-color: var(--color-magenta);
+}
+
+.overview-airport-num {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--color-green);
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 50%;
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    font-weight: 600;
+    background-color: white;
+}
+
+.overview-airport-desc {
+    display: flex;
+    flex-direction: column;
+    font-size: .875rem;
+}
+
+.overview-airport-icao {
+    font-weight: 600;
+}
+
+.overview-airport-icao span {
+    font-size: .625rem;
+    margin-left: .3rem;
+}
+
+.overview-airport-name {
+    font-size: .75rem;
+    color: var(--color-light-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 10rem;
+}
+
+.overview-airport-item:hover .overview-airport-name {
+    color: white;
+}
+
+.overview-airport-stats {
+    display: grid;
+    grid-template-columns: 1rem auto;
+    grid-template-rows: 1fr 1fr;
+    gap: .25rem .5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.overview-airport-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overview-airport-stat {
+    display: flex;
+    align-items: center;
+    line-height: .875rem;
+}
+
+.overview-airport-stat span {
+    font-size: .625rem;
+    line-height: .625rem;
+    width: 2.25rem;
+    text-align: end;
+}
