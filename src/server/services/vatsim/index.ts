@@ -1,0 +1,35 @@
+import { rawDataStorage, vatsimDataStorage } from '@/server/storage'
+import { VatsimData, VatsimTransceiversData } from '@/types/data/vatsim'
+import axios from 'axios'
+import { setPositionsData } from './position'
+
+let dataUpdateInProgress = false
+
+export async function fetchVatsimData() {
+    if (dataUpdateInProgress) return
+
+    dataUpdateInProgress = true
+
+    try {
+        const vatsimData = await axios.get<VatsimData>('https://data.vatsim.net/v3/vatsim-data.json')
+
+        if (!rawDataStorage.vatsim || vatsimData.data.general.update > rawDataStorage.vatsim?.general.update) {
+            const transceivers = await axios.get<VatsimTransceiversData[]>('https://data.vatsim.net/v3/transceivers-data.json')
+
+            rawDataStorage.vatsim = vatsimData.data
+            rawDataStorage.transveivers = transceivers.data
+
+            updateVatsimData()
+        }
+    } catch (error) {
+        console.error('Error fetching VATSIM data from API:', error)
+        throw error
+    }
+
+    dataUpdateInProgress = false
+}
+
+function updateVatsimData() {
+    setPositionsData()
+    console.log(vatsimDataStorage)
+}
