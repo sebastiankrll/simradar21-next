@@ -1,4 +1,4 @@
-import { vatsimDataStorage } from "@/server/storage"
+import { vatsimDataStorage } from "@/server/storage/vatsim"
 import { PositionData, RouteData, RoutePoint } from "@/types/data/vatsim"
 
 export function updateRoute() {

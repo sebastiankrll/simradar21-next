@@ -1,4 +1,4 @@
-import { PositionData, GeneralData, VatsimData, VatsimTransceiversData, StatusData, RouteData } from "@/types/data/vatsim";
+import { VatsimData, VatsimTransceiversData, VatsimDataStorage } from "@/types/data/vatsim";
 import { updatePosition } from "../services/vatsim/position";
 import { updateGeneral } from "../services/vatsim/general";
 import { updateStatus } from "../services/vatsim/status";
@@ -9,14 +9,14 @@ export const rawDataStorage = {
     transveivers: null as null | VatsimTransceiversData[]
 }
 
-export const vatsimDataStorage = {
-    position: null as null | PositionData[],
-    general: null as null | GeneralData[],
-    status: null as null | StatusData[],
-    generalPre: null as null | GeneralData[],
-    statusPre: null as null | StatusData[],
-    route: null as null | RouteData[],
-    timestamp: null as null | Date
+export const vatsimDataStorage: VatsimDataStorage = {
+    position: null,
+    general: null,
+    status: null,
+    generalPre: null,
+    statusPre: null,
+    route: null,
+    timestamp: null
 }
 
 export function updateVatsimStorage() {

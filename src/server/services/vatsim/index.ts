@@ -1,6 +1,11 @@
-import { rawDataStorage, updateVatsimStorage, vatsimDataStorage } from '@/server/storage'
+import { rawDataStorage, updateVatsimStorage, vatsimDataStorage } from '@/server/storage/vatsim'
 import { VatsimData, VatsimTransceiversData } from '@/types/data/vatsim'
 import axios from 'axios'
+import { createClient } from 'redis'
+
+const redisPub = await createClient()
+    .on('error', err => console.log('Redis Client Error', err))
+    .connect()
 
 let dataUpdateInProgress = false
 
@@ -30,5 +35,10 @@ export async function fetchVatsimData() {
 
 function updateVatsimData() {
     updateVatsimStorage()
+    pushVatsimStorage()
     console.log('VATSIM data updated.')
+}
+
+function pushVatsimStorage() {
+    redisPub.publish('vatsim_storage', JSON.stringify(vatsimDataStorage))
 }

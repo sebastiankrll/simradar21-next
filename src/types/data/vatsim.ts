@@ -230,3 +230,13 @@ export interface RouteData {
     callsign: string,
     points: RoutePoint[]
 }
+
+export interface VatsimDataStorage {
+    position: PositionData[] | null,
+    general: GeneralData[] | null,
+    status: StatusData[] | null,
+    generalPre: GeneralData[] | null,
+    statusPre: StatusData[] | null,
+    route: RouteData[] | null,
+    timestamp: Date | null
+}

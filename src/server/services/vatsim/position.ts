@@ -1,4 +1,4 @@
-import { rawDataStorage, vatsimDataStorage } from "@/server/storage";
+import { rawDataStorage, vatsimDataStorage } from "@/server/storage/vatsim";
 import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/data/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
 const airlines = airlinesJSON as Airlines[]

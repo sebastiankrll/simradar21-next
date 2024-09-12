@@ -1,5 +1,5 @@
 import { calculateDistance, roundXMin } from "@/assets/utils/common"
-import { rawDataStorage, vatsimDataStorage } from "@/server/storage"
+import { rawDataStorage, vatsimDataStorage } from "@/server/storage/vatsim"
 import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/data/vatsim"
 
 const taxiTime = 10 * 60000
