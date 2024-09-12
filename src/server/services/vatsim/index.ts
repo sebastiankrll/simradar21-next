@@ -1,7 +1,6 @@
-import { rawDataStorage, vatsimDataStorage } from '@/server/storage'
+import { rawDataStorage, updateVatsimStorage, vatsimDataStorage } from '@/server/storage'
 import { VatsimData, VatsimTransceiversData } from '@/types/data/vatsim'
 import axios from 'axios'
-import { setPositionsData } from './position'
 
 let dataUpdateInProgress = false
 
@@ -30,6 +29,5 @@ export async function fetchVatsimData() {
 }
 
 function updateVatsimData() {
-    setPositionsData()
-    console.log(vatsimDataStorage)
+    updateVatsimStorage()
 }

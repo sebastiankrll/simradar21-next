@@ -1,3 +1,5 @@
+import { Feature, GeoJsonObject, GeoJsonProperties, Point } from "geojson"
+
 export interface VatsimGeneral {
     version: number
     update: number
@@ -127,56 +129,91 @@ export interface VatsimData {
 }
 
 export interface PositionData {
-    cs: string,
-    ac: string | null,
-    co: number[] | null,
-    alt: number[],
-    hdg: number,
-    gs: number[],
-    frq: string,
-    apt: string[] | null,
-    iata: string | null,
-    typ: number
+    callsign: string,
+    aircraft: string | null,
+    coordinates: number[],
+    altitudes: number[],
+    heading: number,
+    groundspeeds: number[],
+    frequency: string,
+    airports: string[] | null,
+    airline: string | null,
+    type: number,
+    connected: boolean
 }
 
-export interface StatusIndex {
+export interface GeneralIndex {
     cid: number,
     callsign: string,
     name: string,
-    rating: string,
-    server: string,
+    rating?: string,
+    server?: string,
 }
 
-export interface StatusAirport {
-    dep: string,
-    arr: string
+export interface GeneralAirport {
+    dep: Feature<Point, GeoJsonProperties>,
+    arr: Feature<Point, GeoJsonProperties>
 }
 
-export interface StatusFlightPlan {
+export interface GeneralFlightPlan {
+    filedSpeed: number,
+    filedLevel: number,
+    depTime: Date | null,
+    enrouteTime: number,
     plan: string,
     remarks: string,
     rules: string
 }
 
-export interface StatusAircraft {
+export interface GeneralAircraft {
     icao: string,
     type: string,
-    registration: string,
+    registration?: string,
     country: string,
-    msn: string,
-    age: number
+    msn?: string,
+    age?: number
 }
 
-export interface StatusAirline {
+export interface GeneralAirline {
     icao: string,
     iata: string,
-    name: string
+    name: string,
+    flightno: string
+}
+
+export interface GeneralData {
+    index: GeneralIndex,
+    airport: GeneralAirport | null,
+    flightplan: GeneralFlightPlan | null,
+    aircraft: GeneralAircraft | null,
+    airline: GeneralAirline
+}
+
+export interface StatusIndex {
+    callsign: string,
+    transponder?: string,
+    altimeters?: number,
+    altitude: number
+}
+
+export interface StatusProgress {
+    status: string,
+    stops: 0,
+    depDist: number,
+    arrDist: number
+}
+
+export interface StatusTimes {
+    offBlock: Date,
+    schedDep: Date,
+    actDep: Date,
+    schedArr: Date,
+    actArr: Date,
+    onBlock: Date
 }
 
 export interface StatusData {
     index: StatusIndex,
-    airport?: StatusAirport,
-    flightplan?: StatusFlightPlan,
-    aircraft?: StatusAircraft,
-    airline: StatusAirline
+    progress: StatusProgress,
+    times: StatusTimes
 }
