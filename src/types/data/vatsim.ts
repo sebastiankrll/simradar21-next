@@ -217,3 +217,16 @@ export interface StatusData {
     progress: StatusProgress,
     times: StatusTimes
 }
+
+export interface RoutePoint {
+    coordinates: number[],
+    altitudes: number[],
+    groundspeed: number,
+    connected: boolean,
+    timestamp: Date
+}
+
+export interface RouteData {
+    callsign: string,
+    points: RoutePoint[]
+}

@@ -30,7 +30,7 @@ export function updateGeneralData() {
         const pilot = structuredClone(rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign))
         if (!pilot) continue
 
-        const noDataChange = prevGeneral ? checkFlightDataChange(pilot, prevGeneral) : false
+        const noDataChange = prevGeneral ? checkSameData(pilot, prevGeneral) : false
         const newGeneral: GeneralData = {
             index: prevGeneral?.index && noDataChange ? prevGeneral?.index : getIndexData(pilot),
             airport: getAirportData(pilot),
@@ -65,7 +65,7 @@ export function updateGeneralDataPrefile() {
     vatsimDataStorage.generalPre = newGenerals
 }
 
-function checkFlightDataChange(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {
+function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {
     const airportsChange = pilot.flight_plan?.departure === prevGeneral.airport?.dep.properties?.icao && pilot.flight_plan?.arrival === prevGeneral.airport?.arr.properties?.icao
     const flightplanChange = pilot.flight_plan?.route === prevGeneral.flightplan?.plan
 

@@ -35,6 +35,7 @@ export function updatePosition() {
     }
 
     vatsimDataStorage.position = newPositions
+    vatsimDataStorage.timestamp = new Date()
 }
 
 function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, transceiver: VatsimTransceiver | null, dT: number): PositionData {

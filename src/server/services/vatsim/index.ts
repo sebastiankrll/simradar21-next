@@ -30,4 +30,5 @@ export async function fetchVatsimData() {
 
 function updateVatsimData() {
     updateVatsimStorage()
+    console.log('VATSIM data updated.')
 }
