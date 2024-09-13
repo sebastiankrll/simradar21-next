@@ -5,24 +5,61 @@ import { Map, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import { MapLibreLayer } from "@geoblocks/ol-maplibre-layer"
 import mapLibreStyle from '@/assets/styles/positron.json'
+import { StyleSpecification } from "maplibre-gl"
+import VectorSource from "ol/source/Vector"
 
 import './Map.css'
-import { StyleSpecification } from "maplibre-gl"
+import { webglConfig, WebGLLayer } from "./webgl"
+import { VectorStyle } from "ol/render/webgl/VectorStyleRenderer"
+import { updateSunFeatures } from './utils/mapSun'
 
 export default function MapLayer() {
     const mapRef = useRef<Map | null>(null)
+    const vectorSourceRef = useRef({
+        init: null,
+        sun: new VectorSource({
+            wrapX: false
+        }),
+        firs: new VectorSource(),
+        tracons: new VectorSource(),
+        firLabels: new VectorSource(),
+        airportLabels: new VectorSource(),
+        airports: new VectorSource(),
+        routes: new VectorSource(),
+        flights: new VectorSource(),
+        airportTops: new VectorSource()
+    })
 
     useEffect(() => {
+        const view = localStorage.getItem('MAP_VIEW')?.split(',')
+        const zoom = view ? parseFloat(view[2]) : 3
+        const center = view ? view.slice(0, 2).map(parseFloat) : [0, 0]
+
+        const map = new Map({
+            target: "map",
+            view: new View({
+                center: fromLonLat(center),
+                zoom: zoom,
+                maxZoom: 18,
+                minZoom: 3,
+                extent: transformExtent([-190, -80, 190, 80], 'EPSG:4326', 'EPSG:3857')
+            }),
+            controls: []
+        })
+        mapRef.current = map
+
         const mbLayer = new MapLibreLayer({
             mapLibreOptions: {
                 style: mapLibreStyle as StyleSpecification,
             },
         })
+        map.addLayer(mbLayer)
 
         // const sunLayer = new WebGLLayer({
         //     source: vectorSourceRef.current.sun,
-        //     style: webglConfig.sun
+        //     style: webglConfig.sun as VectorStyle
         // })
+        // map.addLayer(sunLayer)
 
         // const firLayer = new WebGLLayer({
         //     source: vectorSourceRef.current.firs,
@@ -85,28 +122,10 @@ export default function MapLayer() {
         // })
         // firLabelLayer.setZIndex(9)
 
-        const view = localStorage.getItem('MAP_VIEW')?.split(',')
-        const zoom = view ? parseFloat(view[2]) : 3
-        const center = view ? view.slice(0, 2).map(parseFloat) : [0, 0]
-
-        const map = new Map({
-            target: "map",
-            view: new View({
-                center: fromLonLat(center),
-                zoom: zoom,
-                maxZoom: 18,
-                minZoom: 3,
-                extent: transformExtent([-190, -80, 190, 80], 'EPSG:4326', 'EPSG:3857')
-            }),
-            controls: []
-        })
-        map.addLayer(mbLayer)
-        mapRef.current = map
-
         // vectorSourceRef.current.init = Date.now()
 
         // const updateSunLayer = () => {
-        //     addSunFeatures(vectorSourceRef)
+        //     updateSunFeatures(vectorSourceRef)
         // }
         // updateSunLayer()
         // const sunLayerInterval = setInterval(updateSunLayer, 30000)

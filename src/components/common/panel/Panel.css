@@ -290,7 +290,7 @@
     overflow: hidden;
     transition: ease .2s height, opacity;
     display: flex;
-    align-items: end;
+    align-items: flex-end;
 }
 
 .info-panel-footer-button:hover p,
