@@ -2,6 +2,24 @@ import { Layer } from 'ol/layer'
 import { Options } from 'ol/layer/Layer'
 import { VectorStyle } from 'ol/render/webgl/VectorStyleRenderer'
 import WebGLVectorLayerRenderer from 'ol/renderer/webgl/VectorLayer.js'
+import aircraftSprite from '@/assets/images/sprites/aircraftSprite.png'
+import airportSprite from '@/assets/images/sprites/airportSprite.png'
+import airportLabelSprite from '@/assets/images/sprites/airportLabelSprite.png'
+
+export class WebGLLayer extends Layer {
+    style: VectorStyle | null
+
+    constructor(options: Options & { style?: VectorStyle }) {
+        super(options)
+        this.style = options.style || null
+    }
+
+    createRenderer() {
+        return new WebGLVectorLayerRenderer(this, {
+            style: this.style as VectorStyle,
+        })
+    }
+}
 
 export const webglConfig = {
     flights: {
@@ -13,7 +31,7 @@ export const webglConfig = {
             ['==', ['var', 'callsign'], 'all'],
             ['==', ['var', 'callsign'], ['get', 'callsign']],
         ],
-        'icon-src': '/assets/img/sprites/aircraftSprite.png',
+        'icon-src': aircraftSprite.src,
         'icon-size': [49, 44],
         'icon-offset': [
             'case', ['==', ['get', 'hover'], 0], [
@@ -186,7 +204,7 @@ export const webglConfig = {
             ['==', ['var', 'callsign'], 'all'],
             ['==', ['var', 'callsign'], ['get', 'callsign']],
         ],
-        'icon-src': '/assets/img/sprites/aircraftSprite.png',
+        'icon-src': aircraftSprite.src,
         'icon-size': [49, 44],
         'icon-offset': [
             'match', ['get', 'shape'],
@@ -304,7 +322,7 @@ export const webglConfig = {
         ]],
             ['==', ['var', 'show'], 'all']
         ],
-        'icon-src': '/assets/img/sprites/airportSprite.png',
+        'icon-src': airportSprite.src,
         'icon-size': [32, 32],
         'icon-offset': ['case',
             ['==', ['get', 'hover'], '1'], [32, 0],
@@ -318,7 +336,7 @@ export const webglConfig = {
         'icon-rotate-with-view': false
     },
     airportTops: {
-        'icon-src': '/assets/img/sprites/airportSprite.png',
+        'icon-src': airportSprite.src,
         'icon-size': [32, 32],
         'icon-offset': ['case',
             ['==', ['get', 'hover'], '1'], [32, 0],
@@ -341,7 +359,7 @@ export const webglConfig = {
             ['==', ['var', 'arr'], ['get', 'icao']],
             ['==', ['var', 'dep'], '']
         ],
-        'icon-src': '/assets/img/sprites/airportLabelSprite.png',
+        'icon-src': airportLabelSprite.src,
         'icon-size': [36, 36],
         'icon-offset': ['case',
             ['any',
@@ -396,20 +414,5 @@ export const webglConfig = {
             ['case', ['==', ['get', 'type'], 'tracon'], [222, 89, 234, 0.4], [77, 95, 131, 0.4]],
             ['case', ['==', ['get', 'type'], 'tracon'], [222, 89, 234, 0.1], [77, 95, 131, 0.1]]
         ]
-    }
-}
-
-export class WebGLLayer extends Layer {
-    style: VectorStyle | null
-
-    constructor(options: Options & { style?: VectorStyle }) {
-        super(options)
-        this.style = options.style || null
-    }
-
-    createRenderer() {
-        return new WebGLVectorLayerRenderer(this, {
-            style: this.style as VectorStyle,
-        })
     }
 }

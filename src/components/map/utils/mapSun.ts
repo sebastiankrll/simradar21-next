@@ -1,8 +1,9 @@
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
 import { circular } from "ol/geom/Polygon"
+import VectorSource from "ol/source/Vector"
 
-export const updateSunFeatures = (vectorSourceRef) => {
+export const updateSunFeatures = (vectorSource: VectorSource) => {
     const angles = [0.566666, 6, 12, 18]
     const center = getShadowPosition(new Date())
 
@@ -13,11 +14,11 @@ export const updateSunFeatures = (vectorSourceRef) => {
         return new Feature(polygon.transform('EPSG:4326', 'EPSG:3857'))
     })
 
-    vectorSourceRef.current.sun.clear()
-    vectorSourceRef.current.sun.addFeatures(newFeatures)
+    vectorSource.clear()
+    vectorSource.addFeatures(newFeatures)
 }
 
-const createCircularPolygon = (center, radius) => {
+const createCircularPolygon = (center: number[], radius: number) => {
     const polygon = circular(center, radius, 128)
     const coords = polygon.getCoordinates()[0]
 
@@ -35,20 +36,20 @@ const createCircularPolygon = (center, radius) => {
     return new MultiPolygon([[coords], [shift]])
 }
 
-const getShadowRadiusFromAngle = (angle) => {
+const getShadowRadiusFromAngle = (angle: number) => {
     let shadow_radius = 6371008 * Math.PI * 0.5
     var twilight_dist = ((6371008 * 2 * Math.PI) / 360) * angle
 
     return shadow_radius - twilight_dist
 }
 
-const getShadowPosition = (time) => {
+const getShadowPosition = (time: Date) => {
     const sunPosition = calculateSunPosition(time)
 
     return [sunPosition[0] + 180, -sunPosition[1]]
 }
 
-const calculateSunPosition = (time) => {
+const calculateSunPosition = (time: Date) => {
     const rad = 0.017453292519943295
 
     const ms_past_midnight = ((time.getUTCHours() * 60 + time.getUTCMinutes()) * 60 + time.getUTCSeconds()) * 1000 + time.getUTCMilliseconds()
