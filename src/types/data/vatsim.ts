@@ -1,4 +1,4 @@
-import { Feature, GeoJsonObject, GeoJsonProperties, Point } from "geojson"
+import { Feature, GeoJsonProperties, Point } from "geojson"
 
 export interface VatsimGeneral {
     version: number
@@ -239,4 +239,15 @@ export interface VatsimDataStorage {
     statusPre: StatusData[] | null,
     route: RouteData[] | null,
     timestamp: Date | null
+}
+
+export interface RawDataStorage {
+    vatsim: null | VatsimData,
+    transveivers: null | VatsimTransceiversData[]
+}
+
+export interface FlightData {
+    position: PositionData | null,
+    general: GeneralData | null,
+    status: StatusData | null
 }

@@ -9,12 +9,11 @@ export const metadata: Metadata = {
 }
 
 const Map = dynamic(() => import('@/components/map/MapLayer'), {
-    ssr: false,
-
+    ssr: false
 })
 
 export default function RootLayout({
-    children,
+    children
 }: Readonly<{
     children: React.ReactNode
 }>) {
@@ -26,5 +25,5 @@ export default function RootLayout({
                 {children}
             </body>
         </html>
-    );
+    )
 }

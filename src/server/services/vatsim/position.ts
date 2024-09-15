@@ -1,13 +1,15 @@
-import { rawDataStorage, vatsimDataStorage } from "@/server/storage/vatsim";
+import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim";
 import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/data/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
 const airlines = airlinesJSON as Airlines[]
 import aircraftsJSON from '@/assets/data/aircrafts.json'
 import { Aircrafts, Airlines } from "@/types/data/misc";
-import { calculateDistance, toDegrees, toRadians } from "@/assets/utils/common";
+import { calculateDistance, toDegrees, toRadians } from "@/utils/common";
 const aircrafts = aircraftsJSON as Aircrafts
 
 export function updatePosition() {
+    const vatsimDataStorage = getVatsimStorage()
+    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots) return
 
     const newPositions = []
@@ -36,6 +38,7 @@ export function updatePosition() {
 
     vatsimDataStorage.position = newPositions
     vatsimDataStorage.timestamp = new Date()
+    setVatsimStorage(vatsimDataStorage)
 }
 
 function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, transceiver: VatsimTransceiver | null, dT: number): PositionData {
@@ -80,6 +83,7 @@ function checkDisconnectType(position: PositionData): boolean {
 }
 
 function estimatePosition(prevPosition: PositionData, general: GeneralData | null): PositionData | null {
+    const vatsimDataStorage = getVatsimStorage()
     if (!general?.airport || !general.flightplan) return null
 
     const destination = general.airport.arr.geometry.coordinates

@@ -1,4 +1,4 @@
-import { vatsimDataStorage } from "@/server/storage/vatsim"
+import { getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
 import { PositionData, RouteData, RoutePoint } from "@/types/data/vatsim"
 
 export function updateRoute() {
@@ -6,13 +6,14 @@ export function updateRoute() {
 }
 
 export function updateRouteData() {
+    const vatsimDataStorage = getVatsimStorage()
     if (!vatsimDataStorage.position) return
 
     const newRoutes = []
 
     for (const position of vatsimDataStorage.position) {
         const prevRoute = structuredClone(vatsimDataStorage.route?.find(route => route.callsign === position.callsign))
-        const newPoint = getRoutePoint(position)
+        const newPoint = getRoutePoint(position, vatsimDataStorage.timestamp)
 
         if (!prevRoute) {
             const newRoute: RouteData = {
@@ -35,6 +36,7 @@ export function updateRouteData() {
     }
 
     vatsimDataStorage.route = newRoutes
+    setVatsimStorage(vatsimDataStorage)
 }
 
 function checkSamePosition(lastPoint: RoutePoint | null, newPoint: RoutePoint): boolean {
@@ -42,12 +44,13 @@ function checkSamePosition(lastPoint: RoutePoint | null, newPoint: RoutePoint): 
     return lastPoint.coordinates[0] === newPoint.coordinates[0] && lastPoint.coordinates[1] === newPoint.coordinates[1]
 }
 
-function getRoutePoint(position: PositionData): RoutePoint {
+function getRoutePoint(position: PositionData, timestamp: Date | null): RoutePoint {
+
     return {
         coordinates: position.coordinates,
         altitudes: [position.altitudes[0], position.altitudes[2]],
         groundspeed: position.groundspeeds[0],
         connected: position.connected,
-        timestamp: vatsimDataStorage.timestamp ? vatsimDataStorage.timestamp : new Date()
+        timestamp: timestamp ? timestamp : new Date()
     }
 }

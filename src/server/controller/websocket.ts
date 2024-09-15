@@ -1,12 +1,7 @@
-import { VatsimDataStorage } from "@/types/data/vatsim";
-import { createClient } from "redis";
-import { vatsimDataStorage } from "@/server/storage/vatsim";
+import { subRedis } from "@/storage/redis";
+import { getVatsimStorage, setVatsimStorage } from "@/storage/vatsim";
 import { WebSocketServer } from "ws";
 import { createGzip } from "zlib";
-
-const redisSub = await createClient()
-    .on('error', err => console.log('Redis Client Error', err))
-    .connect()
 
 const wss = new WebSocketServer({
     port: 8080,
@@ -20,10 +15,11 @@ wss.on('connection', function connection(ws) {
     })
 })
 
-redisSub.subscribe('vatsim_storage', (data) => {
-    receiveVatsimStorage(JSON.parse(data))
+function sendWsData(data: string) {
+    setVatsimStorage(JSON.parse(data))
 
     const gzip = createGzip()
+    const vatsimDataStorage = getVatsimStorage()
     gzip.write(JSON.stringify({
         event: 'set_vatsim',
         data: vatsimDataStorage.position,
@@ -44,8 +40,6 @@ redisSub.subscribe('vatsim_storage', (data) => {
             }
         })
     })
-})
-
-function receiveVatsimStorage(data: VatsimDataStorage) {
-    Object.assign(vatsimDataStorage, data)
 }
+
+subRedis('vatsim_storage', sendWsData)

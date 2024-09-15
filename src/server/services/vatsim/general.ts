@@ -1,4 +1,4 @@
-import { rawDataStorage, vatsimDataStorage } from "@/server/storage/vatsim"
+import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
 import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/data/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'
@@ -7,7 +7,7 @@ import fleetsJSON from '@/assets/data/fleets.json'
 import { Airlines, Fleet } from "@/types/data/misc"
 const fleets = fleetsJSON as Fleet[]
 import airlinesJSON from '@/assets/data/airlines.json'
-import { convertVatsimDate } from "@/assets/utils/common"
+import { convertVatsimDate } from "@/utils/common"
 const airlines = airlinesJSON as Airlines[]
 
 export function updateGeneral() {
@@ -16,6 +16,8 @@ export function updateGeneral() {
 }
 
 export function updateGeneralData() {
+    const vatsimDataStorage = getVatsimStorage()
+    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position) return
 
     const newGenerals = []
@@ -43,9 +45,12 @@ export function updateGeneralData() {
     }
 
     vatsimDataStorage.general = newGenerals
+    setVatsimStorage(vatsimDataStorage)
 }
 
 export function updateGeneralDataPrefile() {
+    const vatsimDataStorage = getVatsimStorage()
+    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.prefiles) return
 
     const newGenerals = []
@@ -63,6 +68,7 @@ export function updateGeneralDataPrefile() {
     }
 
     vatsimDataStorage.generalPre = newGenerals
+    setVatsimStorage(vatsimDataStorage)
 }
 
 function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {

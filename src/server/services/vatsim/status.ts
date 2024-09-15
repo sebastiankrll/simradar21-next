@@ -1,5 +1,5 @@
-import { calculateDistance, roundXMin } from "@/assets/utils/common"
-import { rawDataStorage, vatsimDataStorage } from "@/server/storage/vatsim"
+import { calculateDistance, roundXMin } from "@/utils/common"
+import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
 import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/data/vatsim"
 
 const taxiTime = 10 * 60000
@@ -12,6 +12,8 @@ export function updateStatus() {
 }
 
 export function updateStatusData() {
+    const vatsimDataStorage = getVatsimStorage()
+    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position || !vatsimDataStorage.general) return
 
     const newStatuses = []
@@ -27,9 +29,12 @@ export function updateStatusData() {
     }
 
     vatsimDataStorage.status = newStatuses
+    setVatsimStorage(vatsimDataStorage)
 }
 
 export function updateStatusDataPrefile() {
+    const vatsimDataStorage = getVatsimStorage()
+    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.prefiles || !vatsimDataStorage.generalPre) return
 
     const newStatuses = []
@@ -44,6 +49,7 @@ export function updateStatusDataPrefile() {
     }
 
     vatsimDataStorage.statusPre = newStatuses
+    setVatsimStorage(vatsimDataStorage)
 }
 
 function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): StatusData | undefined {

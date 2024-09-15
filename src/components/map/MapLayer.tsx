@@ -11,25 +11,58 @@ import './Map.css'
 import { webglConfig, WebGLLayer } from "./webgl"
 import { VectorStyle } from "ol/render/webgl/VectorStyleRenderer"
 import { updateSunFeatures } from './utils/mapSun'
-import { VectorSources } from "@/types/map"
+import { MapStorage } from "@/types/map"
 import VectorLayer from "ol/layer/Vector"
 import WebGLPointsLayer from "ol/layer/WebGLPoints"
 import { FeatureLike } from "ol/Feature"
 import { getFIRStyle } from "./utils/mapStyle"
 import { StyleLike } from "ol/style/Style"
+import { Feature, GeoJsonProperties, Point } from "geojson"
+import GeoJSON from 'ol/format/GeoJSON'
+import { getVatsimStorage } from "@/storage/vatsim"
+import { mapStorage } from "@/storage/map"
+
+function initFeatures(): Feature<Point, GeoJsonProperties>[] {
+    const vatsimDataStorage = getVatsimStorage()
+    if (!vatsimDataStorage.position) return []
+
+    const tOffset = 0
+    const newFeatures = vatsimDataStorage.position.map(position => {
+        const pos = {
+            coordinates: position.coordinates,
+            altitudes: position.altitudes,
+            groundspeeds: position.groundspeeds,
+            heading: position.heading
+        }
+
+        const newFeature: Feature<Point, GeoJsonProperties> = {
+            type: "Feature",
+            properties: {
+                callsign: position.callsign,
+                type: 'flight',
+                hover: 0,
+                shape: position.aircraft ? position.aircraft : 'A320',
+                rotation: position.heading / 180 * Math.PI,
+                prevRotation: position.heading / 180 * Math.PI,
+                tOffset: tOffset,
+                pos: pos,
+                altitude: position.altitudes[0],
+                frequency: position.frequency
+            },
+            geometry: {
+                type: "Point",
+                coordinates: position.coordinates
+            }
+        }
+
+        return newFeature
+    })
+
+    return newFeatures
+}
 
 export default function MapLayer() {
-    const mapRef = useRef<Map | null>(null)
-    const vectorSourceRef = useRef<VectorSources>({
-        firs: new VectorSource(),
-        tracons: new VectorSource(),
-        firLabels: new VectorSource(),
-        airportLabels: new VectorSource(),
-        airports: new VectorSource(),
-        routes: new VectorSource(),
-        flights: new VectorSource(),
-        airportTops: new VectorSource()
-    })
+    const mapRef = useRef<MapStorage>(mapStorage)
 
     useEffect(() => {
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
@@ -47,7 +80,7 @@ export default function MapLayer() {
             }),
             controls: []
         })
-        mapRef.current = map
+        mapRef.current.map = map
 
         const mbLayer = new MapLibreLayer({
             mapLibreOptions: {
@@ -67,7 +100,7 @@ export default function MapLayer() {
         map.addLayer(sunLayer)
 
         const firLayer = new WebGLLayer({
-            source: vectorSourceRef.current.firs,
+            source: mapRef.current.sources.firs,
             style: webglConfig.firs,
             properties: { type: 'firs' }
         })
@@ -75,7 +108,7 @@ export default function MapLayer() {
         map.addLayer(firLayer)
 
         const traconLayer = new WebGLLayer({
-            source: vectorSourceRef.current.tracons,
+            source: mapRef.current.sources.tracons,
             style: webglConfig.firs,
             properties: { type: 'tracons' }
         })
@@ -83,14 +116,14 @@ export default function MapLayer() {
         map.addLayer(traconLayer)
 
         const routeLayer = new VectorLayer({
-            source: vectorSourceRef.current.routes,
+            source: mapRef.current.sources.routes,
             properties: { type: 'routes' }
         })
         routeLayer.setZIndex(3)
         map.addLayer(routeLayer)
 
         const shadowLayer = new WebGLPointsLayer({
-            source: vectorSourceRef.current.flights as VectorSource<FeatureLike>,
+            source: mapRef.current.sources.flights as VectorSource<FeatureLike>,
             style: webglConfig.shadows,
             properties: { type: 'shadows' }
         })
@@ -98,15 +131,22 @@ export default function MapLayer() {
         map.addLayer(shadowLayer)
 
         const flightLayer = new WebGLPointsLayer({
-            source: vectorSourceRef.current.flights as VectorSource<FeatureLike>,
+            source: mapRef.current.sources.flights as VectorSource<FeatureLike>,
             style: webglConfig.flights,
             properties: { type: 'flights' }
         })
         flightLayer.setZIndex(5)
         map.addLayer(flightLayer)
-
+        flightLayer.getSource()?.addFeatures(
+            new GeoJSON().readFeatures({
+                type: 'FeatureCollection',
+                features: [],
+                featureProjection: 'EPSG:3857',
+            })
+        )
+        
         const airportLabelLayer = new WebGLPointsLayer({
-            source: vectorSourceRef.current.airportLabels as VectorSource<FeatureLike>,
+            source: mapRef.current.sources.airportLabels as VectorSource<FeatureLike>,
             style: webglConfig.airportLabels,
             properties: { type: 'airportLabels' }
         })
@@ -114,7 +154,7 @@ export default function MapLayer() {
         map.addLayer(airportLabelLayer)
 
         const airportLayer = new WebGLPointsLayer({
-            source: vectorSourceRef.current.airports as VectorSource<FeatureLike>,
+            source: mapRef.current.sources.airports as VectorSource<FeatureLike>,
             style: webglConfig.airports,
             properties: { type: 'airports' }
         })
@@ -122,7 +162,7 @@ export default function MapLayer() {
         map.addLayer(airportLayer)
 
         const airportTopLayer = new WebGLPointsLayer({
-            source: vectorSourceRef.current.airportTops as VectorSource<FeatureLike>,
+            source: mapRef.current.sources.airportTops as VectorSource<FeatureLike>,
             style: webglConfig.airportTops,
             properties: { type: 'airportTops' }
         })
@@ -130,14 +170,12 @@ export default function MapLayer() {
         map.addLayer(airportTopLayer)
 
         const firLabelLayer = new VectorLayer({
-            source: vectorSourceRef.current.firLabels,
+            source: mapRef.current.sources.firLabels,
             style: getFIRStyle as StyleLike,
             properties: { type: 'firLabels' }
         })
         firLabelLayer.setZIndex(9)
         map.addLayer(firLabelLayer)
-
-        // vectorSourceRef.current.init = Date.now()
 
         const updateSunLayer = () => {
             updateSunFeatures(sunLayer.getSource() as VectorSource)

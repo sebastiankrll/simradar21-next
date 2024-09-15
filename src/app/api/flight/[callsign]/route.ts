@@ -1,9 +1,8 @@
-import Flight from "@/components/flight/Flight";
-import { getGlobalVatsimStorage } from "@/storage/global";
-import { FlightData } from "@/types/data/vatsim";
+import { getVatsimStorage } from "@/storage/vatsim"
+import { FlightData } from "@/types/data/vatsim"
 
-export default async function Page({ params }: { params: { callsign: string } }) {
-    const vatsimDataStorage = getGlobalVatsimStorage()
+export async function GET({ params }: { params: { callsign: string } }) {
+    const vatsimDataStorage = getVatsimStorage()
     const callsign = params.callsign
 
     const position = vatsimDataStorage.position?.find(pilot => pilot.callsign === callsign) ?? null
@@ -16,5 +15,5 @@ export default async function Page({ params }: { params: { callsign: string } })
         status: status
     }
 
-    return <Flight data={data} />
+    return Response.json({ data })
 }

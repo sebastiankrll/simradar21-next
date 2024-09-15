@@ -50,3 +50,15 @@ export function convertVatsimDate(str: string): Date {
 
     return now
 }
+
+export function getUtcString(time: Date | string) {
+    if (!time) {
+        return 'xx:xx'
+    }
+    time = new Date(time)
+    
+    const hours = String(time.getUTCHours()).padStart(2, '0')
+    const minutes = String(time.getUTCMinutes()).padStart(2, '0')
+
+    return `${hours}:${minutes}`
+}
