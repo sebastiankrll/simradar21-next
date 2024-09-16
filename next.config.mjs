@@ -7,7 +7,7 @@ const nextConfig = {
     reactStrictMode: true,
     webpack: config => {
         config.resolve.fallback = { fs: false, net: false, tls: false }
-        config.externals.push({ 'web-worker': 'commonjs web-worker' }, 'redis', 'ioredis')
+        config.externals.push({ 'web-worker': 'commonjs web-worker' }, 'ioredis')
         return config
     },
     experimental: {

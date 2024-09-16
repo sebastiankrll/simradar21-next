@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Header from "@/components/header/Header"
 import "./globals.css"
 import dynamic from "next/dynamic"
+import { getGlobalVatsimStorage } from "@/storage/global"
 
 export const metadata: Metadata = {
     title: "simradar21",
@@ -17,11 +18,12 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
+    const vatsimData = getGlobalVatsimStorage()
     return (
         <html lang="en">
             <body>
                 <Header />
-                <Map />
+                <Map vatsimData={vatsimData} />
                 {children}
             </body>
         </html>

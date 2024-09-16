@@ -1,49 +1,10 @@
+import { VatsimDataStorage } from "@/types/data/vatsim";
 import { MapStorage } from "@/types/map";
-import { Feature, GeoJsonProperties, Point } from "geojson";
 import VectorSource from "ol/source/Vector";
-import { getGlobalVatsimStorage } from "./global";
 import GeoJSON from 'ol/format/GeoJSON'
+import { initFeatures } from "@/components/map/utils/init";
 
-function initFeatures(): Feature<Point, GeoJsonProperties>[] {
-    const vatsimDataStorage = getGlobalVatsimStorage()
-    if (!vatsimDataStorage?.position) return []
-
-    const tOffset = 0
-    const newFeatures = vatsimDataStorage.position.map(position => {
-        const pos = {
-            coordinates: position.coordinates,
-            altitudes: position.altitudes,
-            groundspeeds: position.groundspeeds,
-            heading: position.heading
-        }
-
-        const newFeature: Feature<Point, GeoJsonProperties> = {
-            type: "Feature",
-            properties: {
-                callsign: position.callsign,
-                type: 'flight',
-                hover: 0,
-                shape: position.aircraft ? position.aircraft : 'A320',
-                rotation: position.heading / 180 * Math.PI,
-                prevRotation: position.heading / 180 * Math.PI,
-                tOffset: tOffset,
-                pos: pos,
-                altitude: position.altitudes[0],
-                frequency: position.frequency
-            },
-            geometry: {
-                type: "Point",
-                coordinates: position.coordinates
-            }
-        }
-
-        return newFeature
-    })
-
-    return newFeatures
-}
-
-export const mapStorage: MapStorage = {
+const mapStorage: MapStorage = {
     map: null,
     sources: {
         firs: new VectorSource(),
@@ -52,13 +13,7 @@ export const mapStorage: MapStorage = {
         airportLabels: new VectorSource(),
         airports: new VectorSource(),
         routes: new VectorSource(),
-        flights: new VectorSource({
-            features: new GeoJSON().readFeatures({
-                type: 'FeatureCollection',
-                features: initFeatures(),
-                featureProjection: 'EPSG:3857',
-            })
-        }),
+        flights: new VectorSource(),
         airportTops: new VectorSource()
     },
     overlays: {
@@ -70,4 +25,18 @@ export const mapStorage: MapStorage = {
         hover: null,
         route: null
     }
+}
+
+export function initMapStorage(vatsimData: VatsimDataStorage): MapStorage {
+    const flightFeatures = initFeatures(vatsimData)
+    mapStorage.sources.flights.addFeatures(
+        new GeoJSON().readFeatures({
+            type: 'FeatureCollection',
+            features: flightFeatures
+        }, {
+            featureProjection: 'EPSG:3857',
+        })
+    )
+
+    return mapStorage
 }

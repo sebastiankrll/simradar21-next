@@ -10,17 +10,18 @@ import VectorSource from "ol/source/Vector"
 import './Map.css'
 import { webglConfig, WebGLLayer } from "./webgl"
 import { VectorStyle } from "ol/render/webgl/VectorStyleRenderer"
-import { updateSunFeatures } from './utils/mapSun'
+import { updateSunFeatures } from './utils/dayNight'
 import { MapStorage } from "@/types/map"
 import VectorLayer from "ol/layer/Vector"
 import WebGLPointsLayer from "ol/layer/WebGLPoints"
 import { FeatureLike } from "ol/Feature"
-import { getFIRStyle } from "./utils/mapStyle"
+import { getFIRStyle } from "./utils/style"
 import { StyleLike } from "ol/style/Style"
-import { mapStorage } from "@/storage/map"
+import { VatsimDataStorage } from "@/types/data/vatsim"
+import { initMapStorage } from "@/storage/map"
 
-export default function MapLayer() {
-    const mapRef = useRef<MapStorage>(mapStorage)
+export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage }) {
+    const mapRef = useRef<MapStorage>(initMapStorage(vatsimData))
 
     useEffect(() => {
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
@@ -95,7 +96,7 @@ export default function MapLayer() {
         })
         flightLayer.setZIndex(5)
         map.addLayer(flightLayer)
-        
+
         const airportLabelLayer = new WebGLPointsLayer({
             source: mapRef.current.sources.airportLabels as VectorSource<FeatureLike>,
             style: webglConfig.airportLabels,
