@@ -325,7 +325,7 @@ export const webglConfig = {
         'icon-src': airportSprite.src,
         'icon-size': [32, 32],
         'icon-offset': ['case',
-            ['==', ['get', 'hover'], '1'], [32, 0],
+            ['==', ['get', 'hover'], 1], [32, 0],
             [0, 0]
         ],
         'icon-scale': ['case',
@@ -339,7 +339,7 @@ export const webglConfig = {
         'icon-src': airportSprite.src,
         'icon-size': [32, 32],
         'icon-offset': ['case',
-            ['==', ['get', 'hover'], '1'], [32, 0],
+            ['==', ['get', 'hover'], 1], [32, 0],
             [0, 0]
         ],
         'icon-scale': ['case',

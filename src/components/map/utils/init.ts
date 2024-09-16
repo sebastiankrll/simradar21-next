@@ -1,19 +1,23 @@
-import { VatsimDataStorage } from "@/types/data/vatsim"
-import { Feature, GeoJsonProperties, Point } from "geojson"
+import { VatsimDataStorage } from "@/types/vatsim"
+import { FlightFeature } from "@/types/map"
+import { getInterpolatedPosition } from "./flights"
 
-export function initFeatures(vatsimDataStorage: VatsimDataStorage): Feature<Point, GeoJsonProperties>[] {
+export function initFeatures(vatsimDataStorage: VatsimDataStorage): FlightFeature[] {
     if (!vatsimDataStorage?.position) return []
 
     const tOffset = 0
     const newFeatures = vatsimDataStorage.position.map(position => {
-        const pos = {
+        const timeElapsed = (Date.now() - new Date(position.timestamp).getTime()) / 1000
+        const attitude = {
             coordinates: position.coordinates,
             altitudes: position.altitudes,
             groundspeeds: position.groundspeeds,
             heading: position.heading
         }
 
-        const newFeature: Feature<Point, GeoJsonProperties> = {
+        const interpolatedPosition = getInterpolatedPosition(attitude, timeElapsed)
+
+        const newFeature: FlightFeature = {
             type: "Feature",
             properties: {
                 callsign: position.callsign,
@@ -23,9 +27,11 @@ export function initFeatures(vatsimDataStorage: VatsimDataStorage): Feature<Poin
                 rotation: position.heading / 180 * Math.PI,
                 prevRotation: position.heading / 180 * Math.PI,
                 tOffset: tOffset,
-                pos: pos,
+                attitude: attitude,
                 altitude: position.altitudes[0],
-                frequency: position.frequency
+                frequency: position.frequency,
+                connected: position.connected,
+                timestamp: position.timestamp
             },
             geometry: {
                 type: "Point",

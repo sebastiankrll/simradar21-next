@@ -1,8 +1,7 @@
-import { VatsimDataStorage } from "@/types/data/vatsim";
+import { VatsimDataStorage } from "@/types/vatsim";
 
 export function setGlobalVatsimStorage(data: VatsimDataStorage) {
     globalThis.vatsimDataStorage = data
-    console.log('VATSIM data updated.')
 }
 
 export function getGlobalVatsimStorage() {

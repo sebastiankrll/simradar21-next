@@ -139,7 +139,8 @@ export interface PositionData {
     airports: string[] | null,
     airline: string | null,
     type: number,
-    connected: boolean
+    connected: boolean,
+    timestamp: Date
 }
 
 export interface GeneralIndex {
@@ -238,16 +239,15 @@ export interface VatsimDataStorage {
     generalPre: GeneralData[] | null,
     statusPre: StatusData[] | null,
     route: RouteData[] | null,
-    timestamp: Date | null
+    timestamp: Date
+}
+
+export interface VatsimDataWS {
+    position: PositionData[] | null,
+    timestamp: Date
 }
 
 export interface RawDataStorage {
     vatsim: null | VatsimData,
     transveivers: null | VatsimTransceiversData[]
-}
-
-export interface FlightData {
-    position: PositionData | null,
-    general: GeneralData | null,
-    status: StatusData | null
 }

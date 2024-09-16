@@ -1,5 +1,5 @@
 import { getRawStorage, getVatsimStorage, setRawStorage, updateVatsimStorage } from '@/storage/vatsim'
-import { VatsimData, VatsimTransceiversData } from '@/types/data/vatsim'
+import { VatsimData, VatsimTransceiversData } from '@/types/vatsim'
 import axios from 'axios'
 import { Redis } from 'ioredis'
 
@@ -22,8 +22,8 @@ export async function fetchVatsimData() {
             rawDataStorage.vatsim = vatsimData.data
             rawDataStorage.transveivers = transceivers.data
 
-            updateVatsimData()
             setRawStorage(rawDataStorage)
+            updateVatsimData()
         }
     } catch (error) {
         console.error('Error fetching VATSIM data from API:', error)
@@ -36,7 +36,7 @@ export async function fetchVatsimData() {
 function updateVatsimData() {
     updateVatsimStorage()
     pushVatsimStorage()
-    console.log('VATSIM data updated.')
+    console.log(new Date().toISOString() + ': VATSIM data updated.')
 }
 
 function pushVatsimStorage() {

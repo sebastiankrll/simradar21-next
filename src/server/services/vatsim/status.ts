@@ -1,6 +1,6 @@
 import { calculateDistance, roundXMin } from "@/utils/common"
 import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
-import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/data/vatsim"
+import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 
 const taxiTime = 10 * 60000
 let now = new Date()

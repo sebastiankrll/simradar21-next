@@ -4,7 +4,7 @@ import CloseButton from '../common/panel/CloseButton'
 import AirportLink from './components/AirportLink'
 import TimeSlots from './components/TimeSlots'
 import RouteProgress from './components/RouteProgress'
-import { FlightData } from '@/types/data/vatsim'
+import { FlightData } from '@/types/vatsim'
 
 export default function Aircraft({ data }: { data: FlightData }) {
     return (

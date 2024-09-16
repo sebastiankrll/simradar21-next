@@ -8,22 +8,30 @@ import mapLibreStyle from '@/assets/styles/positron.json'
 import { StyleSpecification } from "maplibre-gl"
 import VectorSource from "ol/source/Vector"
 import './Map.css'
-import { webglConfig, WebGLLayer } from "./webgl"
+import { webglConfig, WebGLLayer } from "./utils/webgl"
 import { VectorStyle } from "ol/render/webgl/VectorStyleRenderer"
-import { updateSunFeatures } from './utils/dayNight'
+import { initSunLayer } from './utils/dayNight'
 import { MapStorage } from "@/types/map"
 import VectorLayer from "ol/layer/Vector"
 import WebGLPointsLayer from "ol/layer/WebGLPoints"
 import { FeatureLike } from "ol/Feature"
 import { getFIRStyle } from "./utils/style"
 import { StyleLike } from "ol/style/Style"
-import { VatsimDataStorage } from "@/types/data/vatsim"
+import { VatsimDataStorage } from "@/types/vatsim"
 import { initMapStorage } from "@/storage/map"
+import { onMessage } from "@/utils/ws"
+import { interpolateFlightFeatures, updateFlightFeatures } from "./utils/flights"
+import { WsMessage } from "@/types/misc"
+import { VatsimDataWS } from "@/types/vatsim"
 
 export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage }) {
     const mapRef = useRef<MapStorage>(initMapStorage(vatsimData))
 
     useEffect(() => {
+        const unMessage = onMessage((message: WsMessage) => {
+            updateFlightFeatures(mapRef, message.data as VatsimDataWS)
+        })
+
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
         const zoom = view ? parseFloat(view[2]) : 3
         const center = view ? view.slice(0, 2).map(parseFloat) : [0, 0]
@@ -96,6 +104,7 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         })
         flightLayer.setZIndex(5)
         map.addLayer(flightLayer)
+        mapRef.current.layerInit = new Date()
 
         const airportLabelLayer = new WebGLPointsLayer({
             source: mapRef.current.sources.airportLabels as VectorSource<FeatureLike>,
@@ -129,24 +138,21 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         firLabelLayer.setZIndex(9)
         map.addLayer(firLabelLayer)
 
-        const updateSunLayer = () => {
-            updateSunFeatures(sunLayer.getSource() as VectorSource)
-        }
-        updateSunLayer()
-        const sunLayerInterval = setInterval(updateSunLayer, 5000)
+        initSunLayer(mapRef)
+        interpolateFlightFeatures(mapRef)
 
-        // const animate = () => {
-        //     map.render()
-        //     animationFrameId = window.requestAnimationFrame(animate)
-        // }
-        // let animationFrameId = window.requestAnimationFrame(animate)
+        const animate = () => {
+            map.render()
+            animationFrameId = window.requestAnimationFrame(animate)
+        }
+        let animationFrameId = window.requestAnimationFrame(animate)
 
         return () => {
             map.setTarget('')
-            // if (animationFrameId) {
-            //     window.cancelAnimationFrame(animationFrameId)
-            // }
-            clearInterval(sunLayerInterval)
+            unMessage()
+            if (animationFrameId) {
+                window.cancelAnimationFrame(animationFrameId)
+            }
         }
     }, [])
 

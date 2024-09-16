@@ -1,9 +1,23 @@
+import { MapStorage } from "@/types/map"
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
 import { circular } from "ol/geom/Polygon"
 import VectorSource from "ol/source/Vector"
+import { RefObject } from "react"
 
-export const updateSunFeatures = (vectorSource: VectorSource) => {
+let sunInterval: number | NodeJS.Timeout
+
+export function initSunLayer(map: RefObject<MapStorage>) {
+    clearInterval(sunInterval)
+    sunInterval = setInterval(() => {
+        updateSunFeatures(map.current?.sources.sun)
+    }, 5000)
+    updateSunFeatures(map.current?.sources.sun)
+}
+
+const updateSunFeatures = (vectorSource: VectorSource | undefined) => {
+    if (!vectorSource) return
+
     const angles = [0.566666, 6, 12, 18]
     const center = getShadowPosition(new Date())
 

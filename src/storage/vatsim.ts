@@ -2,37 +2,46 @@ import { updateGeneral } from "@/server/services/vatsim/general";
 import { updatePosition } from "@/server/services/vatsim/position";
 import { updateRoute } from "@/server/services/vatsim/route";
 import { updateStatus } from "@/server/services/vatsim/status";
-import { VatsimDataStorage, RawDataStorage } from "@/types/data/vatsim";
+import { VatsimDataStorage, RawDataStorage } from "@/types/vatsim";
+import { VatsimDataWS } from "@/types/vatsim";
 
-const rawDataStorage: RawDataStorage = {
+let rawDataStorage: RawDataStorage = {
     vatsim: null,
     transveivers: null
 }
 
 export function setRawStorage(data: RawDataStorage) {
-    Object.assign(rawDataStorage, data)
+    rawDataStorage = data
 }
 
 export function getRawStorage() {
     return structuredClone(rawDataStorage)
 }
 
-const vatsimDataStorage: VatsimDataStorage = {
+let vatsimDataStorage: VatsimDataStorage = {
     position: null,
     general: null,
     status: null,
     generalPre: null,
     statusPre: null,
     route: null,
-    timestamp: null
+    timestamp: new Date()
 }
 
 export function setVatsimStorage(data: VatsimDataStorage) {
-    Object.assign(vatsimDataStorage, data)
+    vatsimDataStorage = data
 }
 
 export function getVatsimStorage() {
     return structuredClone(vatsimDataStorage)
+}
+
+export function getVatsimDataWs() {
+    const storage = structuredClone(vatsimDataStorage)
+    return {
+        position: storage.position,
+        timestamp: storage.timestamp
+    } as VatsimDataWS
 }
 
 export function updateVatsimStorage() {

@@ -1,4 +1,4 @@
-import { VatsimDataStorage } from "@/types/data/vatsim";
+import { VatsimDataStorage } from "@/types/vatsim";
 import { MapStorage } from "@/types/map";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from 'ol/format/GeoJSON'
@@ -6,6 +6,7 @@ import { initFeatures } from "@/components/map/utils/init";
 
 const mapStorage: MapStorage = {
     map: null,
+    layerInit: new Date(),
     sources: {
         firs: new VectorSource(),
         tracons: new VectorSource(),

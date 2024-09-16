@@ -1,6 +1,6 @@
 import { subRedis } from "@/storage/redis";
-import { getVatsimStorage, setVatsimStorage } from "@/storage/vatsim";
-import { WebSocketServer } from "ws";
+import { getVatsimDataWs, setVatsimStorage } from "@/storage/vatsim";
+import { WebSocket, WebSocketServer } from "ws";
 import { createGzip } from "zlib";
 
 const wss = new WebSocketServer({
@@ -9,6 +9,7 @@ const wss = new WebSocketServer({
 })
 
 wss.on('connection', function connection(ws) {
+    console.log('A new client connected!')
     ws.on('error', console.error)
     ws.on('message', async msg => {
         console.log(msg)
@@ -19,10 +20,10 @@ function sendWsData(data: string) {
     setVatsimStorage(JSON.parse(data))
 
     const gzip = createGzip()
-    const vatsimDataStorage = getVatsimStorage()
+    const storage = getVatsimDataWs()
     gzip.write(JSON.stringify({
         event: 'set_vatsim',
-        data: vatsimDataStorage.position,
+        data: storage,
     }))
     gzip.end()
 

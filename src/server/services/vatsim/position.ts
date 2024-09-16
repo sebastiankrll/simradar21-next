@@ -1,9 +1,9 @@
 import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim";
-import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/data/vatsim";
+import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
 const airlines = airlinesJSON as Airlines[]
 import aircraftsJSON from '@/assets/data/aircrafts.json'
-import { Aircrafts, Airlines } from "@/types/data/misc";
+import { Aircrafts, Airlines } from "@/types/misc";
 import { calculateDistance, toDegrees, toRadians } from "@/utils/common";
 const aircrafts = aircraftsJSON as Aircrafts
 
@@ -61,7 +61,8 @@ function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, 
         airports: pilot.flight_plan?.departure && pilot.flight_plan.arrival ? [pilot.flight_plan?.departure, pilot.flight_plan?.arrival] : null,
         airline: airline?.iata ?? null,
         type: getAircraftType(pilot),
-        connected: true
+        connected: true,
+        timestamp: new Date(pilot.last_updated)
     }
 }
 

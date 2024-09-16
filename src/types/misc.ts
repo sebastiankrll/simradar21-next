@@ -22,3 +22,8 @@ export interface Airlines {
     country?: string,
     active?: string
 }
+
+export interface WsMessage {
+    event: string,
+    data: any
+}
