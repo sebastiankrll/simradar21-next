@@ -1,11 +1,9 @@
 import { getRawStorage, getVatsimStorage, setRawStorage, updateVatsimStorage } from '@/storage/vatsim'
 import { VatsimData, VatsimTransceiversData } from '@/types/data/vatsim'
 import axios from 'axios'
-import { createClient } from 'redis'
+import { Redis } from 'ioredis'
 
-const redisPub = await createClient()
-    .on('error', err => console.log('Redis Client Error', err))
-    .connect()
+const redisPub = new Redis()
 
 let dataUpdateInProgress = false
 

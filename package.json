@@ -15,12 +15,12 @@
     "@types/openlayers": "^4.6.23",
     "axios": "^1.7.7",
     "cron": "^3.1.7",
+    "ioredis": "^5.4.1",
     "maplibre-gl": "^4.7.0",
     "next": "14.2.9",
     "ol": "^10.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "redis": "^4.7.0",
     "server-only": "^0.0.1",
     "ws": "^8.18.0"
   },

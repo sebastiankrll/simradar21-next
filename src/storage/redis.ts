@@ -1,11 +1,19 @@
-import { createClient } from "redis";
+import { Redis } from "ioredis";
 
 export async function subRedis(topic: string, callback: (data: string) => void) {
-    const redisSub = await createClient()
-        .on('error', err => console.log('Redis Client Error', err))
-        .connect()
+    const redisSub = new Redis()
 
-    redisSub.subscribe(topic, (data: string) => {
+    redisSub.subscribe(topic, (err, count) => {
+        if (err) {
+            console.error("Failed to subscribe: %s", err.message)
+        } else {
+            console.log(
+                `Subscribed successfully! This client is currently subscribed to ${count} channels.`
+            )
+        }
+    })
+
+    redisSub.on("message", (channel, data) => {
         callback(data)
     })
 }
