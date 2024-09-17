@@ -34,7 +34,7 @@ export const webglConfig = {
         'icon-src': aircraftSprite.src,
         'icon-size': [49, 44],
         'icon-offset': [
-            'case', ['==', ['get', 'hover'], 0], [
+            'case', ['all', ['==', ['get', 'hover'], 0], ['==', ['get', 'connected'], 1]], [
                 'match', ['get', 'shape'],
                 'A225', [0, 44],
                 'A306', [0, 88],

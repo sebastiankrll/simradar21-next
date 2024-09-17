@@ -2,7 +2,7 @@ import { VatsimDataStorage } from "@/types/vatsim";
 import { MapStorage } from "@/types/map";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from 'ol/format/GeoJSON'
-import { initFeatures } from "@/components/map/utils/init";
+import { initFlightFeatures } from "@/components/map/utils/init";
 
 const mapStorage: MapStorage = {
     map: null,
@@ -25,11 +25,16 @@ const mapStorage: MapStorage = {
         click: null,
         hover: null,
         route: null
+    },
+    view: {
+        lastView: null,
+        viewInit: false
     }
 }
 
 export function initMapStorage(vatsimData: VatsimDataStorage): MapStorage {
-    const flightFeatures = initFeatures(vatsimData)
+    const flightFeatures = initFlightFeatures(vatsimData)
+    mapStorage.sources.flights.clear()
     mapStorage.sources.flights.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',

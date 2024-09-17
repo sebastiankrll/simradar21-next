@@ -8,27 +8,26 @@ import { Point } from "ol/geom"
 
 let interpolateInterval: number | NodeJS.Timeout
 
-export function updateFlightFeatures(map: RefObject<MapStorage>, vatsimData: VatsimDataWS) {
-    if (!map.current || !vatsimData.position) return
+export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS) {
+    if (!mapRef.current || !vatsimData.position) return
     clearInterval(interpolateInterval)
 
-    const tOffset = (Date.now() - map.current.layerInit.getTime()) / 1000
+    const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
     const flights = structuredClone(vatsimData.position)
-    const prevFeatures = map.current.sources.flights.getFeatures()
+    const prevFeatures = mapRef.current.sources.flights.getFeatures()
     const checked: PositionData[] = []
 
     for (const feature of prevFeatures as Feature<Point>[]) {
         const newData = flights.find(flight => flight.callsign === feature.get('callsign'))
 
         if (!newData) {
-            map.current!.sources.flights.removeFeature(feature)
+            mapRef.current!.sources.flights.removeFeature(feature)
             continue
         }
 
         feature.set('prevRotation', feature.get('rotation'))
         feature.set('rotation', newData.heading / 180 * Math.PI)
         feature.set('tOffset', tOffset)
-        feature.set('frequency', newData.frequency)
         feature.set('attitude', {
             coordinates: newData.coordinates,
             altitudes: newData.altitudes,
@@ -36,7 +35,10 @@ export function updateFlightFeatures(map: RefObject<MapStorage>, vatsimData: Vat
             heading: newData.heading
         } as Attitude)
         feature.set('altitude', newData.altitudes[0])
-        feature.set('connected', newData.connected)
+        feature.set('frequency', newData.frequency)
+        feature.set('airline', newData.airline)
+        feature.set('airports', newData.airports)
+        feature.set('connected', newData.connected ? 1 : 0)
         feature.set('timestamp', new Date(newData.timestamp))
 
         checked.push(newData)
@@ -66,7 +68,9 @@ export function updateFlightFeatures(map: RefObject<MapStorage>, vatsimData: Vat
                 attitude: attitude,
                 altitude: insert.altitudes[0],
                 frequency: insert.frequency,
-                connected: insert.connected,
+                airline: insert.airline,
+                airports: insert.airports,
+                connected: insert.connected ? 1 : 0,
                 timestamp: new Date(insert.timestamp)
             },
             geometry: {
@@ -76,7 +80,7 @@ export function updateFlightFeatures(map: RefObject<MapStorage>, vatsimData: Vat
         }
     })
 
-    map.current.sources.flights.addFeatures(
+    mapRef.current.sources.flights.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
             features: newFeatures
@@ -85,7 +89,7 @@ export function updateFlightFeatures(map: RefObject<MapStorage>, vatsimData: Vat
         })
     )
 
-    interpolateFlightFeatures(map)
+    moveFlightFeatures(mapRef)
 }
 
 export function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
@@ -101,7 +105,7 @@ export function getInterpolatedPosition(position: Attitude, timeElapsed: number)
     return [newLon, newLat]
 }
 
-export function interpolateFlightFeatures(map: RefObject<MapStorage>) {
+export function moveFlightFeatures(map: RefObject<MapStorage>) {
     const features = map.current?.sources.flights.getFeatures() as Feature<Point>[]
 
     clearInterval(interpolateInterval)
@@ -111,5 +115,5 @@ export function interpolateFlightFeatures(map: RefObject<MapStorage>) {
             const interpolatedPosition = getInterpolatedPosition(feature.get('attitude'), timeElapsed)
             feature.getGeometry()?.setCoordinates(fromLonLat(interpolatedPosition))
         })
-    }, 30)
+    }, 100)
 }

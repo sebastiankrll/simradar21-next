@@ -2,7 +2,7 @@ import { VatsimDataStorage } from "@/types/vatsim"
 import { FlightFeature } from "@/types/map"
 import { getInterpolatedPosition } from "./flights"
 
-export function initFeatures(vatsimDataStorage: VatsimDataStorage): FlightFeature[] {
+export function initFlightFeatures(vatsimDataStorage: VatsimDataStorage): FlightFeature[] {
     if (!vatsimDataStorage?.position) return []
 
     const tOffset = 0
@@ -30,12 +30,14 @@ export function initFeatures(vatsimDataStorage: VatsimDataStorage): FlightFeatur
                 attitude: attitude,
                 altitude: position.altitudes[0],
                 frequency: position.frequency,
-                connected: position.connected,
+                airline: position.airline,
+                airports: position.airports,
+                connected: position.connected ? 1 : 0,
                 timestamp: position.timestamp
             },
             geometry: {
                 type: "Point",
-                coordinates: position.coordinates
+                coordinates: interpolatedPosition
             }
         }
 

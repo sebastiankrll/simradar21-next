@@ -1,7 +1,8 @@
 import { Feature as oFeature, Map, Overlay } from "ol";
 import VectorSource from "ol/source/Vector";
 import { GeneralData, PositionData, StatusData } from "./vatsim";
-import { Feature, GeoJsonProperties, Point } from "geojson";
+import { Feature, Point } from "geojson";
+import { Extent } from "openlayers";
 
 export interface VectorSources {
     [key: string]: VectorSource
@@ -12,13 +13,17 @@ export interface MapStorage {
     layerInit: Date,
     sources: VectorSources,
     overlays: {
-        click: Overlay[] | null,
-        hover: Overlay[] | null
+        click: Overlay | null,
+        hover: Overlay | null
     },
     features: {
         click: oFeature | null,
         hover: oFeature | null,
         route: oFeature | null
+    },
+    view: {
+        lastView: Extent | null,
+        viewInit: boolean
     }
 }
 
@@ -46,7 +51,9 @@ interface FlightProperties {
     attitude: Object,
     altitude: number,
     frequency: string,
-    connected: boolean,
+    airline: string | null,
+    airports: string[] | null,
+    connected: number,
     timestamp: Date
 }
 

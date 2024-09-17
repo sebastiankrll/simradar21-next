@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from "react"
-import { Map, View } from "ol"
+import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import { MapLibreLayer } from "@geoblocks/ol-maplibre-layer"
 import mapLibreStyle from '@/assets/styles/positron.json'
@@ -20,9 +20,10 @@ import { StyleLike } from "ol/style/Style"
 import { VatsimDataStorage } from "@/types/vatsim"
 import { initMapStorage } from "@/storage/map"
 import { onMessage } from "@/utils/ws"
-import { interpolateFlightFeatures, updateFlightFeatures } from "./utils/flights"
+import { moveFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
+import { handleClick, handleHover } from "./utils/misc"
 
 export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage }) {
     const mapRef = useRef<MapStorage>(initMapStorage(vatsimData))
@@ -138,17 +139,27 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         firLabelLayer.setZIndex(9)
         map.addLayer(firLabelLayer)
 
-        initSunLayer(mapRef)
-        interpolateFlightFeatures(mapRef)
-
+        const onHover = (event: MapBrowserEvent<any>) => {
+            handleHover(mapRef, event)
+        }
+        const onClick = (event: MapBrowserEvent<any>) => {
+            handleClick(mapRef, event)
+        }
         const animate = () => {
             map.render()
             animationFrameId = window.requestAnimationFrame(animate)
         }
         let animationFrameId = window.requestAnimationFrame(animate)
 
+        initSunLayer(mapRef)
+        moveFlightFeatures(mapRef)
+        map.on(['pointermove'], onHover as (event: any) => unknown)
+        map.on(['click'], onClick as (event: any) => unknown)
+
         return () => {
             map.setTarget('')
+            map.un(['pointermove'], onHover as (event: any) => unknown)
+            map.un(['click'], onClick as (event: any) => unknown)
             unMessage()
             if (animationFrameId) {
                 window.cancelAnimationFrame(animationFrameId)

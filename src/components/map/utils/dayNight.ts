@@ -7,12 +7,12 @@ import { RefObject } from "react"
 
 let sunInterval: number | NodeJS.Timeout
 
-export function initSunLayer(map: RefObject<MapStorage>) {
+export function initSunLayer(mapRef: RefObject<MapStorage>) {
     clearInterval(sunInterval)
     sunInterval = setInterval(() => {
-        updateSunFeatures(map.current?.sources.sun)
+        updateSunFeatures(mapRef.current?.sources.sun)
     }, 5000)
-    updateSunFeatures(map.current?.sources.sun)
+    updateSunFeatures(mapRef.current?.sources.sun)
 }
 
 const updateSunFeatures = (vectorSource: VectorSource | undefined) => {

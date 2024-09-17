@@ -91,14 +91,14 @@ function estimatePosition(prevPosition: PositionData, general: GeneralData | nul
     const remainingDistance = calculateDistance(prevPosition.coordinates, destination)
     if (remainingDistance < 5) return null
 
-    const bearing = calculateBearing(prevPosition.coordinates, destination)
+    const bearing = Math.round(calculateBearing(prevPosition.coordinates, destination))
     const dT = vatsimDataStorage.timestamp ? Date.now() - vatsimDataStorage.timestamp?.getTime() : 0
     const filedSpeed = general.flightplan?.filedSpeed
 
     const newCoordinates = getNextPosition(prevPosition.coordinates, bearing, filedSpeed, dT)
 
     const filedLevel = general.flightplan.filedLevel
-    const deltaAlt = prevPosition.altitudes[0] >= filedLevel ? 0 : Math.min(1000 / 60 * dT / 1000, filedLevel - prevPosition.altitudes[0])
+    const deltaAlt = Math.round(prevPosition.altitudes[0] >= filedLevel ? 0 : Math.min(1000 / 60 * dT / 1000, filedLevel - prevPosition.altitudes[0]))
     const newAltitudes = [prevPosition.altitudes[0] + deltaAlt, deltaAlt, prevPosition.altitudes[0] + deltaAlt]
 
     const newSpeeds = [filedSpeed, 0]
