@@ -8,6 +8,9 @@ const mapStorage: MapStorage = {
     map: null,
     layerInit: new Date(),
     sources: {
+        sun: new VectorSource({
+            wrapX: false
+        }),
         firs: new VectorSource(),
         tracons: new VectorSource(),
         firLabels: new VectorSource(),

@@ -10,13 +10,13 @@ let sunInterval: number | NodeJS.Timeout
 export function initSunLayer(mapRef: RefObject<MapStorage>) {
     clearInterval(sunInterval)
     sunInterval = setInterval(() => {
-        updateSunFeatures(mapRef.current?.sources.sun)
+        updateSunFeatures(mapRef)
     }, 5000)
-    updateSunFeatures(mapRef.current?.sources.sun)
+    updateSunFeatures(mapRef)
 }
 
-const updateSunFeatures = (vectorSource: VectorSource | undefined) => {
-    if (!vectorSource) return
+const updateSunFeatures = (mapRef: RefObject<MapStorage>) => {
+    if (!mapRef.current?.sources.sun) return
 
     const angles = [0.566666, 6, 12, 18]
     const center = getShadowPosition(new Date())
@@ -28,8 +28,8 @@ const updateSunFeatures = (vectorSource: VectorSource | undefined) => {
         return new Feature(polygon.transform('EPSG:4326', 'EPSG:3857'))
     })
 
-    vectorSource.clear()
-    vectorSource.addFeatures(newFeatures)
+    mapRef.current?.sources.sun.clear()
+    mapRef.current?.sources.sun.addFeatures(newFeatures)
 }
 
 const createCircularPolygon = (center: number[], radius: number) => {
