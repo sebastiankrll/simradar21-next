@@ -27,8 +27,20 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         const onClick = (event: MapBrowserEvent<any>) => {
             handleClick(mapRef, event)
         }
+
+        let then: number = Date.now()
+        const fpsInterval = 1000 / 1000
+
         const animate = () => {
-            map.render()
+            const now = Date.now()
+            const elapsed = now - then
+
+            if (elapsed > fpsInterval) {
+                map.render()
+                moveFlightFeatures(mapRef)
+
+                then = now - (elapsed % fpsInterval)
+            }
             animationFrameId = window.requestAnimationFrame(animate)
         }
 

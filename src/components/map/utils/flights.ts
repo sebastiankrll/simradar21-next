@@ -6,11 +6,8 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
 
-let interpolateInterval: number | NodeJS.Timeout
-
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS) {
     if (!mapRef.current || !vatsimData.position) return
-    clearInterval(interpolateInterval)
 
     const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
     const flights = structuredClone(vatsimData.position)
@@ -88,8 +85,6 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
             featureProjection: 'EPSG:3857',
         })
     )
-
-    moveFlightFeatures(mapRef)
 }
 
 export function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
@@ -105,15 +100,12 @@ export function getInterpolatedPosition(position: Attitude, timeElapsed: number)
     return [newLon, newLat]
 }
 
-export function moveFlightFeatures(map: RefObject<MapStorage>) {
-    const features = map.current?.sources.flights.getFeatures() as Feature<Point>[]
+export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
+    const features = mapRef.current?.sources.flights.getFeatures() as Feature<Point>[]
 
-    clearInterval(interpolateInterval)
-    interpolateInterval = setInterval(() => {
-        features.forEach(feature => {
-            const timeElapsed = (Date.now() - new Date(feature.get('timestamp')).getTime()) / 1000
-            const interpolatedPosition = getInterpolatedPosition(feature.get('attitude'), timeElapsed)
-            feature.getGeometry()?.setCoordinates(fromLonLat(interpolatedPosition))
-        })
-    }, 100)
+    features.forEach(feature => {
+        const timeElapsed = (Date.now() - new Date(feature.get('timestamp')).getTime()) / 1000
+        const interpolatedPosition = getInterpolatedPosition(feature.get('attitude'), timeElapsed)
+        feature.getGeometry()?.setCoordinates(fromLonLat(interpolatedPosition))
+    })
 }
