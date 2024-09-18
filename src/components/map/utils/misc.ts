@@ -90,15 +90,29 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     const overlays = mapRef.current.overlays
     const features = mapRef.current.features
 
-    resetMap(mapRef)
-
     const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature, {
         layerFilter: function (layer) {
             return layer.get('type') === 'airports' || layer.get('type') === 'airportTops' || layer.get('type') === 'flights' || layer.get('type') === 'firLabels'
         }
     }) as Feature
 
-    if (!feature) return
+    if (!feature) {
+        resetMap(mapRef, true)
+        return
+    }
+
+    if (overlays.hover && features.hover) {
+        resetMap(mapRef, false)
+
+        overlays.click = overlays.hover
+        overlays.hover = null
+        features.click = features.hover
+        features.hover = null
+
+        return
+    } else {
+        resetMap(mapRef, true)
+    }
 
     feature.set('hover', 1)
     features.click = feature
@@ -124,30 +138,8 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     // }
 }
 
-export function resetMap(mapRef: RefObject<MapStorage>) {
+export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {
     if (!mapRef.current?.map) return
-
-    if (mapRef.current.features.click?.get('type') === 'tracon') {
-        const polygon = mapRef.current.sources.tracons.getFeatureById(mapRef.current.features.click.get('id'))
-        polygon?.set('hover', 0)
-    }
-
-    if (mapRef.current.features.click?.get('type') === 'fir') {
-        const polygon = mapRef.current.sources.firs.getFeatureById(mapRef.current.features.click.get('id'))
-        polygon?.set('hover', 0)
-    }
-
-    mapRef.current.features.route = null
-
-    mapRef.current.features.hover?.set('hover', 0)
-    mapRef.current.features.click?.set('hover', 0)
-    mapRef.current.features.hover = null
-    mapRef.current.features.click = null
-
-    if (mapRef.current.overlays.hover) mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
-    mapRef.current.overlays.hover = null
-    if (mapRef.current.overlays.click) mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
-    mapRef.current.overlays.click = null
 
     if (mapRef.current.view.lastView) {
         mapRef.current.map.getView().fit(mapRef.current.view.lastView, {
@@ -163,4 +155,30 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
 
     mapRef.current.sources.airportTops.clear()
     mapRef.current.sources.routes.clear()
+
+    if (mapRef.current.features.click?.get('type') === 'tracon' && fullReset) {
+        const polygon = mapRef.current.sources.tracons.getFeatureById(mapRef.current.features.click.get('id'))
+        polygon?.set('hover', 0)
+    }
+
+    if (mapRef.current.features.click?.get('type') === 'fir' && fullReset) {
+        const polygon = mapRef.current.sources.firs.getFeatureById(mapRef.current.features.click.get('id'))
+        polygon?.set('hover', 0)
+    }
+
+    mapRef.current.features.route = null
+
+    if (mapRef.current.features.hover && fullReset) {
+        mapRef.current.features.hover.set('hover', 0)
+        mapRef.current.features.hover = null
+    }
+    mapRef.current.features.click?.set('hover', 0)
+    mapRef.current.features.click = null
+
+    if (mapRef.current.overlays.hover && fullReset) {
+        mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
+        mapRef.current.overlays.hover = null
+    }
+    if (mapRef.current.overlays.click) mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
+    mapRef.current.overlays.click = null
 }

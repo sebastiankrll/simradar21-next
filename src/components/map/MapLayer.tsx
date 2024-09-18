@@ -25,19 +25,26 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
             handleHover(mapRef, event)
         }
         const onClick = (event: MapBrowserEvent<any>) => {
-            handleClick(mapRef, event)
+            stop = true
+            setTimeout(() => {
+                handleClick(mapRef, event)
+                stop = false
+            }, 0)
         }
 
+        let animationFrameId: number
         let then: number = Date.now()
-        const fpsInterval = 1000 / 1000
+        let stop = false
+        const fpsInterval = 1000 / 100
+        const limit = false
 
         const animate = () => {
             const now = Date.now()
             const elapsed = now - then
 
-            if (elapsed > fpsInterval) {
+            if (elapsed > fpsInterval || !limit) {
+                if (!stop) moveFlightFeatures(mapRef)
                 map.render()
-                moveFlightFeatures(mapRef)
 
                 then = now - (elapsed % fpsInterval)
             }
@@ -61,9 +68,8 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         })
         mapRef.current.map = map
 
-        let animationFrameId = window.requestAnimationFrame(animate)
         initLayers(mapRef)
-        moveFlightFeatures(mapRef)
+        animationFrameId = window.requestAnimationFrame(animate)
 
         map.on(['pointermove'], onHover as (event: any) => unknown)
         map.on(['click'], onClick as (event: any) => unknown)
