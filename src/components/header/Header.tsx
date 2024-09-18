@@ -1,9 +1,9 @@
 import Image from 'next/image'
-
-import { Clock, Search } from './clients'
 import logo from '@/assets/images/logo.svg'
 
 import './Header.css'
+import { Clock } from './components/Clock'
+import { Search } from './components/Search'
 
 export default function Header() {
     return (
