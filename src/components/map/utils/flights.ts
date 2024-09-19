@@ -5,7 +5,7 @@ import { RefObject } from "react"
 import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
-import { updateOverlayPosition } from "./overlays"
+import { updateFlightOverlayContent, updateOverlayPosition } from "./overlays"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS) {
     if (!mapRef.current || !vatsimData.position) return
@@ -86,6 +86,8 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
             featureProjection: 'EPSG:3857',
         })
     )
+
+    updateFlightOverlayContent(mapRef)
 }
 
 export function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
