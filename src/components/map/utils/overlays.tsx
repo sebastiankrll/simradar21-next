@@ -63,16 +63,22 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feat
 //     return popupOverlay
 // }
 
-// export const updatePopupPosition = (popupRef, feature) => {
-//     const popups = [popupRef.current.click, popupRef.current.hover]
+export function updateOverlayPosition(mapRef: RefObject<MapStorage>) {
+    const overlays = mapRef.current?.overlays
+    const features = mapRef.current?.features
 
-//     popups.forEach(popup => {
-//         if (popup?.getId() === feature.get('callsign')) {
-//             const coords = feature.getGeometry().getCoordinates()
-//             popup.setPosition(coords)
-//         }
-//     })
-// }
+    if (overlays?.hover && features?.hover) {
+        const feature = features.hover as Feature<Point>
+        overlays.hover.setPosition(feature.getGeometry()?.getCoordinates())
+
+    }
+
+    if (overlays?.click && features?.click) {
+        const feature = features.click as Feature<Point>
+        overlays.click.setPosition(feature.getGeometry()?.getCoordinates())
+
+    }
+}
 
 // export const updateFlightPopupContent = (popupRef, feature) => {
 //     const popups = [popupRef.current.click, popupRef.current.hover]
