@@ -6,6 +6,7 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
 import { updateFlightOverlayContent, updateOverlayPosition } from "./overlays"
+import { setClickedFeature } from "./misc"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     if (!mapRef.current || !vatsimData?.position) return
@@ -23,6 +24,7 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
             continue
         }
 
+        feature.set('shape', newData.aircraft ? newData.aircraft : 'A320')
         feature.set('prevRotation', feature.get('rotation'))
         feature.set('rotation', newData.heading / 180 * Math.PI)
         feature.set('tOffset', tOffset)
@@ -87,6 +89,8 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
         })
     )
 
+    if (mapRef.current.features.init && mapRef.current.features.init[0] === 'flight') setClickedFeature(mapRef, 'flight', mapRef.current.features.init[1])
+    mapRef.current.features.init = null
     updateFlightOverlayContent(mapRef)
 }
 

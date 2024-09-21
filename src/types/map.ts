@@ -9,6 +9,7 @@ export interface VectorSources {
 
 export interface MapStorage {
     map: Map | null,
+    animate: boolean,
     layerInit: Date,
     sources: VectorSources,
     overlays: {
@@ -18,7 +19,8 @@ export interface MapStorage {
     features: {
         click: oFeature | null,
         hover: oFeature | null,
-        route: oFeature | null
+        route: oFeature | null,
+        init: string[] | null
     },
     view: {
         lastView: Extent | null,

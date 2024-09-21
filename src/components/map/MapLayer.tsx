@@ -10,15 +10,15 @@ import { onMessage } from "@/utils/ws"
 import { moveFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleHover } from "./utils/misc"
+import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
 import { initLayers } from "./utils/init"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
 
 export default function MapLayer({ }) {
     const router = useRouter()
+    const pathname = usePathname()
     const mapRef = useRef<MapStorage>(mapStorage)
-    const animateRef = useRef(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,7 +44,7 @@ export default function MapLayer({ }) {
             const elapsed = now - then
 
             if (elapsed > fpsInterval || !limit) {
-                if (!animateRef.current) moveFlightFeatures(mapRef)
+                if (mapRef.current.animate) moveFlightFeatures(mapRef)
                 map.render()
 
                 then = now - (elapsed % fpsInterval)
@@ -86,16 +86,25 @@ export default function MapLayer({ }) {
     }, [])
 
     useEffect(() => {
+        if (!mapRef.current.view.viewInit) {
+            if (pathname.includes('flight')) {
+                setClickedFeature(mapRef, 'flight', pathname.split('/')[2])
+            }
+            mapRef.current.view.viewInit = true
+        }
+    }, [pathname])
+
+    useEffect(() => {
         const map = mapRef.current.map
         if (!map) return
 
         const onClick = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
-            animateRef.current = true
+            mapRef.current.animate = false
             setTimeout(() => {
                 const route = handleClick(mapRef, targetEvent)
-                animateRef.current = false
-                router.push(route)
+                mapRef.current.animate = true
+                router.replace(route)
             }, 0)
         }
 

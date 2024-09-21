@@ -11,12 +11,23 @@ import MainInfo from './components/MainInfo'
 import Footer from './components/Footer'
 import Image from 'next/image'
 import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { getFlightStatus } from './utils/update'
+import { onMessage } from '@/utils/ws'
+import { WsMessage } from '@/types/misc'
 
 export default function Flight({ data }: { data: FlightData }) {
     const flightStatusRef = useRef<StatusFlightData>(getFlightStatus(data, null))
-    console.log(flightStatusRef.current)
+
+    useEffect(() => {
+        const unMessage = onMessage((message: WsMessage) => {
+            // Fetch API
+        })
+
+        return () => {
+            unMessage()
+        }
+    }, [])
 
     if (!data) return
 

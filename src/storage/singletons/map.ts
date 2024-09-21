@@ -4,6 +4,7 @@ import VectorSource from "ol/source/Vector";
 export const mapStorage: MapStorage = {
     map: null,
     layerInit: new Date(),
+    animate: true,
     sources: {
         sun: new VectorSource({
             wrapX: false
@@ -24,7 +25,8 @@ export const mapStorage: MapStorage = {
     features: {
         click: null,
         hover: null,
-        route: null
+        route: null,
+        init: null
     },
     view: {
         lastView: null,

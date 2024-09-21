@@ -1,4 +1,4 @@
-import { MapStorage } from "@/types/map"
+import { FlightFeature, MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
 import { RefObject } from "react"
 import { createFlightOverlay, updateFlightOverlayContent } from "./overlays"
@@ -131,6 +131,32 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     // }
 
     return '/'
+}
+
+export function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, id: string | null) {
+    if (!mapRef.current?.map || !id) return
+
+    if (type === 'flight') {
+        const features = mapRef.current.sources.flights.getFeatures()
+
+        if (features.length > 0) {
+            const feature = features.find(feature => feature.get('callsign') === id)
+
+            if (!feature) {
+                return
+            }
+
+            feature.set('hover', 1)
+            mapRef.current.features.click = feature
+
+            const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
+            mapRef.current.overlays.click = overlay
+
+            return
+        }
+    }
+
+    mapRef.current.features.init = [type, id]
 }
 
 export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {
