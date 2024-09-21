@@ -154,6 +154,7 @@
 
 .info-panel-title-logo img {
     height: 100%;
+    width: auto;
 }
 
 .info-panel-title-desc {

@@ -2,7 +2,6 @@ import { MapStorage } from "@/types/map"
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
 import { circular } from "ol/geom/Polygon"
-import VectorSource from "ol/source/Vector"
 import { RefObject } from "react"
 
 let sunInterval: number | NodeJS.Timeout
@@ -51,8 +50,8 @@ const createCircularPolygon = (center: number[], radius: number) => {
 }
 
 const getShadowRadiusFromAngle = (angle: number) => {
-    let shadow_radius = 6371008 * Math.PI * 0.5
-    var twilight_dist = ((6371008 * 2 * Math.PI) / 360) * angle
+    const shadow_radius = 6371008 * Math.PI * 0.5
+    const twilight_dist = ((6371008 * 2 * Math.PI) / 360) * angle
 
     return shadow_radius - twilight_dist
 }

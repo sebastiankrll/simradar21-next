@@ -7,7 +7,7 @@ import fleetsJSON from '@/assets/data/fleets.json'
 import { Airlines, Fleet } from "@/types/misc"
 const fleets = fleetsJSON as Fleet[]
 import airlinesJSON from '@/assets/data/airlines.json'
-import { convertVatsimDate } from "@/utils/common"
+import { calculateDistance, convertVatsimDate } from "@/utils/common"
 const airlines = airlinesJSON as Airlines[]
 
 export function updateGeneral() {
@@ -62,6 +62,10 @@ export function updateGeneralDataPrefile() {
             flightplan: getFlightPlanData(prefile),
             aircraft: getAircraftData(prefile),
             airline: getAirlineData(prefile)
+        }
+
+        if (newGeneral.flightplan && newGeneral.airport) {
+            newGeneral.flightplan.dist = calculateDistance(newGeneral.airport.dep.geometry.coordinates, newGeneral.airport.arr.geometry.coordinates)
         }
 
         newGenerals.push(newGeneral)
@@ -155,6 +159,7 @@ function getFlightPlanData(pilot: VatsimPilot | VatsimPrefile): GeneralFlightPla
         filedSpeed: pilot.flight_plan.cruise_tas ? parseInt(pilot.flight_plan.cruise_tas) : 300,
         depTime: pilot.flight_plan.deptime ? convertVatsimDate(pilot.flight_plan.deptime) : null,
         enrouteTime: pilot.flight_plan.enroute_time ? parseInt(pilot.flight_plan.enroute_time) : 0,
+        dist: 0,
         plan: pilot.flight_plan.route ?? '',
         remarks: pilot.flight_plan.remarks ?? '',
         rules: getFlightRule(pilot.flight_plan.flight_rules)
@@ -225,4 +230,3 @@ function getAirlineData(pilot: VatsimPilot | VatsimPrefile): GeneralAirline {
         flightno: airline?.iata ? airline.iata + pilot.callsign.substring(3) : pilot.callsign
     }
 }
-

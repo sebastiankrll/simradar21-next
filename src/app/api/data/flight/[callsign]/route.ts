@@ -1,7 +1,10 @@
 import { getVatsimStorage } from "@/storage/vatsim"
-import { FlightData } from "@/types/data/vatsim"
+import { FlightData } from "@/types/flight"
 
-export async function GET({ params }: { params: { callsign: string } }) {
+export async function GET(
+    request: Request,
+    { params }: { params: { callsign: string } }
+) {
     const vatsimDataStorage = getVatsimStorage()
     const callsign = params.callsign
 

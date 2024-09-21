@@ -4,9 +4,14 @@ import CloseButton from '../common/panel/CloseButton'
 import AirportLink from './components/AirportLink'
 import TimeSlots from './components/TimeSlots'
 import RouteProgress from './components/RouteProgress'
-import { FlightData } from '@/types/vatsim'
+import { FlightData } from '@/types/flight'
+import MainInfo from './components/MainInfo'
+import Footer from './components/Footer'
+import Image from 'next/image'
 
 export default function Aircraft({ data }: { data: FlightData }) {
+    if (!data) return
+
     return (
         <div className='info-panel'>
             <div className="info-panel-container header">
@@ -16,7 +21,7 @@ export default function Aircraft({ data }: { data: FlightData }) {
             <div className="info-panel-container">
                 <div className="info-panel-title-main">
                     <figure className="info-panel-title-logo">
-                        <img src={'https://images.kiwi.com/airlines/64/' + data.general?.airline.iata + '.png'} alt="" />
+                        <Image src={'https://images.kiwi.com/airlines/64/' + data.general?.airline.iata + '.png'} alt={`${data.general?.airline.iata}.png`} width={64} height={64} />
                     </figure>
                     <div className="info-panel-title-desc">{data.general?.airline.name}</div>
                     <div className="info-panel-title-content">
@@ -34,24 +39,27 @@ export default function Aircraft({ data }: { data: FlightData }) {
                         </div>
                     </div>
                 </div>
-                {/* <figure className="info-panel-image-fig">
-                    <img src='/assets/img/placeholder.jpeg' alt="" />
-                </figure> */}
             </div>
             <div className="info-panel-container column">
                 <div id="aircraft-panel-route">
                     <AirportLink airport={data.general?.airport?.dep} />
                     <div id='aircraft-panel-airport-line'></div>
                     <figure id="aircraft-panel-route-logo">
-                        <svg>
+                        {/* <svg>
                             <use href={`/assets/img/sprites/flightstatus_sprite.svg#${'climb'}`} />
-                        </svg>
+                        </svg> */}
                     </figure>
                     <AirportLink airport={data.general?.airport?.arr} />
                 </div>
-                <TimeSlots status={data.status} />
-                <RouteProgress status={data.status} />
+                {data.status?.progress &&
+                    <>
+                        <TimeSlots data={data} />
+                        <RouteProgress data={data} />
+                    </>
+                }
             </div>
+            <MainInfo data={data} />
+            <Footer data={data} />
         </div>
     )
 }

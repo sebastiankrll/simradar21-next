@@ -1,3 +1,5 @@
+import { VatsimDataWS } from "./vatsim"
+
 export interface Aircrafts {
     [key: string]: number
 }
@@ -25,5 +27,5 @@ export interface Airlines {
 
 export interface WsMessage {
     event: string,
-    data: any
+    data: VatsimDataWS
 }

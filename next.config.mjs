@@ -12,7 +12,18 @@ const nextConfig = {
     },
     experimental: {
         instrumentationHook: true
-    }
+    },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'images.kiwi.com',
+                port: '',
+                pathname: '/airlines/64/**',
+            },
+        ],
+    },
+    // output: 'standalone'
 }
 
 export default nextConfig

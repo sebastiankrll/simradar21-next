@@ -1,6 +1,4 @@
-import { VatsimDataStorage } from "@/types/vatsim"
-import { FlightFeature, MapStorage } from "@/types/map"
-import { getInterpolatedPosition } from "./flights"
+import { MapStorage } from "@/types/map"
 import { RefObject } from "react"
 import { MapLibreLayer } from "@geoblocks/ol-maplibre-layer"
 import mapLibreStyle from '@/assets/styles/positron.json'
@@ -106,49 +104,4 @@ export function initLayers(mapRef: RefObject<MapStorage>) {
     mapRef.current?.map.addLayer(firLabelLayer)
 
     initSunLayer(mapRef)
-}
-
-export function initFlightFeatures(vatsimDataStorage: VatsimDataStorage): FlightFeature[] {
-    if (!vatsimDataStorage?.position) return []
-
-    const tOffset = 0
-    const newFeatures = vatsimDataStorage.position.map(position => {
-        const timeElapsed = (Date.now() - new Date(position.timestamp).getTime()) / 1000
-        const attitude = {
-            coordinates: position.coordinates,
-            altitudes: position.altitudes,
-            groundspeeds: position.groundspeeds,
-            heading: position.heading
-        }
-
-        const interpolatedPosition = getInterpolatedPosition(attitude, timeElapsed)
-
-        const newFeature: FlightFeature = {
-            type: "Feature",
-            properties: {
-                callsign: position.callsign,
-                type: 'flight',
-                hover: 0,
-                shape: position.aircraft ? position.aircraft : 'A320',
-                rotation: position.heading / 180 * Math.PI,
-                prevRotation: position.heading / 180 * Math.PI,
-                tOffset: tOffset,
-                attitude: attitude,
-                altitude: position.altitudes[0],
-                frequency: position.frequency,
-                airline: position.airline,
-                airports: position.airports,
-                connected: position.connected ? 1 : 0,
-                timestamp: position.timestamp
-            },
-            geometry: {
-                type: "Point",
-                coordinates: interpolatedPosition
-            }
-        }
-
-        return newFeature
-    })
-
-    return newFeatures
 }

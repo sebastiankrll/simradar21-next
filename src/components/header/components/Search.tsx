@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 
-export const Search = () => {
+export default function Search({ }) {
     const [searchValue, setSearchValue] = useState('')
 
     useEffect(() => {

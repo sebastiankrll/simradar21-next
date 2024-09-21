@@ -19,7 +19,7 @@ export function calculateDistance(start: number[], end: number[]): number {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-    return R * c
+    return Math.round(R * c)
 }
 
 export function roundXMin(date: Date, x: number): Date {
@@ -36,6 +36,10 @@ export function roundXMin(date: Date, x: number): Date {
     newDate.setMilliseconds(0)
 
     return newDate
+}
+
+export function roundNumToX(number: number, x: number) {
+    return Math.round(number / x) * x
 }
 
 export function convertVatsimDate(str: string): Date {
@@ -56,9 +60,23 @@ export function getUtcString(time: Date | string) {
         return 'xx:xx'
     }
     time = new Date(time)
-    
+
     const hours = String(time.getUTCHours()).padStart(2, '0')
     const minutes = String(time.getUTCMinutes()).padStart(2, '0')
 
     return `${hours}:${minutes}`
+}
+
+export function convertLengthUnit(nm: number): string {
+    return Math.round(nm * 1.852).toLocaleString()
+}
+
+export function getDurationString(ms: number): string {
+    const hours = Math.floor(ms / (1000 * 60 * 60))
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
+
+    const formattedHours = String(hours).padStart(2, '0')
+    const formattedMinutes = String(minutes).padStart(2, '0')
+
+    return `${formattedHours}:${formattedMinutes}`
 }

@@ -5,45 +5,46 @@ import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
 import { MapStorage } from "@/types/map"
-import { VatsimDataStorage } from "@/types/vatsim"
-import { initMapStorage } from "@/storage/map"
+import { mapStorage } from "@/storage/map"
 import { onMessage } from "@/utils/ws"
 import { moveFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
 import { handleClick, handleHover } from "./utils/misc"
 import { initLayers } from "./utils/init"
+import { useRouter } from "next/navigation"
+import BaseEvent from "ol/events/Event"
 
-export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage }) {
-    const mapRef = useRef<MapStorage>(initMapStorage(vatsimData))
+export default function MapLayer({ }) {
+    const router = useRouter()
+    const mapRef = useRef<MapStorage>(mapStorage)
+    const animateRef = useRef(false)
 
     useEffect(() => {
+        const fetchData = async () => {
+            const res = await fetch('/api/data/init')
+            const data = await res.json()
+            updateFlightFeatures(mapRef, data.data as VatsimDataWS | null)
+        }
         const unMessage = onMessage((message: WsMessage) => {
             updateFlightFeatures(mapRef, message.data as VatsimDataWS)
         })
-        const onHover = (event: MapBrowserEvent<any>) => {
-            handleHover(mapRef, event)
-        }
-        const onClick = (event: MapBrowserEvent<any>) => {
-            stop = true
-            setTimeout(() => {
-                handleClick(mapRef, event)
-                stop = false
-            }, 0)
+        const onHover = (event: BaseEvent | Event) => {
+            const targetEvent = event as MapBrowserEvent<UIEvent>
+            handleHover(mapRef, targetEvent)
         }
 
         let animationFrameId: number
         let then: number = Date.now()
-        let stop = false
-        const fpsInterval = 1000 / 100
-        const limit = false
+        const fpsInterval = 1000 / 30
+        const limit = true
 
         const animate = () => {
             const now = Date.now()
             const elapsed = now - then
 
             if (elapsed > fpsInterval || !limit) {
-                if (!stop) moveFlightFeatures(mapRef)
+                if (!animateRef.current) moveFlightFeatures(mapRef)
                 map.render()
 
                 then = now - (elapsed % fpsInterval)
@@ -69,21 +70,41 @@ export default function MapLayer({ vatsimData }: { vatsimData: VatsimDataStorage
         mapRef.current.map = map
 
         initLayers(mapRef)
+        fetchData()
         animationFrameId = window.requestAnimationFrame(animate)
 
-        map.on(['pointermove'], onHover as (event: any) => unknown)
-        map.on(['click'], onClick as (event: any) => unknown)
+        map.on(['pointermove'], onHover)
 
         return () => {
             map.setTarget('')
-            map.un(['pointermove'], onHover as (event: any) => unknown)
-            map.un(['click'], onClick as (event: any) => unknown)
+            map.un(['pointermove'], onHover)
             unMessage()
             if (animationFrameId) {
                 window.cancelAnimationFrame(animationFrameId)
             }
         }
     }, [])
+
+    useEffect(() => {
+        const map = mapRef.current.map
+        if (!map) return
+
+        const onClick = (event: BaseEvent | Event) => {
+            const targetEvent = event as MapBrowserEvent<UIEvent>
+            animateRef.current = true
+            setTimeout(() => {
+                const route = handleClick(mapRef, targetEvent)
+                animateRef.current = false
+                router.push(route)
+            }, 0)
+        }
+
+        map.on(['click'], onClick)
+
+        return () => {
+            map.un(['click'], onClick)
+        }
+    }, [router])
 
     return (
         <div id="map" />

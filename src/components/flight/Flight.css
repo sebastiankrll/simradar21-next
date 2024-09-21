@@ -203,6 +203,7 @@
 
 #aircraft-panel-more-airline img {
     height: 64px;
+    width: auto;
 }
 
 #aircraft-panel-ac {

@@ -12,7 +12,7 @@ function getTime(time: Date): string {
     return `${formattedHours}:${formattedMinutes}`
 }
 
-export const Clock = () => {
+export default function Clock({ }) {
     const [time, setTime] = useState(new Date())
 
     useEffect(() => {

@@ -161,6 +161,7 @@ export interface GeneralFlightPlan {
     filedLevel: number,
     depTime: Date | null,
     enrouteTime: number,
+    dist: number,
     plan: string,
     remarks: string,
     rules: string

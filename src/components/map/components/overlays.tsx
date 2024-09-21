@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import './Overlay.css'
 import { Feature } from 'ol'
 import { Attitude } from '@/types/map'
+import Image from 'next/image'
 
 export function FlightOverlay({ feature }: { feature: Feature }) {
     const attitude = feature.get('attitude') as Attitude
@@ -19,7 +19,7 @@ export function FlightOverlay({ feature }: { feature: Feature }) {
             </div>
             <div className="popup-content flight">
                 <figure className="popup-content-logo">
-                    <img src={'https://images.kiwi.com/airlines/64/' + feature.get('airline') + '.png'} alt="" />
+                    <Image src={'https://images.kiwi.com/airlines/64/' + feature.get('airline') + '.png'} alt={`${feature.get('airline')}.png`} width={64} height={64} />
                 </figure>
                 <div className="popup-content-main flight">
                     <div className="popup-content-header">{feature.get('callsign')}</div>
@@ -142,28 +142,28 @@ export function FlightOverlay({ feature }: { feature: Feature }) {
 //     )
 // }
 
-function getOnlineTime(logonTime: Date): string {
-    let dT = Date.now() - logonTime.getTime()
+// function getOnlineTime(logonTime: Date): string {
+//     let dT = Date.now() - logonTime.getTime()
 
-    const hours = Math.floor(dT / (1000 * 60 * 60))
-    dT -= hours * (1000 * 60 * 60)
+//     const hours = Math.floor(dT / (1000 * 60 * 60))
+//     dT -= hours * (1000 * 60 * 60)
 
-    const minutes = Math.floor(dT / (1000 * 60))
+//     const minutes = Math.floor(dT / (1000 * 60))
 
-    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0')
-}
+//     return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0')
+// }
 
-function getFrequencyColor(facility: number): string {
-    switch (facility) {
-        case -1:
-            return 'atis'
-        case 2:
-            return 'del'
-        case 3:
-            return 'gnd'
-        case 4:
-            return 'twr'
-        default:
-            return ''
-    }
-}
+// function getFrequencyColor(facility: number): string {
+//     switch (facility) {
+//         case -1:
+//             return 'atis'
+//         case 2:
+//             return 'del'
+//         case 3:
+//             return 'gnd'
+//         case 4:
+//             return 'twr'
+//         default:
+//             return ''
+//     }
+// }

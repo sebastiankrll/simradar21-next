@@ -1,6 +1,5 @@
 import { Feature as oFeature, Map, Overlay } from "ol";
 import VectorSource from "ol/source/Vector";
-import { GeneralData, PositionData, StatusData } from "./vatsim";
 import { Feature, Point } from "geojson";
 import { Extent } from "openlayers";
 
@@ -27,12 +26,6 @@ export interface MapStorage {
     }
 }
 
-export interface FlightData {
-    position: PositionData | null,
-    general: GeneralData | null,
-    status: StatusData | null
-}
-
 export interface Attitude {
     coordinates: number[],
     altitudes: number[],
@@ -48,7 +41,7 @@ interface FlightProperties {
     rotation: number,
     prevRotation: number,
     tOffset: number,
-    attitude: Object,
+    attitude: Attitude,
     altitude: number,
     frequency: string,
     airline: string | null,

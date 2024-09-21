@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Header from "@/components/header/Header"
 import "./globals.css"
 import dynamic from "next/dynamic"
-import { getGlobalVatsimStorage } from "@/storage/global"
 import { Manrope } from 'next/font/google'
 
 export const metadata: Metadata = {
@@ -19,17 +18,16 @@ const Map = dynamic(() => import('@/components/map/MapLayer'), {
     ssr: false
 })
 
-export default function RootLayout({
+export default async function RootLayout({
     children
 }: Readonly<{
     children: React.ReactNode
 }>) {
-    const vatsimData = getGlobalVatsimStorage()
     return (
         <html lang="en" className={manrope.className}>
             <body>
                 <Header />
-                <Map vatsimData={vatsimData} />
+                <Map />
                 {children}
             </body>
         </html>

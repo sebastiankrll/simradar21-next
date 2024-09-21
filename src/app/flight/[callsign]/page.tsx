@@ -1,6 +1,10 @@
-import Flight from "@/components/flight/Flight";
 import { getGlobalVatsimStorage } from "@/storage/global";
-import { FlightData } from "@/types/data/vatsim";
+import { FlightData } from "@/types/flight";
+import dynamic from "next/dynamic";
+
+const Flight = dynamic(() => import('@/components/flight/Flight'), {
+    ssr: false
+})
 
 export default async function Page({ params }: { params: { callsign: string } }) {
     const vatsimDataStorage = getGlobalVatsimStorage()

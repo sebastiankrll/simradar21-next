@@ -7,8 +7,8 @@ import { Feature } from "ol"
 import { Point } from "ol/geom"
 import { updateFlightOverlayContent, updateOverlayPosition } from "./overlays"
 
-export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS) {
-    if (!mapRef.current || !vatsimData.position) return
+export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
+    if (!mapRef.current || !vatsimData?.position) return
 
     const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
     const flights = structuredClone(vatsimData.position)

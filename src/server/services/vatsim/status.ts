@@ -319,7 +319,7 @@ function inFlightETA(times: StatusTimes, position: PositionData, general: Genera
     // Time needed at current speed and direct distance to destination (to account for current speed)
     const delayCurrentSpeed = arrDist / position.groundspeeds[0] * 1000 * 3600 - arrDist / estRemainingAvgSpd * 1000 * 3600
 
-    let totDelay = delayInitial + delayDeltaSched + delayCurrentSpeed
+    const totDelay = delayInitial + delayDeltaSched + delayCurrentSpeed
 
     if (times.schedArr.getTime() + totDelay < now.getTime() + timeEnergy) {
         times.actArr = new Date(now.getTime() + timeEnergy)

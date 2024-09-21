@@ -5,7 +5,7 @@ import { createFlightOverlay } from "./overlays"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 
-export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<any>) => {
+export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
 
     const map = mapRef.current.map
@@ -83,8 +83,8 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
     // }
 }
 
-export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEvent<any>) {
-    if (!mapRef.current?.map) return
+export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>): string {
+    if (!mapRef.current?.map) return '/'
 
     const map = mapRef.current.map
     const overlays = mapRef.current.overlays
@@ -98,7 +98,7 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
 
     if (!feature) {
         resetMap(mapRef, true)
-        return
+        return '/'
     }
 
     if (overlays.hover && features.hover) {
@@ -109,7 +109,9 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
         features.click = features.hover
         features.hover = null
 
-        return
+        if (feature?.get('type') === 'flight') return '/flight/' + feature.get('callsign')
+
+        return '/'
     } else {
         resetMap(mapRef, true)
     }
@@ -120,6 +122,7 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     if (feature?.get('type') === 'flight') {
         const overlay = createFlightOverlay(mapRef, feature as Feature<Point>)
         overlays.click = overlay
+        return '/flight/' + feature.get('callsign')
     }
 
     // if (feature?.get('type')?.includes('airport')) {
@@ -136,6 +139,8 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
 
     //     // navigate(`/airport/${feature.get('icao')}`)
     // }
+
+    return '/'
 }
 
 export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {

@@ -4,6 +4,7 @@ import { Feature, GeoJsonProperties, Point } from "geojson"
 
 function clickAirport(icao: string) {
     // Navigate to airport path
+    console.log(icao)
 }
 
 export default function AirportLink({ airport }: { airport: Feature<Point, GeoJsonProperties> | undefined }) {
