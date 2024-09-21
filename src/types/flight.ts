@@ -15,6 +15,7 @@ export interface LiveFlightData {
 }
 
 export interface StatusFlightData {
+    callsign: string | undefined,
     depStatus: string,
     arrStatus: string,
     delayColor: string,

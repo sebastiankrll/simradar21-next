@@ -2,7 +2,8 @@ import { FlightData, StatusFlightData } from "@/types/flight"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 
 export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData | null): StatusFlightData {
-    const flightStatus = lastStatus ?? {
+    const flightStatus: StatusFlightData = lastStatus ?? {
+        callsign: data.general?.index.callsign,
         depStatus: 'EST',
         arrStatus: 'EST',
         delayColor: '',
