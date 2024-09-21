@@ -1,4 +1,4 @@
-import { getGlobalVatsimStorage } from "@/storage/global";
+import { getGlobalVatsimStorage } from "@/storage/singletons/global";
 import { FlightData } from "@/types/flight";
 import dynamic from "next/dynamic";
 

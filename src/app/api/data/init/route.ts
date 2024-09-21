@@ -1,4 +1,4 @@
-import { getVatsimDataWs } from "@/storage/global"
+import { getVatsimDataWs } from "@/storage/singletons/global"
 import { VatsimDataWS } from "@/types/vatsim"
 
 export const dynamic = 'force-dynamic'

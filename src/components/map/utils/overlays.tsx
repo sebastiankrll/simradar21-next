@@ -1,16 +1,18 @@
-import { MapStorage } from "@/types/map"
+import { Attitude, MapStorage } from "@/types/map"
 import { Feature, Overlay } from "ol"
 import { RefObject } from "react"
 import { createRoot } from "react-dom/client"
 import { FlightOverlay } from "../components/overlays"
 import { Point } from "ol/geom"
+import { LiveFlightData } from "@/types/flight"
+import { roundNumToX } from "@/utils/common"
 
-export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>): Overlay | null {
+export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {
     if (!mapRef.current?.map) return null
 
     const element = document.createElement('div')
     const root = createRoot(element)
-    root.render(<FlightOverlay feature={feature} />)
+    root.render(<FlightOverlay feature={feature} click={click} />)
 
     const overlay = new Overlay({
         element,
@@ -70,13 +72,11 @@ export function updateOverlayPosition(mapRef: RefObject<MapStorage>) {
     if (overlays?.hover && features?.hover) {
         const feature = features.hover as Feature<Point>
         overlays.hover.setPosition(feature.getGeometry()?.getCoordinates())
-
     }
 
     if (overlays?.click && features?.click) {
         const feature = features.click as Feature<Point>
         overlays.click.setPosition(feature.getGeometry()?.getCoordinates())
-
     }
 }
 
@@ -86,13 +86,27 @@ export function updateFlightOverlayContent(mapRef: RefObject<MapStorage>) {
 
     if (overlays?.hover && features?.hover) {
         const root = overlays.hover.get('root')
-        root.render(<FlightOverlay feature={features.hover} />)
-
+        root.render(<FlightOverlay feature={features.hover} click={false} />)
     }
 
     if (overlays?.click && features?.click) {
         const root = overlays.click.get('root')
-        root.render(<FlightOverlay feature={features.click} />)
+        root.render(<FlightOverlay feature={features.click} click={true} />)
+    }
+}
 
+export function getLiveData(feature: Feature | null): LiveFlightData | null {
+    const timestamp = feature?.get('timestamp')
+    const attitude = feature?.get('attitude') as Attitude
+    if (!timestamp || !attitude) return null
+
+    const elapsedTime = Date.now() - new Date(timestamp).getTime()
+
+    return {
+        altitude: roundNumToX(attitude.altitudes[0] + attitude.altitudes[1] / 60 * elapsedTime / 1000, 25),
+        radar: roundNumToX(attitude.altitudes[2] + attitude.altitudes[1] / 60 * elapsedTime / 1000, 25),
+        groundspeed: roundNumToX(attitude.groundspeeds[0] + attitude.groundspeeds[1] / 60 * elapsedTime / 1000, 1),
+        heading: attitude.heading,
+        fpm: attitude.altitudes[1] >= 0 ? '+' + attitude.altitudes[1] : '-' + Math.abs(attitude.altitudes[1])
     }
 }

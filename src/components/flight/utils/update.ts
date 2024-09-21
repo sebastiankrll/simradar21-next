@@ -1,20 +1,5 @@
-import { FlightData, LiveFlightData, StatusFlightData } from "@/types/flight"
-import { convertLengthUnit, getDurationString, roundNumToX } from "@/utils/common"
-
-export function getLiveData(data: FlightData): LiveFlightData | null {
-    if (!data.position) return null
-
-    const position = data.position
-    const elapsedTime = Date.now() - new Date(position.timestamp).getTime()
-
-    return {
-        altitude: roundNumToX(position.altitudes[0] + position.altitudes[1] / 60 * elapsedTime / 1000, 25).toLocaleString() + ' ft',
-        radar: roundNumToX(position.altitudes[2] + position.altitudes[1] / 60 * elapsedTime / 1000, 25).toLocaleString() + ' ft',
-        groundspeed: roundNumToX(position.groundspeeds[0] + position.groundspeeds[1] / 60 * elapsedTime / 1000, 1) + ' kts',
-        heading: position.heading + '°',
-        fpm: position.altitudes[1] > 0 ? '+' + position.altitudes[1] + ' fpm' : position.altitudes[1] + ' fpm'
-    }
-}
+import { FlightData, StatusFlightData } from "@/types/flight"
+import { convertLengthUnit, getDurationString } from "@/utils/common"
 
 export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData | null): StatusFlightData {
     const flightStatus = lastStatus ?? {

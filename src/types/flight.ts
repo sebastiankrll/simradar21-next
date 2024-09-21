@@ -7,10 +7,10 @@ export interface FlightData {
 }
 
 export interface LiveFlightData {
-    altitude: string,
-    radar: string,
-    groundspeed: string,
-    heading: string,
+    altitude: number,
+    radar: number,
+    groundspeed: number,
+    heading: number,
     fpm: string
 }
 

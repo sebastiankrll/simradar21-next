@@ -1,11 +1,10 @@
 'use client'
 
-import { LiveFlightData } from "@/types/flight"
 import { FlightData } from "@/types/flight"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
-import { useEffect, useState } from "react"
-import { getLiveData } from "../utils/update"
+import { useState } from "react"
 import Image from "next/image"
+import { useFlightStore } from "@/storage/zustand/store"
 
 export default function MainInfo({ data }: { data: FlightData }) {
     const [panelStates, setPanelStates] = useState({
@@ -13,7 +12,7 @@ export default function MainInfo({ data }: { data: FlightData }) {
         pilot: false,
         graph: false
     })
-    const [liveData, setLiveData] = useState<LiveFlightData | null>(getLiveData(data))
+    const liveData = useFlightStore((state) => state.liveData)
 
     const setHeight = (e: React.MouseEvent<HTMLElement>, open: boolean) => {
         const eventTarget = e.target as HTMLElement
@@ -50,16 +49,6 @@ export default function MainInfo({ data }: { data: FlightData }) {
             graph: !panelStates.graph
         }))
     }
-
-    useEffect(() => {
-        const liveDataInterval = setInterval(() => {
-            setLiveData(getLiveData(data))
-        }, 2000)
-
-        return () => {
-            clearInterval(liveDataInterval)
-        }
-    }, [data])
 
     if (!data) return
 
@@ -182,19 +171,19 @@ export default function MainInfo({ data }: { data: FlightData }) {
                 <div className="info-panel-container-content" id='aircraft-panel-lnav'>
                     <div className="info-panel-data">
                         <p>BAROMETRIC ALT.</p>
-                        <div className="info-panel-data-content">{liveData?.altitude}</div>
+                        <div className="info-panel-data-content">{liveData?.altitude.toLocaleString() + ' ft'}</div>
                     </div>
                     <div className="info-panel-data">
                         <p>VERTICAL SPEED</p>
-                        <div className="info-panel-data-content">{liveData?.fpm}</div>
+                        <div className="info-panel-data-content">{liveData?.fpm + ' fpm'}</div>
                     </div>
                     <div className="info-panel-data">
                         <p>RADAR ALT.</p>
-                        <div className="info-panel-data-content">{liveData?.radar}</div>
+                        <div className="info-panel-data-content">{liveData?.radar.toLocaleString() + ' ft'}</div>
                     </div>
                     <div className="info-panel-data">
                         <p>TRACK</p>
-                        <div className="info-panel-data-content">{liveData?.heading}</div>
+                        <div className="info-panel-data-content">{liveData?.heading + '°'}</div>
                     </div>
                     <div className="info-panel-data">
                         <p>ALTIMETER</p>
@@ -202,7 +191,7 @@ export default function MainInfo({ data }: { data: FlightData }) {
                     </div>
                     <div className="info-panel-data">
                         <p>GROUND SPEED</p>
-                        <div className="info-panel-data-content">{liveData?.groundspeed}</div>
+                        <div className="info-panel-data-content">{liveData?.groundspeed + ' kts'}</div>
                     </div>
                 </div>
             </div>

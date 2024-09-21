@@ -1,4 +1,4 @@
-import { getVatsimStorage } from "@/storage/vatsim"
+import { getVatsimStorage } from "@/storage/singletons/vatsim"
 import { FlightData } from "@/types/flight"
 
 export async function GET(

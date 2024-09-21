@@ -2,20 +2,51 @@
 
 import './Overlay.css'
 import { Feature } from 'ol'
-import { Attitude } from '@/types/map'
 import Image from 'next/image'
+import { useFlightStore } from '@/storage/zustand/store'
+import { useEffect, useState } from 'react'
+import { getLiveData } from '../utils/overlays'
 
-export function FlightOverlay({ feature }: { feature: Feature }) {
-    const attitude = feature.get('attitude') as Attitude
+export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
+    const sharedliveData = useFlightStore((state) => state.liveData)
+    const setSharedLiveData = useFlightStore((state) => state.updateData)
+    const resetSharedLiveData = useFlightStore((state) => state.resetData)
+
+    const [privateLiveData, setPrivateLiveData] = useState(click ? null : getLiveData(feature))
+
+    const liveData = click ? sharedliveData : privateLiveData
+
+    useEffect(() => {
+        if (click) return
+
+        const interval = setInterval(() => {
+            setPrivateLiveData(getLiveData(feature))
+        })
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!click) return
+
+        setSharedLiveData(feature)
+
+        return () => {
+            resetSharedLiveData()
+        }
+    }, [setSharedLiveData])
+
     const airports = feature.get('airports')
 
     return (
         <div className='popup popup-tip'>
             <div className="popup-content-top flight">
-                <div className="popup-content-vnav"><span>ALT</span>{attitude.altitudes[0]}</div>
-                <div className="popup-content-vnav"><span>FPM</span>{attitude.altitudes[1]}</div>
-                <div className="popup-content-vnav"><span>GS</span>{attitude.groundspeeds[0]}</div>
-                <div className="popup-content-vnav"><span>HDG</span>{attitude.heading}</div>
+                <div className="popup-content-vnav"><span>ALT</span>{liveData?.altitude}</div>
+                <div className="popup-content-vnav"><span>FPM</span>{liveData?.fpm}</div>
+                <div className="popup-content-vnav"><span>GS</span>{liveData?.groundspeed}</div>
+                <div className="popup-content-vnav"><span>HDG</span>{liveData?.heading}</div>
             </div>
             <div className="popup-content flight">
                 <figure className="popup-content-logo">

@@ -1,4 +1,4 @@
-import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
+import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim"
 import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'

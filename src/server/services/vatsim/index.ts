@@ -1,4 +1,4 @@
-import { getRawStorage, getVatsimStorage, setRawStorage, updateVatsimStorage } from '@/storage/vatsim'
+import { getRawStorage, getVatsimStorage, setRawStorage, updateVatsimStorage } from '@/storage/singletons/vatsim'
 import { VatsimData, VatsimTransceiversData } from '@/types/vatsim'
 import axios from 'axios'
 import { Redis } from 'ioredis'

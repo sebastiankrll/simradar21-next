@@ -1,7 +1,7 @@
 import { MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
 import { RefObject } from "react"
-import { createFlightOverlay } from "./overlays"
+import { createFlightOverlay, updateFlightOverlayContent } from "./overlays"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 
@@ -25,8 +25,12 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
 
     if (feature === features.hover || feature === features.click) return
 
-    if (overlays.hover) map.removeOverlay(overlays.hover)
-    overlays.hover = null
+    if (overlays.hover) {
+        const root = overlays.hover.get('root')
+        root?.unmount()
+        map.removeOverlay(overlays.hover)
+        overlays.hover = null
+    }
 
     const id = features.hover?.getId()
 
@@ -59,7 +63,7 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
     features.hover = feature
 
     if (feature?.get('type') === 'flight') {
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>)
+        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, false)
         overlays.hover = overlay
     }
 
@@ -96,31 +100,17 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
         }
     }) as Feature
 
+    resetMap(mapRef, true)
+
     if (!feature) {
-        resetMap(mapRef, true)
         return '/'
-    }
-
-    if (overlays.hover && features.hover) {
-        resetMap(mapRef, false)
-
-        overlays.click = overlays.hover
-        overlays.hover = null
-        features.click = features.hover
-        features.hover = null
-
-        if (feature?.get('type') === 'flight') return '/flight/' + feature.get('callsign')
-
-        return '/'
-    } else {
-        resetMap(mapRef, true)
     }
 
     feature.set('hover', 1)
     features.click = feature
 
     if (feature?.get('type') === 'flight') {
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>)
+        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
         overlays.click = overlay
         return '/flight/' + feature.get('callsign')
     }
@@ -181,9 +171,15 @@ export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {
     mapRef.current.features.click = null
 
     if (mapRef.current.overlays.hover && fullReset) {
+        const root = mapRef.current.overlays.hover.get('root')
+        root?.unmount()
         mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
         mapRef.current.overlays.hover = null
     }
-    if (mapRef.current.overlays.click) mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
-    mapRef.current.overlays.click = null
+    if (mapRef.current.overlays.click) {
+        const root = mapRef.current.overlays.click.get('root')
+        root?.unmount()
+        mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
+        mapRef.current.overlays.click = null
+    }
 }

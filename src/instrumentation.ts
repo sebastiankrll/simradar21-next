@@ -1,4 +1,4 @@
-import { setGlobalVatsimStorage } from "./storage/global";
+import { setGlobalVatsimStorage } from "./storage/singletons/global";
 import { Redis } from "ioredis";
 
 export async function register() {

@@ -1,4 +1,4 @@
-import { getVatsimStorage, setVatsimStorage } from "@/storage/vatsim"
+import { getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim"
 import { PositionData, RouteData, RoutePoint } from "@/types/vatsim"
 
 export function updateRoute() {

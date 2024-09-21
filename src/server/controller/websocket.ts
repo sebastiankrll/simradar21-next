@@ -1,5 +1,5 @@
-import { subRedis } from "@/storage/redis";
-import { getVatsimDataWs, setVatsimStorage } from "@/storage/vatsim";
+import { subRedis } from "@/storage/singletons/redis";
+import { getVatsimDataWs, setVatsimStorage } from "@/storage/singletons/vatsim";
 import { WebSocket, WebSocketServer } from "ws";
 import { createGzip } from "zlib";
 
