@@ -1,15 +1,23 @@
+'use client'
+
 import './Flight.css'
 import '../common/panel/Panel.css'
 import CloseButton from '../common/panel/CloseButton'
 import AirportLink from './components/AirportLink'
 import TimeSlots from './components/TimeSlots'
 import RouteProgress from './components/RouteProgress'
-import { FlightData } from '@/types/flight'
+import { FlightData, StatusFlightData } from '@/types/flight'
 import MainInfo from './components/MainInfo'
 import Footer from './components/Footer'
 import Image from 'next/image'
+import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
+import { useRef } from 'react'
+import { getFlightStatus } from './utils/update'
 
-export default function Aircraft({ data }: { data: FlightData }) {
+export default function Flight({ data }: { data: FlightData }) {
+    const flightStatusRef = useRef<StatusFlightData>(getFlightStatus(data, null))
+    console.log(flightStatusRef.current)
+
     if (!data) return
 
     return (
@@ -44,11 +52,12 @@ export default function Aircraft({ data }: { data: FlightData }) {
                 <div id="aircraft-panel-route">
                     <AirportLink airport={data.general?.airport?.dep} />
                     <div id='aircraft-panel-airport-line'></div>
-                    <figure id="aircraft-panel-route-logo">
-                        {/* <svg>
-                            <use href={`/assets/img/sprites/flightstatus_sprite.svg#${'climb'}`} />
-                        </svg> */}
-                    </figure>
+                    <div id="aircraft-panel-route-logo">
+                        <figure style={{
+                            backgroundImage: `url(${FlightStatusSprite.src})`,
+                            backgroundPositionY: flightStatusRef.current.imgOffset + 'px'
+                        }}></figure>
+                    </div>
                     <AirportLink airport={data.general?.airport?.arr} />
                 </div>
                 {data.status?.progress &&

@@ -62,22 +62,17 @@
     width: 100%;
 }
 
-#aircraft-panel-route-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#aircraft-panel-route-logo svg {
+#aircraft-panel-route-logo figure {
     position: absolute;
     left: 50%;
     top: 27.5%;
     transform: translate(-50%, -50%);
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 40px;
+    height: 30px;
+    background-position: 5px 0px;
+    background-size: 30px;
+    background-repeat: no-repeat;
     background-color: var(--color-light-grey);
-    padding: 0rem .5rem;
-    fill: var(--color-green);
 }
 
 #aircraft-panel-slots {

@@ -41,6 +41,10 @@ export function updateGeneralData() {
             airline: prevGeneral?.airline && noDataChange ? prevGeneral?.airline : getAirlineData(pilot)
         }
 
+        if (newGeneral.flightplan && newGeneral.airport) {
+            newGeneral.flightplan.dist = calculateDistance(newGeneral.airport.dep.geometry.coordinates, newGeneral.airport.arr.geometry.coordinates)
+        }
+
         newGenerals.push(newGeneral)
     }
 

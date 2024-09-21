@@ -6,7 +6,7 @@ export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData |
         depStatus: 'EST',
         arrStatus: 'EST',
         delayColor: '',
-        svg: 'inflight',
+        imgOffset: -60,
         progress: 0,
         startToEnd: ['0 km, 00:00 ago', '0 km, in 00:00']
     }
@@ -48,11 +48,11 @@ export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData |
     if (!position || !general?.flightplan) return flightStatus
 
     if (status.progress.status === "Boarding" || status.progress.status === "Taxi Out" || status.progress.status === "Taxi In" || status.progress.status === "On Block") {
-        flightStatus.svg = 'onground'
+        flightStatus.imgOffset = 0
     } else if (flightStatus.progress < 50 && (position.altitudes[0] / general.flightplan.filedLevel) < 0.8 && status.progress.status === "In Flight" && position.altitudes[1] >= 0) {
-        flightStatus.svg = 'inclimb'
+        flightStatus.imgOffset = -30
     } else if (flightStatus.progress > 50 && (position.altitudes[0] / general.flightplan.filedLevel) < 0.8 && status.progress.status === "In Flight" && position.altitudes[1] <= 0) {
-        flightStatus.svg = 'indescent'
+        flightStatus.imgOffset = -90
     }
 
     return flightStatus

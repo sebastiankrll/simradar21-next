@@ -18,7 +18,7 @@ export interface StatusFlightData {
     depStatus: string,
     arrStatus: string,
     delayColor: string,
-    svg: string,
+    imgOffset: number,
     progress: number,
     startToEnd: string[]
 }
