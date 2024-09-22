@@ -1,6 +1,5 @@
 import { FlightData, StatusFlightData } from "@/types/flight"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
-import { RefObject } from "react"
 
 export function getFlightStatus(data: FlightData): StatusFlightData {
     const flightStatus: StatusFlightData = {
@@ -16,7 +15,9 @@ export function getFlightStatus(data: FlightData): StatusFlightData {
     if (!data.status?.times) return flightStatus
 
     const status = data.status
-    const delay = (new Date(status.times.actArr).getTime() - new Date(status.times.schedDep).getTime()) / 60000
+    const delay = (new Date(status.times.actArr).getTime() - new Date(status.times.schedArr).getTime()) / 60000
+    console.log(status)
+    console.log(delay)
 
     if (delay <= 15) flightStatus.delayColor = 'greenColor'
     if (delay > 15 && delay <= 30) flightStatus.delayColor = 'yellowColor'

@@ -104,14 +104,24 @@ function getStatusData(prevStatus: StatusData | null, position: PositionData, ge
     // Init StatusData
     if (prevStatus?.times && prevStatus.progress.status !== 'prefile') {
         index = structuredClone(prevStatus.index)
+        if (pilot) index = {
+            callsign: pilot.callsign,
+            transponder: pilot.transponder,
+            altimeters: pilot.qnh_mb,
+            altitude: pilot.altitude
+        }
+
         progress = structuredClone(prevStatus.progress)
+        progress.depDist = depDist
+        progress.arrDist = arrDist
+        
         times = structuredClone(prevStatus.times)
     } else {
         if (!pilot?.flight_plan || !general.flightplan?.depTime) return
         index = {
             callsign: pilot.callsign,
             transponder: pilot.transponder,
-            altimeters: pilot.qnh_i_hg,
+            altimeters: pilot.qnh_mb,
             altitude: pilot.altitude
         }
         times = {

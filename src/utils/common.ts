@@ -11,7 +11,7 @@ export function calculateDistance(start: number[], end: number[]): number {
     const lat1Rad = toRadians(start[1])
     const lat2Rad = toRadians(end[1])
     const dLat = lat2Rad - lat1Rad
-    const dLon = toRadians(end[0] - end[1])
+    const dLon = toRadians(end[0] - start[0])
 
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(lat1Rad) * Math.cos(lat2Rad) *

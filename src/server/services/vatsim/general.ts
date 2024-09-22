@@ -162,12 +162,20 @@ function getFlightPlanData(pilot: VatsimPilot | VatsimPrefile): GeneralFlightPla
         filedLevel: pilot.flight_plan.altitude ? (/^[0-9]+$/.test(pilot.flight_plan.altitude) ? parseInt(pilot.flight_plan.altitude) : 30000) : 30000,
         filedSpeed: pilot.flight_plan.cruise_tas ? parseInt(pilot.flight_plan.cruise_tas) : 300,
         depTime: pilot.flight_plan.deptime ? convertVatsimDate(pilot.flight_plan.deptime) : null,
-        enrouteTime: pilot.flight_plan.enroute_time ? parseInt(pilot.flight_plan.enroute_time) : 0,
+        enrouteTime: getEnrouteTime(pilot.flight_plan.enroute_time),
         dist: 0,
         plan: pilot.flight_plan.route ?? '',
         remarks: pilot.flight_plan.remarks ?? '',
         rules: getFlightRule(pilot.flight_plan.flight_rules)
     }
+}
+
+function getEnrouteTime(enroute: string | undefined): number {
+    if (!enroute) return 0
+
+    const enrouteHours = parseInt(enroute.slice(0, 2), 10)
+    const enrouteMinutes = parseInt(enroute.slice(2), 10)
+    return (enrouteHours * 60 + enrouteMinutes) * 60 * 1000
 }
 
 function getFlightRule(rule: string | undefined): string {
