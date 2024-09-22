@@ -61,7 +61,7 @@ export function initTrack(mapRef: RefObject<MapStorage>, trackData: TrackPoint[]
 
 export function moveTrack(mapRef: RefObject<MapStorage>) {
     const clickedFeature = mapRef.current?.features.click
-    if (!clickedFeature) return
+    if (!clickedFeature || mapRef.current.sources.tracks.getFeatures().length < 2) return
 
     const interpolatedFeature = mapRef.current.features.track
     const attitude = clickedFeature.get('attitude') as Attitude
@@ -101,7 +101,7 @@ export function moveTrack(mapRef: RefObject<MapStorage>) {
 export function updateTrack(mapRef: RefObject<MapStorage>) {
     const clickedFeature = mapRef.current?.features.click
     const interpolatedFeature = mapRef.current?.features.track
-    if (!clickedFeature || !interpolatedFeature) return
+    if (!clickedFeature || !interpolatedFeature || mapRef.current.sources.tracks.getFeatures().length < 2) return
 
     // Add new track segment to latest recorded position
     const attitude = clickedFeature.get('attitude') as Attitude

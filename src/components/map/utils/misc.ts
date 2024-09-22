@@ -103,7 +103,6 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     resetMap(mapRef)
 
     if (!feature) {
-        mapRef.current.sources.tracks.clear()
         return '/'
     }
 
@@ -163,6 +162,9 @@ export function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, i
 export function resetMap(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
 
+    mapRef.current.features.track = null
+    mapRef.current.sources.tracks.clear()
+
     if (mapRef.current.view.lastView) {
         mapRef.current.map.getView().fit(mapRef.current.view.lastView, {
             duration: 200
@@ -186,8 +188,6 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
         const polygon = mapRef.current.sources.firs.getFeatureById(mapRef.current.features.click.get('id'))
         polygon?.set('hover', 0)
     }
-
-    mapRef.current.features.track = null
 
     if (mapRef.current.features.hover) {
         mapRef.current.features.hover.set('hover', 0)
