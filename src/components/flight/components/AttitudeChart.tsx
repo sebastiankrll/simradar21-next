@@ -1,15 +1,25 @@
 'use client'
 
 import Chart from "@/components/common/chart/Chart";
-import { getFlightChartData } from "../utils/chart";
+import { flightChartConfig, setFlightChartData, updateFlightChartData } from "../utils/chart";
 import { useFlightStore } from "@/storage/zustand/flight";
+import { useEffect } from "react";
+import { FlightData } from "@/types/flight";
 
-export default function AttitudeChart({ }) {
+export default function AttitudeChart({ data }: { data: FlightData | null }) {
     const trackData = useFlightStore((state) => state.trackData)
+
+    useEffect(() => {
+        setFlightChartData(trackData)
+    }, [trackData])
+
+    useEffect(() => {
+        updateFlightChartData(data)
+    }, [data])
 
     return (
         <div className="info-panel-container-content" id='aircraft-panel-graph'>
-            <Chart param={getFlightChartData(trackData)} />
+            <Chart param={flightChartConfig} />
         </div>
     )
 }

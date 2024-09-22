@@ -157,7 +157,7 @@ export default function MainInfo({ data }: { data: FlightData }) {
                                 clipRule="evenodd"></path>
                         </svg>
                     </div>
-                    <AttitudeChart />
+                    <AttitudeChart data={data} />
                 </div>
             </div>
             <LiveData data={data} />

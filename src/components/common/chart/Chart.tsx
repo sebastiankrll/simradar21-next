@@ -1,3 +1,5 @@
+'use client'
+
 import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
@@ -14,6 +16,7 @@ import {
 import 'chartjs-adapter-date-fns'
 
 import './Chart.css'
+import { useEffect, useRef } from 'react'
 
 ChartJS.register(
     LinearScale,
@@ -32,6 +35,9 @@ export interface ChartJsConfig {
 }
 
 export default function Chart({ param }: { param: ChartJsConfig | null }) {
+    const chartRef = useRef<ChartJS<'line'>>(null)
+    chartRef.current?.update()
+
     if (param) {
         return (
             <>
@@ -46,7 +52,7 @@ export default function Chart({ param }: { param: ChartJsConfig | null }) {
                     </div>
                 </div>
                 <div className='chart-wrapper'>
-                    <Line options={param.options} data={param.data} />
+                    {/* <Line ref={chartRef} options={param.options} data={param.data} /> */}
                 </div>
             </>
         )

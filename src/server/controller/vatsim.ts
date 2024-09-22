@@ -4,7 +4,7 @@ import { fetchVatsimData } from '../services/vatsim'
 CronJob.from({
     cronTime: '* * * * * *',
     onTick: async () => {
-        fetchVatsimData()
+        await fetchVatsimData()
     },
     start: true,
     runOnInit: true

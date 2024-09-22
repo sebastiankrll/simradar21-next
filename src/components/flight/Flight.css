@@ -214,7 +214,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    height: 10rem;
+    min-height: 10rem;
+    max-height: 10rem;
 }
 
 #aircraft-panel-lnav {
