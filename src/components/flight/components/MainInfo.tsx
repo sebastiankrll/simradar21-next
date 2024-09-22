@@ -5,8 +5,7 @@ import { convertLengthUnit, getDurationString } from "@/utils/common"
 import { useState } from "react"
 import Image from "next/image"
 import LiveData from "./LiveData"
-import Chart from "@/components/common/chart/Chart"
-import { getChartData } from "../utils/chart"
+import AttitudeChart from "./AttitudeChart"
 
 export default function MainInfo({ data }: { data: FlightData }) {
     const [panelStates, setPanelStates] = useState({
@@ -158,9 +157,7 @@ export default function MainInfo({ data }: { data: FlightData }) {
                                 clipRule="evenodd"></path>
                         </svg>
                     </div>
-                    <div className="info-panel-container-content" id='aircraft-panel-graph'>
-                        <Chart param={getChartData(null)} />
-                    </div>
+                    <AttitudeChart />
                 </div>
             </div>
             <LiveData data={data} />

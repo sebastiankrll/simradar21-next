@@ -11,7 +11,7 @@ import {
     ChartData,
     ChartOptions
 } from 'chart.js'
-// import 'chartjs-adapter-date-fns'
+import 'chartjs-adapter-date-fns'
 
 import './Chart.css'
 

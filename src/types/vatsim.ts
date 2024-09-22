@@ -220,7 +220,7 @@ export interface StatusData {
     times: StatusTimes
 }
 
-export interface RoutePoint {
+export interface TrackPoint {
     coordinates: number[],
     altitudes: number[],
     groundspeed: number,
@@ -228,9 +228,9 @@ export interface RoutePoint {
     timestamp: Date
 }
 
-export interface RouteData {
+export interface TrackData {
     callsign: string,
-    points: RoutePoint[]
+    points: TrackPoint[]
 }
 
 export interface VatsimDataStorage {
@@ -239,7 +239,7 @@ export interface VatsimDataStorage {
     status: StatusData[] | null,
     generalPre: GeneralData[] | null,
     statusPre: StatusData[] | null,
-    route: RouteData[] | null,
+    track: TrackData[] | null,
     timestamp: Date
 }
 

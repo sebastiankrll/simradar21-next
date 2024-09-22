@@ -14,9 +14,11 @@ import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
 import { useEffect, useRef, useState } from 'react'
 import { getFlightStatus } from './utils/update'
 import { onMessage } from '@/utils/ws'
+import { useFlightStore } from '@/storage/zustand/flight'
 
 export default function Flight({ data }: { data: FlightData }) {
     const [flightData, setFlightData] = useState<FlightData>(data)
+    const setTrackData = useFlightStore((state) => state.setTrackData)
     const flightStatusRef = useRef<StatusFlightData>(getFlightStatus(data, null))
 
     useEffect(() => {
@@ -25,6 +27,7 @@ export default function Flight({ data }: { data: FlightData }) {
             const data = await res.json()
             setFlightData(data.data as FlightData)
         })
+        setTrackData(data.track?.points ?? null)
 
         return () => {
             unMessage()

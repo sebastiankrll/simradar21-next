@@ -1,6 +1,6 @@
 import { updateGeneral } from "@/server/services/vatsim/general";
 import { updatePosition } from "@/server/services/vatsim/position";
-import { updateRoute } from "@/server/services/vatsim/route";
+import { updateTrack } from "@/server/services/vatsim/track";
 import { updateStatus } from "@/server/services/vatsim/status";
 import { VatsimDataStorage, RawDataStorage } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
@@ -24,7 +24,7 @@ let vatsimDataStorage: VatsimDataStorage = {
     status: null,
     generalPre: null,
     statusPre: null,
-    route: null,
+    track: null,
     timestamp: new Date()
 }
 
@@ -48,5 +48,5 @@ export function updateVatsimStorage() {
     updatePosition()
     updateGeneral()
     updateStatus()
-    updateRoute()
+    updateTrack()
 }

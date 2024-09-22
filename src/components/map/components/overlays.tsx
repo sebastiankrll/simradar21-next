@@ -3,14 +3,14 @@
 import './Overlay.css'
 import { Feature } from 'ol'
 import Image from 'next/image'
-import { useFlightStore } from '@/storage/zustand/store'
+import { useFlightStore } from '@/storage/zustand/flight'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlays'
 
 export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
     const sharedliveData = useFlightStore((state) => state.liveData)
-    const setSharedLiveData = useFlightStore((state) => state.updateData)
-    const resetSharedLiveData = useFlightStore((state) => state.resetData)
+    const setSharedLiveData = useFlightStore((state) => state.updateLiveData)
+    const resetSharedLiveData = useFlightStore((state) => state.resetLiveData)
 
     const [privateLiveData, setPrivateLiveData] = useState(click ? null : getLiveData(feature))
 

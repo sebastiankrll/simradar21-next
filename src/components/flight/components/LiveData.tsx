@@ -1,6 +1,6 @@
 'use client'
 
-import { useFlightStore } from "@/storage/zustand/store"
+import { useFlightStore } from "@/storage/zustand/flight"
 import { FlightData } from "@/types/flight"
 
 export default function LiveData({ data }: { data: FlightData }) {
