@@ -6,6 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import LiveData from "./LiveData"
 import AttitudeChart from "./AttitudeChart"
+import FlagSprite from '@/assets/images/sprites/flagSprite.png'
 
 export default function MainInfo({ data }: { data: FlightData }) {
     const [panelStates, setPanelStates] = useState({
@@ -129,7 +130,7 @@ export default function MainInfo({ data }: { data: FlightData }) {
                         <div className="info-panel-data">
                             <p>COUNTRY OF REG.</p>
                             <div className="info-panel-data-content">
-                                <div className={'fflag ff-ac fflag-' + data.general.aircraft?.country}></div>
+                                <div className={'fflag ff-ac fflag-' + data.general.aircraft?.country} style={{ backgroundImage: `url(${FlagSprite.src})` }}></div>
                             </div>
                         </div>
                         <div className="info-panel-data">

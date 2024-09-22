@@ -1,17 +1,18 @@
 'use client'
 
 import './Flight.css'
+import './freakflags.css'
 import '../common/panel/Panel.css'
 import CloseButton from '../common/panel/CloseButton'
 import AirportLink from './components/AirportLink'
 import TimeSlots from './components/TimeSlots'
 import RouteProgress from './components/RouteProgress'
-import { FlightData, StatusFlightData } from '@/types/flight'
+import { FlightData } from '@/types/flight'
 import MainInfo from './components/MainInfo'
 import Footer from './components/Footer'
 import Image from 'next/image'
 import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getFlightStatus } from './utils/update'
 import { onMessage } from '@/utils/ws'
 import { useFlightStore } from '@/storage/zustand/flight'
@@ -19,11 +20,11 @@ import { useFlightStore } from '@/storage/zustand/flight'
 export default function Flight({ data }: { data: FlightData }) {
     const [flightData, setFlightData] = useState<FlightData>(data)
     const setTrackData = useFlightStore((state) => state.setTrackData)
-    const flightStatusRef = useRef<StatusFlightData>(getFlightStatus(data, null))
 
     useEffect(() => {
+        const callsign = flightData.general?.index.callsign
         const unMessage = onMessage(async () => {
-            const res = await fetch('/api/data/flight/' + flightStatusRef.current.callsign)
+            const res = await fetch('/api/data/flight/' + callsign)
             const data = await res.json()
             setFlightData(data.data as FlightData)
         })
@@ -35,6 +36,8 @@ export default function Flight({ data }: { data: FlightData }) {
     }, [])
 
     if (!flightData) return
+
+    const flightStatus = getFlightStatus(flightData)
 
     return (
         <div className='info-panel'>
@@ -71,15 +74,15 @@ export default function Flight({ data }: { data: FlightData }) {
                     <div id="aircraft-panel-route-logo">
                         <figure style={{
                             backgroundImage: `url(${FlightStatusSprite.src})`,
-                            backgroundPositionY: flightStatusRef.current.imgOffset + 'px'
+                            backgroundPositionY: flightStatus.imgOffset + 'px'
                         }}></figure>
                     </div>
                     <AirportLink airport={flightData.general?.airport?.arr} />
                 </div>
                 {flightData.status?.progress &&
                     <>
-                        <TimeSlots data={flightData} />
-                        <RouteProgress data={flightData} />
+                        <TimeSlots data={flightData} flightStatus={flightStatus} />
+                        <RouteProgress data={flightData} flightStatus={flightStatus} />
                     </>
                 }
             </div>

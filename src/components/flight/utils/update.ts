@@ -1,8 +1,9 @@
 import { FlightData, StatusFlightData } from "@/types/flight"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
+import { RefObject } from "react"
 
-export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData | null): StatusFlightData {
-    const flightStatus: StatusFlightData = lastStatus ?? {
+export function getFlightStatus(data: FlightData): StatusFlightData {
+    const flightStatus: StatusFlightData = {
         callsign: data.general?.index.callsign,
         depStatus: 'EST',
         arrStatus: 'EST',
@@ -38,10 +39,6 @@ export function getFlightStatus(data: FlightData, lastStatus: StatusFlightData |
 
     const totalDist = status.progress.depDist + status.progress.arrDist
     flightStatus.progress = Math.floor((1 - status.progress.arrDist / totalDist) * 100)
-
-    if (lastStatus?.progress && lastStatus.progress > flightStatus.progress) {
-        flightStatus.progress = lastStatus.progress
-    }
 
     const position = data.position
     const general = data.general

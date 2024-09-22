@@ -2,12 +2,8 @@
 
 import { FlightData, StatusFlightData } from "@/types/flight"
 import { getUtcString } from "@/utils/common"
-import { useRef } from "react"
-import { getFlightStatus } from "../utils/update"
 
-export default function TimeSlots({ data }: { data: FlightData }) {
-    const flightStatusRef = useRef<StatusFlightData>(getFlightStatus(data, null))
-
+export default function TimeSlots({ data, flightStatus }: { data: FlightData, flightStatus: StatusFlightData }) {
     if (!data?.status) return
 
     return (
@@ -19,12 +15,12 @@ export default function TimeSlots({ data }: { data: FlightData }) {
             <div className="aircraft-panel-slot-desc">
                 <p className='r'>SCHED</p>
                 <p>SCHED</p>
-                <p className='r'>{flightStatusRef.current.depStatus}</p>
-                <p>{flightStatusRef.current.arrStatus}</p>
+                <p className='r'>{flightStatus.depStatus}</p>
+                <p>{flightStatus.arrStatus}</p>
             </div>
             <div className="aircraft-panel-slot-time">
                 <p>{getUtcString(data.status.times.schedArr)}</p>
-                <p className={`aircraft-panel-act-arr-status ${flightStatusRef.current.delayColor ?? null}`}>{getUtcString(data.status.times.actArr)}</p>
+                <p className={`aircraft-panel-act-arr-status ${flightStatus.delayColor ?? null}`}>{getUtcString(data.status.times.actArr)}</p>
             </div>
         </div>
     )
