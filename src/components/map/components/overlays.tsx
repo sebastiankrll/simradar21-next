@@ -5,7 +5,7 @@ import { Feature } from 'ol'
 import Image from 'next/image'
 import { useFlightStore } from '@/storage/zustand/flight'
 import { useEffect, useState } from 'react'
-import { getLiveData } from '../utils/overlays'
+import { getLiveData } from '../utils/overlay'
 
 export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
     const sharedliveData = useFlightStore((state) => state.liveData)

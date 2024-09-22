@@ -1,4 +1,4 @@
-import { getLiveData } from '@/components/map/utils/overlays'
+import { getLiveData } from '@/components/map/utils/overlay'
 import { FlightStore } from '@/types/zustand'
 import { create } from 'zustand'
 

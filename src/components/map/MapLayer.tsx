@@ -14,10 +14,13 @@ import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
 import { initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
+import { useFlightStore } from "@/storage/zustand/flight"
+import { initTrack } from "./utils/track"
 
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
+    const trackData = useFlightStore((state) => state.trackData)
     const mapRef = useRef<MapStorage>(mapStorage)
 
     useEffect(() => {
@@ -93,6 +96,10 @@ export default function MapLayer({ }) {
             mapRef.current.view.viewInit = true
         }
     }, [pathname])
+
+    useEffect(() => {
+        initTrack(mapRef, trackData)
+    }, [trackData])
 
     useEffect(() => {
         const map = mapRef.current.map

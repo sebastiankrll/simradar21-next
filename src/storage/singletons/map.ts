@@ -14,7 +14,7 @@ export const mapStorage: MapStorage = {
         firLabels: new VectorSource(),
         airportLabels: new VectorSource(),
         airports: new VectorSource(),
-        routes: new VectorSource(),
+        tracks: new VectorSource(),
         flights: new VectorSource(),
         airportTops: new VectorSource()
     },
@@ -25,7 +25,7 @@ export const mapStorage: MapStorage = {
     features: {
         click: null,
         hover: null,
-        route: null,
+        track: null,
         init: null
     },
     view: {

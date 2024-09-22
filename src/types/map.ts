@@ -1,7 +1,8 @@
 import { Feature as oFeature, Map, Overlay } from "ol";
+import { LineString, Point as oPoint } from "ol/geom";
 import VectorSource from "ol/source/Vector";
 import { Feature, Point } from "geojson";
-import { Extent } from "openlayers";
+import { Extent } from "ol/extent";
 
 export interface VectorSources {
     [key: string]: VectorSource
@@ -17,9 +18,9 @@ export interface MapStorage {
         hover: Overlay | null
     },
     features: {
-        click: oFeature | null,
-        hover: oFeature | null,
-        route: oFeature | null,
+        click: oFeature<oPoint> | null,
+        hover: oFeature<oPoint> | null,
+        track: oFeature<LineString> | null,
         init: string[] | null
     },
     view: {

@@ -48,7 +48,7 @@ export function initLayers(mapRef: RefObject<MapStorage>) {
     mapRef.current?.map.addLayer(traconLayer)
 
     const routeLayer = new VectorLayer({
-        source: mapRef.current.sources.routes,
+        source: mapRef.current.sources.tracks,
         properties: { type: 'routes' }
     })
     routeLayer.setZIndex(3)

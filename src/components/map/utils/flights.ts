@@ -5,8 +5,9 @@ import { RefObject } from "react"
 import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
-import { updateFlightOverlayContent, updateOverlayPosition } from "./overlays"
+import { moveOverlay, updateFlightOverlayContent } from "./overlay"
 import { setClickedFeature } from "./misc"
+import { moveTrack, updateTrack } from "./track"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     if (!mapRef.current || !vatsimData?.position) return
@@ -91,6 +92,8 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
 
     if (mapRef.current.features.init && mapRef.current.features.init[0] === 'flight') setClickedFeature(mapRef, 'flight', mapRef.current.features.init[1])
     mapRef.current.features.init = null
+
+    updateTrack(mapRef)
     updateFlightOverlayContent(mapRef)
 }
 
@@ -116,5 +119,6 @@ export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
         feature.getGeometry()?.setCoordinates(fromLonLat(interpolatedPosition))
     })
 
-    updateOverlayPosition(mapRef)
+    moveTrack(mapRef)
+    moveOverlay(mapRef)
 }

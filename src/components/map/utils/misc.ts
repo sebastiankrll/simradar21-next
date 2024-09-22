@@ -1,7 +1,7 @@
 import { FlightFeature, MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
 import { RefObject } from "react"
-import { createFlightOverlay, updateFlightOverlayContent } from "./overlays"
+import { createFlightOverlay, updateFlightOverlayContent } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 
@@ -21,7 +21,7 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
         layerFilter: function (layer) {
             return layer.get('type') === 'airports' || layer.get('type') === 'airportTops' || layer.get('type') === 'flights' || layer.get('type') === 'firLabels'
         }
-    }) as Feature
+    }) as Feature<Point>
 
     if (feature === features.hover || feature === features.click) return
 
@@ -98,11 +98,12 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
         layerFilter: function (layer) {
             return layer.get('type') === 'airports' || layer.get('type') === 'airportTops' || layer.get('type') === 'flights' || layer.get('type') === 'firLabels'
         }
-    }) as Feature
+    }) as Feature<Point>
 
-    resetMap(mapRef, true)
+    resetMap(mapRef)
 
     if (!feature) {
+        mapRef.current.sources.tracks.clear()
         return '/'
     }
 
@@ -137,7 +138,7 @@ export function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, i
     if (!mapRef.current?.map || !id) return
 
     if (type === 'flight') {
-        const features = mapRef.current.sources.flights.getFeatures()
+        const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
 
         if (features.length > 0) {
             const feature = features.find(feature => feature.get('callsign') === id)
@@ -159,7 +160,7 @@ export function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, i
     mapRef.current.features.init = [type, id]
 }
 
-export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {
+export function resetMap(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
 
     if (mapRef.current.view.lastView) {
@@ -175,28 +176,27 @@ export function resetMap(mapRef: RefObject<MapStorage>, fullReset: boolean) {
     }
 
     mapRef.current.sources.airportTops.clear()
-    mapRef.current.sources.routes.clear()
 
-    if (mapRef.current.features.click?.get('type') === 'tracon' && fullReset) {
+    if (mapRef.current.features.click?.get('type') === 'tracon') {
         const polygon = mapRef.current.sources.tracons.getFeatureById(mapRef.current.features.click.get('id'))
         polygon?.set('hover', 0)
     }
 
-    if (mapRef.current.features.click?.get('type') === 'fir' && fullReset) {
+    if (mapRef.current.features.click?.get('type') === 'fir') {
         const polygon = mapRef.current.sources.firs.getFeatureById(mapRef.current.features.click.get('id'))
         polygon?.set('hover', 0)
     }
 
-    mapRef.current.features.route = null
+    mapRef.current.features.track = null
 
-    if (mapRef.current.features.hover && fullReset) {
+    if (mapRef.current.features.hover) {
         mapRef.current.features.hover.set('hover', 0)
         mapRef.current.features.hover = null
     }
     mapRef.current.features.click?.set('hover', 0)
     mapRef.current.features.click = null
 
-    if (mapRef.current.overlays.hover && fullReset) {
+    if (mapRef.current.overlays.hover) {
         const root = mapRef.current.overlays.hover.get('root')
         root?.unmount()
         mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
