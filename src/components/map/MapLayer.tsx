@@ -14,21 +14,17 @@ import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
 import { initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
-import { useFlightStore } from "@/storage/zustand/flight"
-import { initTrack } from "./utils/track"
+import { fetchTrack, initTrack } from "./utils/track"
+import useSWR from "swr"
+import { fetcher } from "@/utils/api"
 
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
-    const trackData = useFlightStore((state) => state.trackData)
+    const { data } = useSWR<VatsimDataWS | null>('/api/data/init', fetcher)
     const mapRef = useRef<MapStorage>(mapStorage)
 
     useEffect(() => {
-        const fetchData = async () => {
-            const res = await fetch('/api/data/init')
-            const data = await res.json()
-            updateFlightFeatures(mapRef, data.data as VatsimDataWS | null)
-        }
         const unMessage = onMessage((message: WsMessage) => {
             updateFlightFeatures(mapRef, message.data as VatsimDataWS)
         })
@@ -73,7 +69,6 @@ export default function MapLayer({ }) {
         mapRef.current.map = map
 
         initLayers(mapRef)
-        fetchData()
         animationFrameId = window.requestAnimationFrame(animate)
 
         map.on(['pointermove'], onHover)
@@ -89,6 +84,10 @@ export default function MapLayer({ }) {
     }, [])
 
     useEffect(() => {
+        if (data) updateFlightFeatures(mapRef, data)
+    }, [data])
+
+    useEffect(() => {
         if (!mapRef.current.view.viewInit) {
             if (pathname.includes('flight')) {
                 setClickedFeature(mapRef, 'flight', pathname.split('/')[2])
@@ -98,20 +97,21 @@ export default function MapLayer({ }) {
     }, [pathname])
 
     useEffect(() => {
-        initTrack(mapRef, trackData)
-    }, [trackData])
-
-    useEffect(() => {
         const map = mapRef.current.map
         if (!map) return
 
         const onClick = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
             mapRef.current.animate = false
-            setTimeout(() => {
+
+            setTimeout(async () => {
                 const route = handleClick(mapRef, targetEvent)
+
                 mapRef.current.animate = true
                 router.replace(route)
+
+                const trackData = await fetchTrack(route)
+                initTrack(mapRef, trackData?.points)
             }, 0)
         }
 

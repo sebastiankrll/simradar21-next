@@ -1,6 +1,6 @@
 'use client'
 
-import { Line } from 'react-chartjs-2'
+// import { Line } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
     LinearScale,
@@ -16,7 +16,7 @@ import {
 import 'chartjs-adapter-date-fns'
 
 import './Chart.css'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 ChartJS.register(
     LinearScale,

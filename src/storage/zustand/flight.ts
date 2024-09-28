@@ -5,7 +5,7 @@ import { create } from 'zustand'
 export const useFlightStore = create<FlightStore>((set, get) => ({
     feature: null,
     liveData: null,
-    trackData: null,
+    trackPoints: null,
     timer: null,
     updateLiveData: (feature) => {
         set((state) => ({ feature: state.feature = feature }))
@@ -22,5 +22,6 @@ export const useFlightStore = create<FlightStore>((set, get) => ({
         if (timer === null) return
         clearInterval(timer)
     },
-    setTrackData: (points) => set((state) => ({ trackData: state.trackData = points }))
+    setTrackPoints: (points) => set((state) => ({ trackPoints: state.trackPoints = points })),
+    resetTrackPoints: () => set((state) => ({ trackPoints: state.trackPoints = null }))
 }))

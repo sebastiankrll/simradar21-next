@@ -89,7 +89,7 @@ function estimatePosition(prevPosition: PositionData, general: GeneralData | nul
     const arrLoc = general.airport.arr.geometry.coordinates
     const depDist = calculateDistance(depLoc, prevPosition.coordinates)
     const totalDist = calculateDistance(depLoc, arrLoc)
-    if (totalDist - depDist < 5) return null
+    if (totalDist - depDist < 25) return null
 
     const bearing = Math.round(calculateBearing(prevPosition.coordinates, arrLoc))
     const dT = Date.now() - timestamp?.getTime()

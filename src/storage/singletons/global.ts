@@ -4,7 +4,7 @@ export function setGlobalVatsimStorage(data: VatsimDataStorage) {
     globalThis.vatsimDataStorage = data
 }
 
-export function getGlobalVatsimStorage() {
+export function getGlobalVatsimStorage(): VatsimDataStorage | null {
     return structuredClone(globalThis.vatsimDataStorage)
 }
 

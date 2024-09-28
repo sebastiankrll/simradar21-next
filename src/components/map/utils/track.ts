@@ -1,25 +1,25 @@
 import { Attitude, MapStorage } from "@/types/map"
-import { TrackPoint } from "@/types/vatsim"
+import { TrackData, TrackPoint } from "@/types/vatsim"
 import { Feature } from "ol"
 import { LineString } from "ol/geom"
 import { fromLonLat } from "ol/proj"
 import { Stroke, Style } from "ol/style"
 import { RefObject } from "react"
 
-export function initTrack(mapRef: RefObject<MapStorage>, trackData: TrackPoint[] | null) {
+export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | undefined) {
     const trackFeatures: Feature<LineString>[] = []
 
-    if (!trackData || !mapRef.current) return
+    if (!trackPoints || !mapRef.current) return
 
     let combined = []
     let index = 0
 
     // Add all recorded track segments
-    for (let i = 0; i < trackData.length - 1; i++) {
-        const start = trackData[i]
-        const end = trackData[i + 1]
+    for (let i = 0; i < trackPoints.length - 1; i++) {
+        const start = trackPoints[i]
+        const end = trackPoints[i + 1]
 
-        if (getRouteColor(start.altitudes[0], start.altitudes[1], start.connected).getColor() === getRouteColor(end.altitudes[0], end.altitudes[1], end.connected).getColor() && i < trackData.length - 2) {
+        if (getRouteColor(start.altitudes[0], start.altitudes[1], start.connected).getColor() === getRouteColor(end.altitudes[0], end.altitudes[1], end.connected).getColor() && i < trackPoints.length - 2) {
             combined.push(start)
             continue
         }
@@ -125,7 +125,7 @@ export function moveTrack(mapRef: RefObject<MapStorage>) {
     const coords = interpolatedFeature.getGeometry()?.getCoordinates()
     coords?.pop()
     coords?.push(end)
-    
+
     if (coords) interpolatedFeature.getGeometry()?.setCoordinates(coords)
 }
 
@@ -173,4 +173,18 @@ function getRouteColor(altitude: number | null, radar: number | null, connected:
         color: `rgb(${resultRGB[0]}, ${resultRGB[1]}, ${resultRGB[2]})`,
         width: 3,
     })
+}
+
+export async function fetchTrack(route: string): Promise<TrackData | null> {
+    if (route.split('/')[1] === 'flight') {
+        const response = await fetch(`/api/data/track/${route.split('/')[2]}`)
+        if (!response.ok) {
+            console.error('Error fetching track data for flight ' + route.split('/')[1])
+            return null
+        }
+
+        return await response.json()
+    }
+
+    return null
 }

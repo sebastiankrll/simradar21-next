@@ -7,11 +7,11 @@ import { useEffect } from "react";
 import { FlightData } from "@/types/flight";
 
 export default function AttitudeChart({ data }: { data: FlightData | null }) {
-    const trackData = useFlightStore((state) => state.trackData)
+    const { trackPoints } = useFlightStore()
 
     useEffect(() => {
-        setFlightChartData(trackData)
-    }, [trackData])
+        setFlightChartData(trackPoints)
+    }, [trackPoints])
 
     useEffect(() => {
         updateFlightChartData(data)

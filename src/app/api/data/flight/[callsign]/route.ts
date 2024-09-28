@@ -1,7 +1,6 @@
 import { getGlobalVatsimStorage } from "@/storage/singletons/global"
 import { FlightData } from "@/types/flight"
-
-export const dynamicParams = true
+import { NextResponse } from "next/server"
 
 export async function GET(
     request: Request,
@@ -10,9 +9,9 @@ export async function GET(
     const vatsimDataStorage = getGlobalVatsimStorage()
     const callsign = params.callsign
 
-    const position = vatsimDataStorage.position?.find(pilot => pilot.callsign === callsign) ?? null
-    const general = vatsimDataStorage.general?.find(pilot => pilot.index.callsign === callsign) ?? null
-    const status = vatsimDataStorage.status?.find(pilot => pilot.index.callsign === callsign) ?? null
+    const position = vatsimDataStorage?.position?.find(pilot => pilot.callsign === callsign) ?? null
+    const general = vatsimDataStorage?.general?.find(pilot => pilot.index.callsign === callsign) ?? null
+    const status = vatsimDataStorage?.status?.find(pilot => pilot.index.callsign === callsign) ?? null
 
     const data: FlightData = {
         position: position,
@@ -20,5 +19,5 @@ export async function GET(
         status: status
     }
 
-    return Response.json({ data })
+    return NextResponse.json(data)
 }

@@ -1,7 +1,7 @@
-import { FlightFeature, MapStorage } from "@/types/map"
+import { MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
 import { RefObject } from "react"
-import { createFlightOverlay, updateFlightOverlayContent } from "./overlay"
+import { createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 
