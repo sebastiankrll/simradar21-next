@@ -16,8 +16,6 @@ export function getFlightStatus(data: FlightData): StatusFlightData {
 
     const status = data.status
     const delay = (new Date(status.times.actArr).getTime() - new Date(status.times.schedArr).getTime()) / 60000
-    console.log(status)
-    console.log(delay)
 
     if (delay <= 15) flightStatus.delayColor = 'greenColor'
     if (delay > 15 && delay <= 30) flightStatus.delayColor = 'yellowColor'

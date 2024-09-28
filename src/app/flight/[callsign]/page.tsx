@@ -1,6 +1,8 @@
 import { getGlobalVatsimStorage } from "@/storage/singletons/global";
 import { FlightData } from "@/types/flight";
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
+
+export const dynamicParams = true
 
 const Flight = dynamic(() => import('@/components/flight/Flight'), {
     ssr: false

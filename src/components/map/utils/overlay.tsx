@@ -65,7 +65,7 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feat
 //     return popupOverlay
 // }
 
-export function moveOverlay(mapRef: RefObject<MapStorage>) {
+export function moveFlightOverlay(mapRef: RefObject<MapStorage>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
 
@@ -80,7 +80,7 @@ export function moveOverlay(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export function updateFlightOverlayContent(mapRef: RefObject<MapStorage>) {
+export function updateFlightOverlay(mapRef: RefObject<MapStorage>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
 

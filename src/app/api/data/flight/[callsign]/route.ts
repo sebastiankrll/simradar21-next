@@ -1,7 +1,7 @@
 import { getGlobalVatsimStorage } from "@/storage/singletons/global"
 import { FlightData } from "@/types/flight"
 
-export const dynamic = 'force-dynamic'
+export const dynamicParams = true
 
 export async function GET(
     request: Request,

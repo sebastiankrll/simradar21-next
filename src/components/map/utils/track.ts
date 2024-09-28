@@ -11,139 +11,135 @@ export function initTrack(mapRef: RefObject<MapStorage>, trackData: TrackPoint[]
 
     if (!trackData || !mapRef.current) return
 
+    let combined = []
+    let index = 0
+
     // Add all recorded track segments
     for (let i = 0; i < trackData.length - 1; i++) {
         const start = trackData[i]
         const end = trackData[i + 1]
 
+        if (getRouteColor(start.altitudes[0], start.altitudes[1], start.connected).getColor() === getRouteColor(end.altitudes[0], end.altitudes[1], end.connected).getColor() && i < trackData.length - 2) {
+            combined.push(start)
+            continue
+        }
+        combined.push(start, end)
+
         const trackFeature = new Feature({
-            geometry: new LineString([fromLonLat(start.coordinates), fromLonLat(end.coordinates)]),
+            geometry: new LineString(combined.map(c => fromLonLat(c.coordinates))),
             type: 'route',
+            color: getRouteColor(start.altitudes[0], start.altitudes[1], start.connected).getColor()
         })
         const trackStyle = new Style({
-            stroke: new Stroke({
-                color: getRouteColor(start.altitudes[0], start.altitudes[1]),
-                width: 3,
-            }),
+            stroke: getRouteColor(start.altitudes[0], start.altitudes[1], start.connected)
         })
         trackFeature.setStyle(trackStyle)
+        trackFeature.setId(i)
         trackFeatures.push(trackFeature)
+
+        combined = []
+        index = i + 1
     }
 
     mapRef.current.sources.tracks.clear()
     mapRef.current.sources.tracks.addFeatures(trackFeatures)
 
-    // Add first interpolated segment
+    firstInterpolation(mapRef, index)
+}
+
+function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
     const clickedFeature = mapRef.current?.features.click
     if (!clickedFeature) return
 
     const attitude = clickedFeature.get('attitude') as Attitude
     const start = fromLonLat(attitude.coordinates)
-    const end = clickedFeature?.getGeometry()?.getCoordinates()
+    const end = clickedFeature.getGeometry()?.getCoordinates()
 
     if (!start || !end) return
 
     const trackFeature = new Feature({
         geometry: new LineString([start, end]),
         type: 'route',
+        color: getRouteColor(attitude.altitudes[0], attitude.altitudes[2], clickedFeature.get('connected') === 0 ? false : true).getColor()
     })
     const trackStyle = new Style({
-        stroke: new Stroke({
-            color: getRouteColor(attitude.altitudes[0], attitude.altitudes[2]),
-            width: 3,
-        }),
+        stroke: getRouteColor(attitude.altitudes[0], attitude.altitudes[2], clickedFeature.get('connected') === 0 ? false : true)
     })
     trackFeature.setStyle(trackStyle)
+    trackFeature.setId(index)
 
     mapRef.current.features.track = trackFeature
     mapRef.current.sources.tracks.addFeature(trackFeature)
 }
 
-export function moveTrack(mapRef: RefObject<MapStorage>) {
-    const clickedFeature = mapRef.current?.features.click
-    if (!clickedFeature || mapRef.current.sources.tracks.getFeatures().length < 2) return
-
-    const interpolatedFeature = mapRef.current.features.track
-    const attitude = clickedFeature.get('attitude') as Attitude
-    const end = clickedFeature?.getGeometry()?.getCoordinates()
-
-
-    // If interpolated segment does not exist yet, create it
-    if (!interpolatedFeature) {
-        const start = fromLonLat(attitude.coordinates)
-
-        if (!start || !end) return
-
-        const trackFeature = new Feature({
-            geometry: new LineString([start, end]),
-            type: 'route',
-        })
-        const trackStyle = new Style({
-            stroke: new Stroke({
-                color: getRouteColor(attitude.altitudes[0], attitude.altitudes[2]),
-                width: 3,
-            }),
-        })
-        trackFeature.setStyle(trackStyle)
-
-        mapRef.current.features.track = trackFeature
-        mapRef.current.sources.tracks.addFeature(trackFeature)
-
-        return
-    }
-
-    // If interpolated segment exists, just update its position
-    const start = interpolatedFeature.getGeometry()?.getCoordinates()[0]
-    if (!start || !end) return
-    interpolatedFeature.getGeometry()?.setCoordinates([start, end])
-}
-
 export function updateTrack(mapRef: RefObject<MapStorage>) {
     const clickedFeature = mapRef.current?.features.click
+    if (!clickedFeature || mapRef.current.sources.tracks.getFeatures().length === 0) return
+
+    // Reset interpolated segment
     const interpolatedFeature = mapRef.current?.features.track
-    if (!clickedFeature || !interpolatedFeature || mapRef.current.sources.tracks.getFeatures().length < 2) return
+    if (mapRef.current?.features.track) {
+        mapRef.current.sources.tracks.removeFeature(mapRef.current.features.track)
+        mapRef.current.features.track = null
+    }
 
     // Add new track segment to latest recorded position
     const attitude = clickedFeature.get('attitude') as Attitude
-    const start = interpolatedFeature.getGeometry()?.getCoordinates()[0]
+    const start = interpolatedFeature?.getGeometry()?.getCoordinates()[0]
     const end = fromLonLat(attitude.coordinates)
+    const id = interpolatedFeature?.getId()
 
-    if (!start || !end) return
+    if (!start || !end || !id) return
 
-    const trackFeature = new Feature({
-        geometry: new LineString([start, end]),
-        type: 'route',
-    })
-    trackFeature.setStyle(interpolatedFeature.getStyle())
-    mapRef.current.sources.tracks.addFeature(trackFeature)
+    const lastId = typeof id === 'string' ? parseInt(id) - 1 : id - 1
+    const lastFeature = mapRef.current.sources.tracks.getFeatureById(lastId) as Feature<LineString> | null
+    const line = lastFeature?.getGeometry()?.getCoordinates()
 
-    // Delete previous interpolated segment
-    mapRef.current.sources.tracks.removeFeature(interpolatedFeature)
+    if (interpolatedFeature?.get('color') === lastFeature?.get('color') && line) {
+        line.push(end)
+        lastFeature!.getGeometry()?.setCoordinates(line)
 
-    // Add new interpolated segment
-    const newStart = fromLonLat(attitude.coordinates)
-    const newEnd = clickedFeature?.getGeometry()?.getCoordinates()
+        firstInterpolation(mapRef, lastId + 1)
+    } else {
+        const trackFeature = new Feature({
+            geometry: new LineString([start, end]),
+            type: 'route',
+            color: interpolatedFeature?.get('color')
+        })
+        trackFeature.setStyle(interpolatedFeature.getStyle())
+        trackFeature.setId(id)
 
-    if (!newStart || !newEnd) return
-
-    const newTrackFeature = new Feature({
-        geometry: new LineString([newStart, newEnd]),
-        type: 'route',
-    })
-    const newTrackStyle = new Style({
-        stroke: new Stroke({
-            color: getRouteColor(attitude.altitudes[0], attitude.altitudes[2]),
-            width: 3,
-        }),
-    })
-    newTrackFeature.setStyle(newTrackStyle)
-
-    mapRef.current.features.track = newTrackFeature
-    mapRef.current.sources.tracks.addFeature(newTrackFeature)
+        mapRef.current.sources.tracks.addFeature(trackFeature)
+        firstInterpolation(mapRef, lastId + 2)
+    }
 }
 
-function getRouteColor(altitude: number | null, radar: number | null): string {
-    if (!altitude || !radar || radar < 100) return 'rgb(77, 95, 131)'
+export function moveTrack(mapRef: RefObject<MapStorage>) {
+    const clickedFeature = mapRef.current?.features.click
+    const interpolatedFeature = mapRef.current?.features.track
+    if (!clickedFeature || !interpolatedFeature) return
+
+    const end = clickedFeature?.getGeometry()?.getCoordinates()
+    if (!end) return
+
+    const coords = interpolatedFeature.getGeometry()?.getCoordinates()
+    coords?.pop()
+    coords?.push(end)
+    
+    if (coords) interpolatedFeature.getGeometry()?.setCoordinates(coords)
+}
+
+function getRouteColor(altitude: number | null, radar: number | null, connected: boolean): Stroke {
+    if (!altitude || !radar || !connected) return new Stroke({
+        color: 'rgba(77, 95, 131, 0.7)',
+        lineDash: [5, 5],
+        lineCap: 'butt',
+        width: 3,
+    })
+    if (radar < 100) return new Stroke({
+        color: 'rgb(77, 95, 131)',
+        width: 3,
+    })
 
     const degrees = 300 / 50000 * altitude + 60
     const colorSectors = [
@@ -173,5 +169,8 @@ function getRouteColor(altitude: number | null, radar: number | null): string {
         resultRGB[i] = Math.round(lowerBound.rgb[i] + interpolationFactor * (upperBound.rgb[i] - lowerBound.rgb[i]))
     }
 
-    return `rgb(${resultRGB[0]}, ${resultRGB[1]}, ${resultRGB[2]})`
+    return new Stroke({
+        color: `rgb(${resultRGB[0]}, ${resultRGB[1]}, ${resultRGB[2]})`,
+        width: 3,
+    })
 }

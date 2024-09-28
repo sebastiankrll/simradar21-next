@@ -17,11 +17,10 @@ export function updatePosition() {
 
     if (disconnected) {
         for (const position of disconnected) {
-            const normalDisconnect = checkDisconnectType(position)
-            if (normalDisconnect) continue
+            if (checkDisconnectType(position)) continue
 
             const generalData = vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null
-            const newPosition = estimatePosition(structuredClone(position), structuredClone(generalData))
+            const newPosition = estimatePosition(structuredClone(position), structuredClone(generalData), vatsimDataStorage.timestamp)
             if (newPosition) newPositions.push(newPosition)
         }
     }
@@ -79,20 +78,21 @@ function getAircraftType(pilot: VatsimPilot): number {
 }
 
 function checkDisconnectType(position: PositionData): boolean {
-    if (position.altitudes[2] < 200 && position.groundspeeds[0] < 30) return true
+    if (position.altitudes[2] < 1000) return true
     return false
 }
 
-function estimatePosition(prevPosition: PositionData, general: GeneralData | null): PositionData | null {
-    const vatsimDataStorage = getVatsimStorage()
+function estimatePosition(prevPosition: PositionData, general: GeneralData | null, timestamp: Date): PositionData | null {
     if (!general?.airport || !general.flightplan) return null
 
-    const destination = general.airport.arr.geometry.coordinates
-    const remainingDistance = calculateDistance(prevPosition.coordinates, destination)
-    if (remainingDistance < 5) return null
+    const depLoc = general.airport.dep.geometry.coordinates
+    const arrLoc = general.airport.arr.geometry.coordinates
+    const depDist = calculateDistance(depLoc, prevPosition.coordinates)
+    const totalDist = calculateDistance(depLoc, arrLoc)
+    if (totalDist - depDist < 5) return null
 
-    const bearing = Math.round(calculateBearing(prevPosition.coordinates, destination))
-    const dT = vatsimDataStorage.timestamp ? Date.now() - vatsimDataStorage.timestamp?.getTime() : 0
+    const bearing = Math.round(calculateBearing(prevPosition.coordinates, arrLoc))
+    const dT = Date.now() - timestamp?.getTime()
     const filedSpeed = general.flightplan?.filedSpeed
 
     const newCoordinates = getNextPosition(prevPosition.coordinates, bearing, filedSpeed, dT)
@@ -110,7 +110,8 @@ function estimatePosition(prevPosition: PositionData, general: GeneralData | nul
         altitudes: newAltitudes,
         groundspeeds: newSpeeds,
         frequency: '122.800',
-        connected: false
+        connected: false,
+        timestamp: new Date(prevPosition.timestamp.getTime() + dT)
     }
 }
 
@@ -142,5 +143,5 @@ function getNextPosition(currentPosition: number[], bearing: number, speed: numb
         Math.cos(angularDistance) - Math.sin(latRad) * Math.sin(newLatRad)
     )
 
-    return [toDegrees(newLonRad), toDegrees(newLatRad)]
+    return [parseFloat(toDegrees(newLonRad).toFixed(6)), parseFloat(toDegrees(newLatRad).toFixed(6))]
 }
