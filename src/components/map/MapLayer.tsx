@@ -100,7 +100,7 @@ export default function MapLayer({ }) {
         const map = mapRef.current.map
         if (!map) return
 
-        const onClick = (event: BaseEvent | Event) => {
+        const onClick = async (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
             mapRef.current.animate = false
 
@@ -109,6 +109,16 @@ export default function MapLayer({ }) {
 
                 mapRef.current.animate = true
                 router.replace(route)
+
+                if (route.split('/').length > 2) {
+                    const response = await fetch(`/api/data${route}`)
+                    if (!response.ok) {
+                        console.error('Error fetching track data for flight ' + route.split('/')[1])
+                        return null
+                    }
+
+                    console.log(await response.json())
+                }
 
                 const trackData = await fetchTrack(route)
                 initTrack(mapRef, trackData?.points)

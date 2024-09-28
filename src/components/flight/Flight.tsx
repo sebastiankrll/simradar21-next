@@ -15,13 +15,18 @@ import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
 import { getFlightStatus } from './utils/update'
 import useSWR from 'swr'
 import { fetcher } from '@/utils/api'
+import Spinner from '../common/spinner/Spinner'
 
 export default function Flight({ callsign }: { callsign: string }) {
     const { data } = useSWR<FlightData>(`/api/data/flight/${callsign}`, fetcher, {
         refreshInterval: 20000,
     })
 
-    if (!data) return <div>Loading flight data...</div>
+    if (!data) return (
+        <div className='info-panel'>
+            <Spinner />
+        </div>
+    )
 
     const flightStatus = getFlightStatus(data)
 
