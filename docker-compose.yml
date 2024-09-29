@@ -1,0 +1,48 @@
+services:
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      target: nextjs
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: always
+
+  # Node.js Backend
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      target: backend
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: always
+
+  # WebSocket Worker
+  ws-worker:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      target: ws-worker
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: always
+
+  # Redis Service
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    restart: always
