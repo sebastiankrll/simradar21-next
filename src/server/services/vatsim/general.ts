@@ -1,4 +1,4 @@
-import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
 import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'
@@ -16,20 +16,18 @@ export function updateGeneral() {
 }
 
 export function updateGeneralData() {
-    const vatsimDataStorage = getVatsimStorage()
-    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position) return
 
     const newGenerals = []
 
     for (const position of vatsimDataStorage.position) {
-        const prevGeneral = structuredClone(vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null)
+        const prevGeneral = vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null
         if (!position.connected && prevGeneral) {
             newGenerals.push(prevGeneral)
             continue
         }
 
-        const pilot = structuredClone(rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign))
+        const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign)
         if (!pilot) continue
 
         const noDataChange = prevGeneral ? checkSameData(pilot, prevGeneral) : false
@@ -49,12 +47,9 @@ export function updateGeneralData() {
     }
 
     vatsimDataStorage.general = newGenerals
-    setVatsimStorage(vatsimDataStorage)
 }
 
 export function updateGeneralDataPrefile() {
-    const vatsimDataStorage = getVatsimStorage()
-    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.prefiles) return
 
     const newGenerals = []
@@ -76,7 +71,6 @@ export function updateGeneralDataPrefile() {
     }
 
     vatsimDataStorage.generalPre = newGenerals
-    setVatsimStorage(vatsimDataStorage)
 }
 
 function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {

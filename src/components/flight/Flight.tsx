@@ -17,14 +17,14 @@ import { fetcher } from '@/utils/api'
 import Spinner from '../common/spinner/Spinner'
 
 export default function Flight({ callsign }: { callsign: string }) {
-    const { data } = useSWR<FlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, {
+    const { data, isLoading } = useSWR<FlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, {
         refreshInterval: 20000,
     })
     const flightStatus = getFlightStatus(data)
 
     return (
         <div className='info-panel'>
-            <Spinner show={data ? false : true} />
+            <Spinner show={isLoading} />
             <div className="info-panel-container header">
                 <div className='info-panel-id'>{callsign}</div>
                 <CloseButton />

@@ -1,5 +1,5 @@
 import { calculateDistance, roundXMin } from "@/utils/common"
-import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
 import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 
 const taxiTime = 10 * 60000
@@ -12,16 +12,14 @@ export function updateStatus() {
 }
 
 export function updateStatusData() {
-    const vatsimDataStorage = getVatsimStorage()
-    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position || !vatsimDataStorage.general) return
 
     const newStatuses = []
 
     for (const position of vatsimDataStorage.position) {
-        const prevStatus = structuredClone(vatsimDataStorage.status?.find(status => status.index.callsign === position.callsign) ?? null)
-        const general = structuredClone(vatsimDataStorage.general.find(general => general.index.callsign === position.callsign) ?? null)
-        const pilot = structuredClone(rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign) ?? null)
+        const prevStatus = vatsimDataStorage.status?.find(status => status.index.callsign === position.callsign) ?? null
+        const general = vatsimDataStorage.general.find(general => general.index.callsign === position.callsign) ?? null
+        const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign) ?? null
 
         const newStatus = getStatusData(prevStatus, position, general, pilot)
         if (!newStatus) continue
@@ -29,12 +27,9 @@ export function updateStatusData() {
     }
 
     vatsimDataStorage.status = newStatuses
-    setVatsimStorage(vatsimDataStorage)
 }
 
 export function updateStatusDataPrefile() {
-    const vatsimDataStorage = getVatsimStorage()
-    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.prefiles || !vatsimDataStorage.generalPre) return
 
     const newStatuses = []
@@ -49,7 +44,6 @@ export function updateStatusDataPrefile() {
     }
 
     vatsimDataStorage.statusPre = newStatuses
-    setVatsimStorage(vatsimDataStorage)
 }
 
 function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): StatusData | undefined {

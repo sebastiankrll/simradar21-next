@@ -1,13 +1,12 @@
-import { getGlobalVatsimStorage } from "@/storage/singletons/global"
+import { getTrackData } from "@/storage/singletons/global"
 import { NextResponse } from "next/server"
 
 export async function GET(
     request: Request,
     { params }: { params: { callsign: string } }
 ) {
-    const vatsimDataStorage = getGlobalVatsimStorage()
     const callsign = params.callsign
-    const track = vatsimDataStorage?.track?.find(pilot => pilot.callsign === callsign) ?? null
+    const track = getTrackData(callsign)
 
     return NextResponse.json(track)
 }

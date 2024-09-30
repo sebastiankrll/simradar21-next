@@ -21,9 +21,13 @@ import { useSliderStore } from "@/storage/zustand/slider"
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
-    const { data } = useSWR<VatsimDataWS | null>('/api/data/init', fetcher)
+    const { data } = useSWR<VatsimDataWS | null>('/api/data/init', fetcher, {
+        revalidateOnFocus: false
+    })
     const { setPage } = useSliderStore()
     const mapRef = useRef<MapStorage>(mapStorage)
+
+    console.log('rerender')
 
     useEffect(() => {
         const unMessage = onMessage((message: WsMessage) => {
@@ -107,8 +111,8 @@ export default function MapLayer({ }) {
 
             setTimeout(async () => {
                 const route = handleClick(mapRef, targetEvent)
-
                 mapRef.current.animate = true
+
                 router.prefetch(route)
                 setPage(route)
             }, 0)

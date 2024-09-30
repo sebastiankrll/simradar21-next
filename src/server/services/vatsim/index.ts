@@ -1,4 +1,4 @@
-import { getRawStorage, getVatsimStorage, setRawStorage, updateVatsimStorage } from '@/storage/singletons/vatsim'
+import { rawDataStorage, updateVatsimStorage, vatsimDataStorage } from '@/storage/singletons/vatsim'
 import { VatsimData, VatsimTransceiversData } from '@/types/vatsim'
 import axios from 'axios'
 import { Redis } from 'ioredis'
@@ -8,7 +8,6 @@ const redisPub = new Redis()
 let dataUpdateInProgress = false
 
 export async function fetchVatsimData() {
-    const rawDataStorage = getRawStorage()
     if (dataUpdateInProgress) return
 
     dataUpdateInProgress = true
@@ -22,7 +21,6 @@ export async function fetchVatsimData() {
             rawDataStorage.vatsim = vatsimData.data
             rawDataStorage.transveivers = transceivers.data
 
-            setRawStorage(rawDataStorage)
             updateVatsimData()
         }
     } catch (error) {
@@ -40,6 +38,5 @@ function updateVatsimData() {
 }
 
 function pushVatsimStorage() {
-    const vatsimDataStorage = getVatsimStorage()
     redisPub.publish('vatsim_storage', JSON.stringify(vatsimDataStorage))
 }

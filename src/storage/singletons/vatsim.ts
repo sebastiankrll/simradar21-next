@@ -5,20 +5,12 @@ import { updateStatus } from "@/server/services/vatsim/status";
 import { VatsimDataStorage, RawDataStorage } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
 
-let rawDataStorage: RawDataStorage = {
+export let rawDataStorage: RawDataStorage = {
     vatsim: null,
     transveivers: null
 }
 
-export function setRawStorage(data: RawDataStorage) {
-    rawDataStorage = data
-}
-
-export function getRawStorage() {
-    return structuredClone(rawDataStorage)
-}
-
-let vatsimDataStorage: VatsimDataStorage = {
+export let vatsimDataStorage: VatsimDataStorage = {
     position: null,
     general: null,
     status: null,
@@ -32,15 +24,10 @@ export function setVatsimStorage(data: VatsimDataStorage) {
     vatsimDataStorage = data
 }
 
-export function getVatsimStorage() {
-    return structuredClone(vatsimDataStorage)
-}
-
 export function getVatsimDataWs() {
-    const storage = structuredClone(vatsimDataStorage)
     return {
-        position: storage.position,
-        timestamp: storage.timestamp
+        position: vatsimDataStorage.position,
+        timestamp: vatsimDataStorage.timestamp
     } as VatsimDataWS
 }
 

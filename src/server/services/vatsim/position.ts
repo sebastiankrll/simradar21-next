@@ -1,4 +1,4 @@
-import { getRawStorage, getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim";
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim";
 import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
 const airlines = airlinesJSON as Airlines[]
@@ -8,8 +8,6 @@ import { calculateDistance, toDegrees, toRadians } from "@/utils/common";
 const aircrafts = aircraftsJSON as Aircrafts
 
 export function updatePosition() {
-    const vatsimDataStorage = getVatsimStorage()
-    const rawDataStorage = getRawStorage()
     if (!rawDataStorage.vatsim?.pilots) return
 
     const newPositions = []
@@ -20,7 +18,7 @@ export function updatePosition() {
             if (checkDisconnectType(position)) continue
 
             const generalData = vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null
-            const newPosition = estimatePosition(structuredClone(position), structuredClone(generalData), vatsimDataStorage.timestamp)
+            const newPosition = estimatePosition(position, generalData, vatsimDataStorage.timestamp)
             if (newPosition) newPositions.push(newPosition)
         }
     }
@@ -29,7 +27,7 @@ export function updatePosition() {
         const transceivers = rawDataStorage.transveivers?.find(tx => tx.callsign === pilot.callsign)
         const transceiver = transceivers ? transceivers.transceivers[0] : null
 
-        const prevPosition = structuredClone(vatsimDataStorage.position?.find(pos => pos.callsign === pilot.callsign) ?? null)
+        const prevPosition = vatsimDataStorage.position?.find(pos => pos.callsign === pilot.callsign) ?? null
         const dT = vatsimDataStorage.timestamp ? Date.now() - vatsimDataStorage.timestamp?.getTime() : 0
 
         newPositions.push(getPositionData(prevPosition, pilot, transceiver, dT))
@@ -37,7 +35,6 @@ export function updatePosition() {
 
     vatsimDataStorage.position = newPositions
     vatsimDataStorage.timestamp = new Date()
-    setVatsimStorage(vatsimDataStorage)
 }
 
 function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, transceiver: VatsimTransceiver | null, dT: number): PositionData {

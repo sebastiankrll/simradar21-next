@@ -1,4 +1,4 @@
-import { getVatsimStorage, setVatsimStorage } from "@/storage/singletons/vatsim"
+import { vatsimDataStorage } from "@/storage/singletons/vatsim"
 import { PositionData, TrackData, TrackPoint } from "@/types/vatsim"
 
 export function updateTrack() {
@@ -6,7 +6,6 @@ export function updateTrack() {
 }
 
 export function updateTrackData() {
-    const vatsimDataStorage = getVatsimStorage()
     if (!vatsimDataStorage.position) return
 
     const newTracks = []
@@ -37,7 +36,6 @@ export function updateTrackData() {
     }
 
     vatsimDataStorage.track = newTracks
-    setVatsimStorage(vatsimDataStorage)
 }
 
 function checkSamePosition(lastPoint: TrackPoint | null, newPoint: TrackPoint): boolean {
