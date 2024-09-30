@@ -7,7 +7,7 @@ import './Map.css'
 import { MapStorage } from "@/types/map"
 import { mapStorage } from "@/storage/singletons/map"
 import { onMessage } from "@/utils/ws"
-import { moveFlightFeatures, updateFlightFeatures } from "./utils/flights"
+import { animateFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
 import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
@@ -17,6 +17,8 @@ import BaseEvent from "ol/events/Event"
 import useSWR from "swr"
 import { fetcher } from "@/utils/api"
 import { useSliderStore } from "@/storage/zustand/slider"
+import { useFlightStore } from "@/storage/zustand/flight"
+import { initTrack } from "./utils/track"
 
 export default function MapLayer({ }) {
     const router = useRouter()
@@ -25,41 +27,15 @@ export default function MapLayer({ }) {
         revalidateOnFocus: false
     })
     const { setPage } = useSliderStore()
+    const { trackPoints } = useFlightStore()
+
     const mapRef = useRef<MapStorage>(mapStorage)
 
-    console.log('rerender')
-
     useEffect(() => {
-        const unMessage = onMessage((message: WsMessage) => {
-            updateFlightFeatures(mapRef, message.data as VatsimDataWS)
-        })
-        const onHover = (event: BaseEvent | Event) => {
-            const targetEvent = event as MapBrowserEvent<UIEvent>
-            handleHover(mapRef, targetEvent)
-        }
-
-        let animationFrameId: number
-        let then: number = Date.now()
-        const fpsInterval = 1000 / 30
-        const limit = true
-
-        const animate = () => {
-            const now = Date.now()
-            const elapsed = now - then
-
-            if (elapsed > fpsInterval || !limit) {
-                if (mapRef.current.animate) moveFlightFeatures(mapRef)
-                map.render()
-
-                then = now - (elapsed % fpsInterval)
-            }
-            animationFrameId = window.requestAnimationFrame(animate)
-        }
-
+        // Init map
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
         const zoom = view ? parseFloat(view[2]) : 3
         const center = view ? view.slice(0, 2).map(parseFloat) : [0, 0]
-
         const map = new Map({
             target: "map",
             view: new View({
@@ -72,11 +48,28 @@ export default function MapLayer({ }) {
             controls: []
         })
         mapRef.current.map = map
-
         initLayers(mapRef)
+
+        // Init websocket updates
+        const unMessage = onMessage((message: WsMessage) => {
+            updateFlightFeatures(mapRef, message.data as VatsimDataWS)
+        })
+
+        // Init hover events
+        const onHover = (event: BaseEvent | Event) => {
+            const targetEvent = event as MapBrowserEvent<UIEvent>
+            handleHover(mapRef, targetEvent)
+        }
+        map.on(['pointermove'], onHover)
+
+        // Init flight feature animation
+        let animationFrameId: number
+        const animate = () => {
+            animateFeatures(mapRef)
+            animationFrameId = window.requestAnimationFrame(animate)
+        }
         animationFrameId = window.requestAnimationFrame(animate)
 
-        map.on(['pointermove'], onHover)
 
         return () => {
             map.setTarget('')
@@ -88,10 +81,17 @@ export default function MapLayer({ }) {
         }
     }, [])
 
+    // Init features once on page load via API
     useEffect(() => {
         if (data) updateFlightFeatures(mapRef, data)
     }, [data])
 
+    // Draw track when flight is loaded
+    useEffect(() => {
+        initTrack(mapRef, trackPoints)
+    }, [trackPoints])
+
+    // Set flight feature on page reload with active flight route
     useEffect(() => {
         if (!mapRef.current.view.viewInit) {
             if (pathname.includes('flight')) {
@@ -101,15 +101,16 @@ export default function MapLayer({ }) {
         }
     }, [pathname])
 
+    // Handle feature click events
     useEffect(() => {
         const map = mapRef.current.map
         if (!map) return
 
-        const onClick = async (event: BaseEvent | Event) => {
+        const onClick = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
             mapRef.current.animate = false
 
-            setTimeout(async () => {
+            setTimeout(() => {
                 const route = handleClick(mapRef, targetEvent)
                 mapRef.current.animate = true
 

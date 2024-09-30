@@ -130,3 +130,20 @@ export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
     moveTrack(mapRef)
     moveFlightOverlay(mapRef)
 }
+
+let then: number = Date.now()
+export function animateFeatures(mapRef: RefObject<MapStorage>) {
+    if (!mapRef.current?.map) return
+
+    const fpsInterval = 1000 / 30
+    const limit = true
+    const now = Date.now()
+    const elapsed = now - then
+
+    if (elapsed > fpsInterval || !limit) {
+        if (mapRef.current.animate) moveFlightFeatures(mapRef)
+        mapRef.current.map.render()
+
+        then = now - (elapsed % fpsInterval)
+    }
+}

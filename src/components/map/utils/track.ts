@@ -6,7 +6,7 @@ import { fromLonLat } from "ol/proj"
 import { Stroke, Style } from "ol/style"
 import { RefObject } from "react"
 
-export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | undefined) {
+export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null) {
     const trackFeatures: Feature<LineString>[] = []
 
     if (!trackPoints || !mapRef.current) return
@@ -173,18 +173,4 @@ function getRouteColor(altitude: number | null, radar: number | null, connected:
         color: `rgb(${resultRGB[0]}, ${resultRGB[1]}, ${resultRGB[2]})`,
         width: 3,
     })
-}
-
-export async function fetchTrack(route: string): Promise<TrackData | null> {
-    if (route.split('/')[1] === 'flight') {
-        const response = await fetch(`/api/data/track/${route.split('/')[2]}`)
-        if (!response.ok) {
-            console.error('Error fetching track data for flight ' + route.split('/')[1])
-            return null
-        }
-
-        return await response.json()
-    }
-
-    return null
 }

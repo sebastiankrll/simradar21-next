@@ -4,6 +4,8 @@ import { RefObject } from "react"
 import { createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
+import { initTrack } from "./track"
+import { moveFlightFeatures } from "./flights"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
@@ -112,6 +114,7 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     if (feature?.get('type') === 'flight') {
         const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
         overlays.click = overlay
+
         return '/flight/' + feature.get('callsign')
     }
 
