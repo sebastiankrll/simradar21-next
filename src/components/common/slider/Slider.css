@@ -1,0 +1,13 @@
+.slider {
+    position: absolute;
+    left: 1rem;
+    top: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100% - 6rem);
+    transition: ease left .2s;
+}
+
+.slider.hide {
+    left: -20rem;
+}

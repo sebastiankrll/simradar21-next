@@ -17,3 +17,13 @@ export type FlightActions = {
 }
 
 export type FlightStore = FlightState & FlightActions
+
+export type SliderState = {
+    page: string
+}
+
+export type SliderActions = {
+    setPage: (newPage: string) => void
+}
+
+export type SliderStore = SliderState & SliderActions

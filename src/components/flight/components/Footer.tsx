@@ -3,7 +3,7 @@
 import { FlightData } from "@/types/flight"
 import { useState } from "react"
 
-export default function Footer({ data }: { data: FlightData }) {
+export default function Footer({ data }: { data: FlightData | undefined | null }) {
     const [copied, setCopied] = useState(false)
 
     const clickRoute = () => {
@@ -29,7 +29,7 @@ export default function Footer({ data }: { data: FlightData }) {
     }
 
     const clickShare = () => {
-        navigator.clipboard.writeText(window.location.origin + '/flight/' + data.general?.index.callsign)
+        navigator.clipboard.writeText(window.location.origin + '/flight/' + data?.general?.index.callsign)
         setCopied(prevState => !prevState)
         setTimeout(() => {
             setCopied(prevState => !prevState)
@@ -37,7 +37,7 @@ export default function Footer({ data }: { data: FlightData }) {
     }
 
     const clickStats = () => {
-        window.open('https://stats.vatsim.net/stats/' + data.general?.index.cid, '_blank')
+        window.open('https://stats.vatsim.net/stats/' + data?.general?.index.cid, '_blank')
     }
 
     return (

@@ -14,14 +14,15 @@ import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
 import { initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
-import { fetchTrack, initTrack } from "./utils/track"
 import useSWR from "swr"
 import { fetcher } from "@/utils/api"
+import { useSliderStore } from "@/storage/zustand/slider"
 
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
     const { data } = useSWR<VatsimDataWS | null>('/api/data/init', fetcher)
+    const { setPage } = useSliderStore()
     const mapRef = useRef<MapStorage>(mapStorage)
 
     useEffect(() => {
@@ -108,20 +109,8 @@ export default function MapLayer({ }) {
                 const route = handleClick(mapRef, targetEvent)
 
                 mapRef.current.animate = true
-                router.replace(route)
-
-                if (route.split('/').length > 2) {
-                    const response = await fetch(`/api/data${route}`)
-                    if (!response.ok) {
-                        console.error('Error fetching track data for flight ' + route.split('/')[1])
-                        return null
-                    }
-
-                    console.log(await response.json())
-                }
-
-                const trackData = await fetchTrack(route)
-                initTrack(mapRef, trackData?.points)
+                router.prefetch(route)
+                setPage(route)
             }, 0)
         }
 
@@ -130,7 +119,7 @@ export default function MapLayer({ }) {
         return () => {
             map.un(['click'], onClick)
         }
-    }, [router])
+    }, [router, setPage])
 
     return (
         <div id="map" />

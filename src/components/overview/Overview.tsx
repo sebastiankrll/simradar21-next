@@ -1,5 +1,4 @@
 import './Overview.css'
-import '../common/panel/Panel.css'
 
 export default function Overview() {
 

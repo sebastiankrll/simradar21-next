@@ -1,9 +1,9 @@
 import { FlightData, StatusFlightData } from "@/types/flight"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 
-export function getFlightStatus(data: FlightData): StatusFlightData {
+export function getFlightStatus(data: FlightData | undefined | null): StatusFlightData {
     const flightStatus: StatusFlightData = {
-        callsign: data.general?.index.callsign,
+        callsign: data?.general?.index.callsign,
         depStatus: 'EST',
         arrStatus: 'EST',
         delayColor: '',
@@ -12,7 +12,7 @@ export function getFlightStatus(data: FlightData): StatusFlightData {
         startToEnd: ['0 km, 00:00 ago', '0 km, in 00:00']
     }
 
-    if (!data.status?.times) return flightStatus
+    if (!data?.status?.times) return flightStatus
 
     const status = data.status
     const delay = (new Date(status.times.actArr).getTime() - new Date(status.times.schedArr).getTime()) / 60000

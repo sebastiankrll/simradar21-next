@@ -3,6 +3,8 @@ import Header from "@/components/header/Header"
 import "./globals.css"
 import dynamic from "next/dynamic"
 import { Manrope } from 'next/font/google'
+import Slider from "@/components/common/slider/Slider"
+import '@/components/common/panel/Panel.css'
 
 export const metadata: Metadata = {
     title: "simradar21",
@@ -28,7 +30,9 @@ export default async function RootLayout({
             <body>
                 <Header />
                 <Map />
-                {children}
+                <Slider>
+                    {children}
+                </Slider>
             </body>
         </html>
     )
