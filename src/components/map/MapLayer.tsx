@@ -10,7 +10,7 @@ import { onMessage } from "@/utils/ws"
 import { animateFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleHover, setClickedFeature } from "./utils/misc"
+import { handleClick, handleFirstView, handleHover } from "./utils/misc"
 import { initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
@@ -81,25 +81,18 @@ export default function MapLayer({ }) {
         }
     }, [])
 
-    // Init features once on page load via API
+    // Init features once on page load via API and handle first view
     useEffect(() => {
-        if (data) updateFlightFeatures(mapRef, data)
-    }, [data])
+        if (data && !mapRef.current.view.viewInit) {
+            updateFlightFeatures(mapRef, data)
+            handleFirstView(mapRef, pathname)
+        }
+    }, [data, pathname])
 
     // Draw track when flight is loaded
     useEffect(() => {
         initTrack(mapRef, trackPoints)
     }, [trackPoints])
-
-    // Set flight feature on page reload with active flight route
-    useEffect(() => {
-        if (!mapRef.current.view.viewInit) {
-            if (pathname.includes('flight')) {
-                setClickedFeature(mapRef, 'flight', pathname.split('/')[2])
-            }
-            mapRef.current.view.viewInit = true
-        }
-    }, [pathname])
 
     // Handle feature click events
     useEffect(() => {

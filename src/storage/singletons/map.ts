@@ -25,8 +25,7 @@ export const mapStorage: MapStorage = {
     features: {
         click: null,
         hover: null,
-        track: null,
-        init: null
+        track: null
     },
     view: {
         lastView: null,

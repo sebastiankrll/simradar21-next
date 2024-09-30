@@ -136,32 +136,6 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     return '/'
 }
 
-export function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, id: string | null) {
-    if (!mapRef.current?.map || !id) return
-
-    if (type === 'flight') {
-        const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
-
-        if (features.length > 0) {
-            const feature = features.find(feature => feature.get('callsign') === id)
-
-            if (!feature) {
-                return
-            }
-
-            feature.set('hover', 1)
-            mapRef.current.features.click = feature
-
-            const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
-            mapRef.current.overlays.click = overlay
-
-            return
-        }
-    }
-
-    mapRef.current.features.init = [type, id]
-}
-
 export function resetMap(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
 
@@ -211,4 +185,53 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
         mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
         mapRef.current.overlays.click = null
     }
+}
+
+export function handleFirstView(mapRef: RefObject<MapStorage>, path: string) {
+    if (!mapRef.current) return
+
+    if (path.includes('flight')) {
+        setClickedFeature(mapRef, 'flight', path.split('/')[2])
+        moveViewToFeature(mapRef, mapRef.current.features.click)
+    }
+    mapRef.current.view.viewInit = true
+}
+
+function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, id: string | null) {
+    if (!mapRef.current?.map || !id) return
+
+    if (type === 'flight') {
+        const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
+
+        if (features.length > 0) {
+            const feature = features.find(feature => feature.get('callsign') === id)
+
+            if (!feature) {
+                return
+            }
+
+            feature.set('hover', 1)
+            mapRef.current.features.click = feature
+
+            const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
+            mapRef.current.overlays.click = overlay
+
+            return
+        }
+    }
+}
+
+function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null) {
+    if (!mapRef.current?.map || !feature) return
+
+    const map = mapRef.current.map
+    const view = map.getView()
+    const extent = feature.getGeometry()?.getExtent()
+
+    mapRef.current.view.lastView = view.calculateExtent(map.getSize())
+    map.getView().animate({
+        center: extent,
+        zoom: 8,
+        duration: 200
+    })
 }

@@ -6,7 +6,6 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
 import { moveFlightOverlay, updateFlightOverlay } from "./overlay"
-import { setClickedFeature } from "./misc"
 import { moveTrack, updateTrack } from "./track"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
@@ -96,9 +95,6 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
             featureProjection: 'EPSG:3857',
         })
     )
-
-    if (mapRef.current.features.init && mapRef.current.features.init[0] === 'flight') setClickedFeature(mapRef, 'flight', mapRef.current.features.init[1])
-    mapRef.current.features.init = null
 
     updateTrack(mapRef)
     moveFlightOverlay(mapRef)

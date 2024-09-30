@@ -20,8 +20,7 @@ export interface MapStorage {
     features: {
         click: oFeature<oPoint> | null,
         hover: oFeature<oPoint> | null,
-        track: oFeature<LineString> | null,
-        init: string[] | null
+        track: oFeature<LineString> | null
     },
     view: {
         lastView: Extent | null,
