@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
 
 export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
-    const { liveData: sharedliveData, updateLiveData: setSharedLiveData, resetLiveData: resetSharedLiveData } = useFlightStore()
+    const { liveData: sharedliveData, setLiveData: setSharedLiveData } = useFlightStore()
     const [privateLiveData, setPrivateLiveData] = useState(click ? null : getLiveData(feature))
 
     const liveData = click ? sharedliveData : privateLiveData
@@ -31,9 +31,9 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
         setSharedLiveData(feature)
 
         return () => {
-            resetSharedLiveData()
+            setSharedLiveData(null)
         }
-    }, [click, feature, setSharedLiveData, resetSharedLiveData])
+    }, [click, feature, setSharedLiveData])
 
     const airports = feature.get('airports')
 

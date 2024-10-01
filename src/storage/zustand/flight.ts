@@ -6,22 +6,27 @@ export const useFlightStore = create<FlightStore>((set, get) => ({
     feature: null,
     liveData: null,
     trackPoints: null,
+    action: null,
     timer: null,
-    updateLiveData: (feature) => {
+    setAction: (id) => set((state) => {
+        if (state.action === id) return { action: null }
+        return { action: id }
+    }),
+    setLiveData: (feature) => {
+        if (feature === null) {
+            const { timer } = get()
+            if (timer === null) return
+            clearInterval(timer)
+            return
+        }
+
         set((state) => ({ feature: state.feature = feature }))
+        set((state) => ({ liveData: state.liveData = getLiveData(state.feature) }))
 
         const timerId = setInterval(() => {
             set((state) => ({ liveData: state.liveData = getLiveData(state.feature) }))
         }, 2000)
-        set((state) => ({ liveData: state.liveData = getLiveData(state.feature) }))
-
         set((state) => ({ timer: state.timer = timerId }))
     },
-    resetLiveData: () => {
-        const { timer } = get()
-        if (timer === null) return
-        clearInterval(timer)
-    },
-    setTrackPoints: (points) => set((state) => ({ trackPoints: state.trackPoints = points })),
-    resetTrackPoints: () => set((state) => ({ trackPoints: state.trackPoints = null }))
+    setTrackPoints: (points) => set((state) => ({ trackPoints: state.trackPoints = points }))
 }))

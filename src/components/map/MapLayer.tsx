@@ -7,7 +7,7 @@ import './Map.css'
 import { MapStorage } from "@/types/map"
 import { mapStorage } from "@/storage/singletons/map"
 import { onMessage } from "@/utils/ws"
-import { animateFeatures, updateFlightFeatures } from "./utils/flights"
+import { animateFlightFeatures, handleFlightPanelAction, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
 import { handleClick, handleFirstView, handleHover } from "./utils/misc"
@@ -27,7 +27,7 @@ export default function MapLayer({ }) {
         revalidateOnFocus: false
     })
     const { setPage } = useSliderStore()
-    const { trackPoints } = useFlightStore()
+    const { trackPoints, action } = useFlightStore()
 
     const mapRef = useRef<MapStorage>(mapStorage)
 
@@ -65,7 +65,7 @@ export default function MapLayer({ }) {
         // Init flight feature animation
         let animationFrameId: number
         const animate = () => {
-            animateFeatures(mapRef)
+            animateFlightFeatures(mapRef)
             animationFrameId = window.requestAnimationFrame(animate)
         }
         animationFrameId = window.requestAnimationFrame(animate)
@@ -80,19 +80,6 @@ export default function MapLayer({ }) {
             }
         }
     }, [])
-
-    // Init features once on page load via API and handle first view
-    useEffect(() => {
-        if (data && !mapRef.current.view.viewInit) {
-            updateFlightFeatures(mapRef, data)
-            handleFirstView(mapRef, pathname)
-        }
-    }, [data, pathname])
-
-    // Draw track when flight is loaded
-    useEffect(() => {
-        initTrack(mapRef, trackPoints)
-    }, [trackPoints])
 
     // Handle feature click events
     useEffect(() => {
@@ -118,6 +105,24 @@ export default function MapLayer({ }) {
             map.un(['click'], onClick)
         }
     }, [router, setPage])
+
+    // Init features once on page load via API and handle first view
+    useEffect(() => {
+        if (data && !mapRef.current.view.viewInit) {
+            updateFlightFeatures(mapRef, data)
+            handleFirstView(mapRef, pathname)
+        }
+    }, [data, pathname])
+
+    // Draw track when flight is loaded
+    useEffect(() => {
+        initTrack(mapRef, trackPoints)
+    }, [trackPoints])
+
+    // Handle flight panel actions
+    useEffect(() => {
+        handleFlightPanelAction(mapRef, action)
+    }, [action])
 
     return (
         <div id="map" />

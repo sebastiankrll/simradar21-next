@@ -192,7 +192,7 @@ export function handleFirstView(mapRef: RefObject<MapStorage>, path: string) {
 
     if (path.includes('flight')) {
         setClickedFeature(mapRef, 'flight', path.split('/')[2])
-        moveViewToFeature(mapRef, mapRef.current.features.click)
+        moveViewToFeature(mapRef, mapRef.current.features.click, 8)
     }
     mapRef.current.view.viewInit = true
 }
@@ -221,17 +221,17 @@ function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, id: stri
     }
 }
 
-function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null) {
+export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null, zoom?: number) {
     if (!mapRef.current?.map || !feature) return
 
     const map = mapRef.current.map
     const view = map.getView()
     const extent = feature.getGeometry()?.getExtent()
+    if (!zoom) zoom = view.getZoom()
 
-    mapRef.current.view.lastView = view.calculateExtent(map.getSize())
-    map.getView().animate({
+    view.animate({
         center: extent,
-        zoom: 8,
+        zoom: zoom,
         duration: 200
     })
 }

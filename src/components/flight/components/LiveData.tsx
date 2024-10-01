@@ -4,7 +4,7 @@ import { useFlightStore } from "@/storage/zustand/flight"
 import { FlightData } from "@/types/flight"
 
 export default function LiveData({ data }: { data: FlightData }) {
-    const liveData = useFlightStore((state) => state.liveData)
+    const { liveData } = useFlightStore()
 
     return (
         <div className="info-panel-container sub">

@@ -7,6 +7,7 @@ import { Feature } from "ol"
 import { Point } from "ol/geom"
 import { moveFlightOverlay, updateFlightOverlay } from "./overlay"
 import { moveTrack, updateTrack } from "./track"
+import { moveViewToFeature } from "./misc"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     if (!mapRef.current || !vatsimData?.position) return
@@ -101,7 +102,7 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: 
     updateFlightOverlay(mapRef)
 }
 
-export function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
+function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
     const spd = position.groundspeeds[0] * 0.514444
     const dist = spd * timeElapsed / 1000
 
@@ -128,7 +129,7 @@ export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
 }
 
 let then: number = Date.now()
-export function animateFeatures(mapRef: RefObject<MapStorage>) {
+export function animateFlightFeatures(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
 
     const fpsInterval = 1000 / 30
@@ -142,4 +143,40 @@ export function animateFeatures(mapRef: RefObject<MapStorage>) {
 
         then = now - (elapsed % fpsInterval)
     }
+}
+
+export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | null) {
+    const map = mapRef.current?.map
+    if (!map) return
+
+    if (!action) {
+        clearInterval(followInterval)
+
+        if (mapRef.current?.view.lastView) {
+            map.getView().fit(mapRef.current.view.lastView, {
+                duration: 200
+            })
+        }
+        mapRef.current.view.lastView = null
+
+        return
+    }
+
+    if (action === 1) {
+        followFlightFeature(mapRef)
+    }
+}
+
+let followInterval: NodeJS.Timeout
+function followFlightFeature(mapRef: RefObject<MapStorage>) {
+    const clickedFeature = mapRef.current?.features.click
+    const map = mapRef.current?.map
+    if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
+
+    mapRef.current.view.lastView = map.getView().calculateExtent(map.getSize())
+    moveViewToFeature(mapRef, clickedFeature)
+
+    followInterval = setInterval(() => {
+        moveViewToFeature(mapRef, clickedFeature)
+    }, 5000)
 }
