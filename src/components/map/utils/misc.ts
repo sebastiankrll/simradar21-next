@@ -102,11 +102,11 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
         }
     }) as Feature<Point>
 
-    resetMap(mapRef)
-
     if (!feature) {
         return '/'
     }
+
+    resetMap(mapRef)
 
     feature.set('hover', 1)
     features.click = feature

@@ -18,16 +18,26 @@ import Spinner from '../common/spinner/Spinner'
 import { useEffect } from 'react'
 import { useFlightStore } from '@/storage/zustand/flight'
 import { TrackData } from '@/types/vatsim'
+import { useRouter } from 'next/navigation'
+import { useSliderStore } from '@/storage/zustand/slider'
 
 export default function Flight({ callsign }: { callsign: string }) {
+    const router = useRouter()
     const { data: flightData, isLoading } = useSWR<FlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, {
         refreshInterval: 20000
     })
     const { data: trackData } = useSWR<TrackData | undefined | null>(`/api/data/track/${callsign}`, fetcher, {
         revalidateOnFocus: false
     })
-    const { setTrackPoints } = useFlightStore()
+    const { setTrackPoints, setAction } = useFlightStore()
+    const {setPage} = useSliderStore()
     const flightStatus = getFlightStatus(flightData)
+
+    const clickClose = () => {
+        setAction(null)
+        setPage('/')
+        router.prefetch('/')
+    }
 
     useEffect(() => {
         setTrackPoints(trackData?.points ?? null)
@@ -42,7 +52,7 @@ export default function Flight({ callsign }: { callsign: string }) {
             <Spinner show={isLoading} />
             <div className="info-panel-container header">
                 <div className='info-panel-id'>{callsign}</div>
-                <CloseButton />
+                <CloseButton onButtonClick={clickClose} />
             </div>
             <div className="info-panel-container">
                 <div className="info-panel-title-main">

@@ -10,7 +10,7 @@ import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, handleFlightPanelAction, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleFirstView, handleHover } from "./utils/misc"
+import { handleClick, handleFirstView, handleHover, resetMap } from "./utils/misc"
 import { initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
@@ -111,6 +111,9 @@ export default function MapLayer({ }) {
         if (data && !mapRef.current.view.viewInit) {
             updateFlightFeatures(mapRef, data)
             handleFirstView(mapRef, pathname)
+        }
+        if (pathname === '/' && mapRef.current.view.viewInit) {
+            resetMap(mapRef)
         }
     }, [data, pathname])
 
