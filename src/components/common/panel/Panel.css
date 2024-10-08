@@ -11,6 +11,13 @@
     overflow: hidden;
 }
 
+.info-panel.loading {
+    flex: 1 0;
+    background: linear-gradient(180deg, rgba(77, 95, 131, 1) 20%, rgba(77, 95, 131, 0) 100%);
+    align-items: center;
+    justify-content: center;
+}
+
 .info-panel-container {
     display: flex;
     background-color: white;

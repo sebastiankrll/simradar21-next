@@ -30,7 +30,7 @@ export default function Flight({ callsign }: { callsign: string }) {
         revalidateOnFocus: false
     })
     const { setTrackPoints, setAction } = useFlightStore()
-    const {setPage} = useSliderStore()
+    const { setPage } = useSliderStore()
     const flightStatus = getFlightStatus(flightData)
 
     const clickClose = () => {
@@ -47,9 +47,14 @@ export default function Flight({ callsign }: { callsign: string }) {
         }
     }, [trackData, setTrackPoints])
 
+    if (isLoading) return (
+        <div className='info-panel loading'>
+            <Spinner show={true} />
+        </div>
+    )
+
     return (
         <div className='info-panel'>
-            <Spinner show={isLoading} />
             <div className="info-panel-container header">
                 <div className='info-panel-id'>{callsign}</div>
                 <CloseButton onButtonClick={clickClose} />

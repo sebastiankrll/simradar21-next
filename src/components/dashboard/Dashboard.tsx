@@ -41,9 +41,14 @@ export default function Dashboard() {
         // })
     }
 
+    if (isLoading) return (
+        <div className='info-panel loading'>
+            <Spinner show={true} />
+        </div>
+    )
+
     return (
         <div className='info-panel' ref={panelRef}>
-            <Spinner show={isLoading} />
             <HistoryChart panelStates={panelStates} clickOpen={clickOpen} data={data} />
             <GeneralStats panelStates={panelStates} clickOpen={clickOpen} data={data} />
             <BusiestAirports panelStates={panelStates} clickOpen={clickOpen} data={data} />
