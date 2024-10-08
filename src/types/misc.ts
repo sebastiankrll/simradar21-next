@@ -29,3 +29,7 @@ export interface WsMessage {
     event: string,
     data: VatsimDataWS
 }
+
+export interface PanelStates {
+    [key: string]: boolean
+}
