@@ -175,13 +175,19 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
 
     if (mapRef.current.overlays.hover) {
         const root = mapRef.current.overlays.hover.get('root')
-        root?.unmount()
+        setTimeout(() => {
+            root?.unmount()
+        }, 0)
+
         mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
         mapRef.current.overlays.hover = null
     }
     if (mapRef.current.overlays.click) {
         const root = mapRef.current.overlays.click.get('root')
-        root?.unmount()
+        setTimeout(() => {
+            root?.unmount()
+        }, 0)
+
         mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
         mapRef.current.overlays.click = null
     }
