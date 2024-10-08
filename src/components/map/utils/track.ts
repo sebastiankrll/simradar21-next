@@ -1,5 +1,5 @@
 import { Attitude, MapStorage } from "@/types/map"
-import { TrackData, TrackPoint } from "@/types/vatsim"
+import { TrackPoint } from "@/types/vatsim"
 import { Feature } from "ol"
 import { LineString } from "ol/geom"
 import { fromLonLat } from "ol/proj"

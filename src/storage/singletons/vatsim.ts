@@ -5,7 +5,7 @@ import { updateStatus } from "@/server/services/vatsim/status";
 import { VatsimDataStorage, RawDataStorage } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
 
-export let rawDataStorage: RawDataStorage = {
+export const rawDataStorage: RawDataStorage = {
     vatsim: null,
     transveivers: null
 }

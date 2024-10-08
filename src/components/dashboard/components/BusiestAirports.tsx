@@ -3,13 +3,11 @@ import { PanelStates } from "@/types/misc"
 export default function BusiestAirports(
     {
         panelStates,
-        clickOpen,
-        data
+        clickOpen
     }:
         {
             panelStates: PanelStates,
-            clickOpen: (e: React.MouseEvent<HTMLElement>) => void,
-            data: any
+            clickOpen: (e: React.MouseEvent<HTMLElement>) => void
         }
 ) {
     return (

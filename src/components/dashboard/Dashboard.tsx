@@ -7,18 +7,17 @@ import { fetcher } from '@/utils/api'
 import { useRef, useState } from 'react'
 import { PanelStates } from '@/types/misc'
 import HistoryChart from './components/HistoryChart'
-import { setHeight } from '@/utils/gui'
 import GeneralStats from './components/GeneralStats'
 import BusiestAirports from './components/BusiestAirports'
 import RarestAirports from './components/RarestAirports'
 import EventsList from './components/EventsList'
 
 export default function Dashboard() {
-    const { data, isLoading } = useSWR<null>('/api/data/dashboard', fetcher, {
+    const { isLoading } = useSWR<null>('/api/data/dashboard', fetcher, {
         refreshInterval: 60000,
         revalidateOnFocus: false
     })
-    const [panelStates, setPanelStates] = useState<PanelStates>({
+    const [panelStates] = useState<PanelStates>({
         chart: false,
         stats: false,
         busiest: false,
@@ -49,11 +48,11 @@ export default function Dashboard() {
 
     return (
         <div className='info-panel' ref={panelRef}>
-            <HistoryChart panelStates={panelStates} clickOpen={clickOpen} data={data} />
-            <GeneralStats panelStates={panelStates} clickOpen={clickOpen} data={data} />
-            <BusiestAirports panelStates={panelStates} clickOpen={clickOpen} data={data} />
-            <RarestAirports panelStates={panelStates} clickOpen={clickOpen} data={data} />
-            <EventsList panelStates={panelStates} clickOpen={clickOpen} data={data} />
+            <HistoryChart panelStates={panelStates} clickOpen={clickOpen} />
+            <GeneralStats panelStates={panelStates} clickOpen={clickOpen} />
+            <BusiestAirports panelStates={panelStates} clickOpen={clickOpen} />
+            <RarestAirports panelStates={panelStates} clickOpen={clickOpen} />
+            <EventsList panelStates={panelStates} clickOpen={clickOpen} />
         </div>
     )
 }

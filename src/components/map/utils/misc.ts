@@ -4,8 +4,6 @@ import { RefObject } from "react"
 import { createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
-import { initTrack } from "./track"
-import { moveFlightFeatures } from "./flights"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
