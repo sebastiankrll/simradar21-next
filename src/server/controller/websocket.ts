@@ -1,5 +1,5 @@
-import { subRedis } from "@/storage/singletons/redis";
-import { getVatsimDataWs, setVatsimStorage } from "@/storage/singletons/vatsim";
+import { getVatsimWsData, setVatsimStorage } from "@/storage/singletons/vatsim";
+import { subRedis } from "@/utils/redis";
 import { WebSocket, WebSocketServer } from "ws";
 import { createGzip } from "zlib";
 
@@ -20,7 +20,7 @@ function sendWsData(data: string) {
     setVatsimStorage(JSON.parse(data))
 
     const gzip = createGzip()
-    const storage = getVatsimDataWs()
+    const storage = getVatsimWsData()
     gzip.write(JSON.stringify({
         event: 'set_vatsim',
         data: storage,

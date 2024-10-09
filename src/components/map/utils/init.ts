@@ -12,6 +12,9 @@ import { FeatureLike } from "ol/Feature"
 import { StyleLike } from "ol/style/Style"
 import { getFIRStyle } from "./style"
 import { initSunLayer } from "./sun"
+import { fetcher } from "@/utils/api"
+import { VatsimDataWS } from "@/types/vatsim"
+import { updateFlightFeatures } from "./flights"
 
 export function initLayers(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
@@ -104,4 +107,14 @@ export function initLayers(mapRef: RefObject<MapStorage>) {
     mapRef.current?.map.addLayer(firLabelLayer)
 
     initSunLayer(mapRef)
+}
+
+export async function initData(mapRef: RefObject<MapStorage>) {
+    const initData: VatsimDataWS = await fetcher('/api/data/init')
+
+    updateFlightFeatures(mapRef, initData)
+
+    // if (!mapRef.current?.view.viewInit) {
+    //     handleFirstView(mapRef, pathname)
+    // }
 }

@@ -1,4 +1,4 @@
-import { getFlightData } from "@/storage/singletons/global"
+import { getVatsimFlightData } from "@/storage/singletons/vatsim"
 import { NextResponse } from "next/server"
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
     { params }: { params: { callsign: string } }
 ) {
     const callsign = params.callsign
-    const data = getFlightData(callsign)
+    const data = getVatsimFlightData(callsign)
 
     return NextResponse.json(data)
 }

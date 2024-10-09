@@ -10,12 +10,10 @@ import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, handleFlightPanelAction, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleFirstView, handleHover, resetMap } from "./utils/misc"
-import { initLayers } from "./utils/init"
+import { handleClick, handleHover, resetMap } from "./utils/misc"
+import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
-import useSWR from "swr"
-import { fetcher } from "@/utils/api"
 import { useSliderStore } from "@/storage/zustand/slider"
 import { useFlightStore } from "@/storage/zustand/flight"
 import { initTrack } from "./utils/track"
@@ -23,9 +21,6 @@ import { initTrack } from "./utils/track"
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
-    const { data } = useSWR<VatsimDataWS | null>('/api/data/init', fetcher, {
-        revalidateOnFocus: false
-    })
     const { setPage } = useSliderStore()
     const { trackPoints, action } = useFlightStore()
 
@@ -61,6 +56,9 @@ export default function MapLayer({ }) {
             handleHover(mapRef, targetEvent)
         }
         map.on(['pointermove'], onHover)
+
+        // Init overall data (api calls)
+        initData(mapRef)
 
         // Init flight feature animation
         let animationFrameId: number
@@ -106,16 +104,12 @@ export default function MapLayer({ }) {
         }
     }, [router, setPage])
 
-    // Init features once on page load via API and handle first view
+    // Handle path reset
     useEffect(() => {
-        if (data && !mapRef.current.view.viewInit) {
-            updateFlightFeatures(mapRef, data)
-            handleFirstView(mapRef, pathname)
-        }
         if (pathname === '/' && mapRef.current.view.viewInit) {
             resetMap(mapRef)
         }
-    }, [data, pathname])
+    }, [pathname])
 
     // Draw track when flight is loaded
     useEffect(() => {
