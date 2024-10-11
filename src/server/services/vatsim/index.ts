@@ -7,7 +7,7 @@ const redisPub = new Redis()
 
 let dataUpdateInProgress = false
 
-export async function fetchVatsimData() {
+export async function updateVatsimData() {
     if (dataUpdateInProgress) return
 
     dataUpdateInProgress = true
@@ -21,7 +21,9 @@ export async function fetchVatsimData() {
             rawDataStorage.vatsim = vatsimData.data
             rawDataStorage.transveivers = transceivers.data
 
-            updateVatsimData()
+            updateVatsimStorage()
+            redisPub.publish('vatsim_storage', JSON.stringify(vatsimDataStorage))
+            console.log(new Date().toISOString() + ': VATSIM data updated.')
         }
     } catch (error) {
         console.error('Error fetching VATSIM data from API:', error)
@@ -29,14 +31,4 @@ export async function fetchVatsimData() {
     }
 
     dataUpdateInProgress = false
-}
-
-function updateVatsimData() {
-    updateVatsimStorage()
-    pushVatsimStorage()
-    console.log(new Date().toISOString() + ': VATSIM data updated.')
-}
-
-function pushVatsimStorage() {
-    redisPub.publish('vatsim_storage', JSON.stringify(vatsimDataStorage))
 }

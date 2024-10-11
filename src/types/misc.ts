@@ -1,3 +1,4 @@
+import { Feature, FeatureCollection, MultiPolygon, Point } from "geojson"
 import { VatsimDataWS } from "./vatsim"
 
 export interface Aircrafts {
@@ -32,4 +33,19 @@ export interface WsMessage {
 
 export interface PanelStates {
     [key: string]: boolean
+}
+
+export interface DatabaseDataStorage {
+    airports: {
+        version: string,
+        data: Feature<Point>[] | null
+    },
+    firs: {
+        version: string,
+        data: Feature<MultiPolygon>[] | null
+    },
+    tracons: {
+        version: string,
+        data: Feature<MultiPolygon>[] | null
+    }
 }

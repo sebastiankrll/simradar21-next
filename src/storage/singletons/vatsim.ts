@@ -5,20 +5,7 @@ import { updateStatus } from "@/server/services/vatsim/status";
 import { VatsimDataStorage, RawDataStorage, TrackData } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
 import { FlightData } from "@/types/flight";
-
-declare const globalThis: {
-    vatsimDataStorage: VatsimDataStorage
-} & typeof global
-
-globalThis.vatsimDataStorage = {
-    position: null,
-    general: null,
-    status: null,
-    generalPre: null,
-    statusPre: null,
-    track: null,
-    timestamp: new Date()
-}
+import globalThis from "./global";
 
 export const rawDataStorage: RawDataStorage = {
     vatsim: null,

@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@geoblocks/ol-maplibre-layer": "^1.0.1",
+    "@types/adm-zip": "^0.5.5",
     "@types/geojson": "^7946.0.14",
     "@types/openlayers": "^4.6.23",
+    "adm-zip": "^0.5.16",
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",
     "chartjs-adapter-date-fns": "^3.0.0",
