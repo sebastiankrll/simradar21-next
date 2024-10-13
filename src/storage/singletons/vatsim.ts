@@ -6,6 +6,7 @@ import { VatsimDataStorage, RawDataStorage, TrackData } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
 import { FlightData } from "@/types/flight";
 import globalThis from "./global";
+import { updateController } from "@/server/services/vatsim/controller";
 
 export const rawDataStorage: RawDataStorage = {
     vatsim: null,
@@ -19,6 +20,7 @@ export let vatsimDataStorage: VatsimDataStorage = {
     generalPre: null,
     statusPre: null,
     track: null,
+    controller: null,
     timestamp: new Date()
 }
 
@@ -35,6 +37,7 @@ export function updateVatsimStorage() {
     updateGeneral()
     updateStatus()
     updateTrack()
+    updateController()
 }
 
 export function getVatsimFlightData(callsign: string): FlightData {
@@ -67,7 +70,7 @@ export function getVatsimWsData(): VatsimDataWS | null {
         flights: {
             position: storage.position
         },
-        atc: null,
+        controllers: storage.controller,
         timestamp: storage.timestamp
     }
 }

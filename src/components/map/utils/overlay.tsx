@@ -27,24 +27,44 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feat
     return overlay
 }
 
-// export const createAirportPopup = (map, feature, airportsRef) => {
-//     const element = document.createElement('div')
-//     const root = createRoot(element)
-//     root.render(<AirportPopup feature={feature} airport={airportsRef.current[feature.get('icao')]} />)
+export function createAirportOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {
+    if (!mapRef.current?.map) return null
 
-//     const popupOverlay = new Overlay({
-//         element,
-//         position: feature.getGeometry().getCoordinates(),
-//         positioning: 'bottom-center',
-//         offset: [0, -24],
-//         id: feature.get('icao')
-//     })
-//     popupOverlay.set('root', root)
+    const element = document.createElement('div')
+    const root = createRoot(element)
+    root.render(<FlightOverlay feature={feature} click={click} />)
 
-//     map.addOverlay(popupOverlay)
+    const overlay = new Overlay({
+        element,
+        position: feature.getGeometry()?.getCoordinates(),
+        positioning: 'bottom-center',
+        offset: [0, -25],
+        id: feature.get('callsign')
+    })
+    overlay.set('root', root)
+    mapRef.current?.map.addOverlay(overlay)
 
-//     return popupOverlay
-// }
+    return overlay
+}
+
+export const createAirportPopup = (map, feature, airportsRef) => {
+    const element = document.createElement('div')
+    const root = createRoot(element)
+    root.render(<AirportPopup feature={feature} airport={airportsRef.current[feature.get('icao')]} />)
+
+    const popupOverlay = new Overlay({
+        element,
+        position: feature.getGeometry().getCoordinates(),
+        positioning: 'bottom-center',
+        offset: [0, -24],
+        id: feature.get('icao')
+    })
+    popupOverlay.set('root', root)
+
+    map.addOverlay(popupOverlay)
+
+    return popupOverlay
+}
 
 // export const createATCPopup = (map, feature) => {
 //     const element = document.createElement('div')

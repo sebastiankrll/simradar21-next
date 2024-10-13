@@ -233,6 +233,18 @@ export interface TrackData {
     points: TrackPoint[]
 }
 
+export interface ControllerIndex {
+    facility: string,
+    callsign: string,
+    frequency: string,
+    text: string[] | null,
+    logon: Date
+}
+
+export interface ControllerData {
+    [key: string]: ControllerIndex[]
+}
+
 export interface VatsimDataStorage {
     position: PositionData[] | null,
     general: GeneralData[] | null,
@@ -240,6 +252,7 @@ export interface VatsimDataStorage {
     generalPre: GeneralData[] | null,
     statusPre: StatusData[] | null,
     track: TrackData[] | null,
+    controller: ControllerData | null,
     timestamp: Date
 }
 
@@ -247,7 +260,7 @@ export interface VatsimDataWS {
     flights: {
         position: PositionData[] | null
     },
-    atc: null,
+    controllers: ControllerData | null,
     timestamp: Date
 }
 

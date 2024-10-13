@@ -17,7 +17,7 @@ import BaseEvent from "ol/events/Event"
 import { useSliderStore } from "@/storage/state/slider"
 import { useFlightStore } from "@/storage/state/flight"
 import { initTrack } from "./utils/track"
-import { updateAirportFeatures } from "./utils/airports"
+import { setAirportFeaturesByExtent } from "./utils/airports"
 
 export default function MapLayer({ }) {
     const router = useRouter()
@@ -60,7 +60,7 @@ export default function MapLayer({ }) {
 
         // Init hover events
         const onMoveEnd = () => {
-            updateAirportFeatures(mapRef)
+            setAirportFeaturesByExtent(mapRef)
         }
         map.on(['moveend'], onMoveEnd)
 

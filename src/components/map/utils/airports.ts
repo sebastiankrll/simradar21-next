@@ -6,10 +6,12 @@ import { transformExtent } from "ol/proj";
 import RBush from "rbush";
 import { RefObject } from "react";
 import GeoJSON from 'ol/format/GeoJSON'
+import { VatsimDataWS } from "@/types/vatsim";
 
 const rbush = new RBush<IndexedAirportFeature>()
+let controllers
 
-export async function initAirportFeatures(mapRef: RefObject<MapStorage>) {
+export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     const airportFeatures = await getAirports()
     if (!airportFeatures) return
 
@@ -25,10 +27,12 @@ export async function initAirportFeatures(mapRef: RefObject<MapStorage>) {
     })
     rbush.load(indexedFeatures)
 
-    updateAirportFeatures(mapRef)
+    controllers = vatsimData?.controllers
+    console.log(controllers)
+    setAirportFeaturesByExtent(mapRef)
 }
 
-export function updateAirportFeatures(mapRef: RefObject<MapStorage>) {
+export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
     const map = mapRef.current?.map
     const resolution = map?.getView().getResolution()
     if (!resolution || !map) {

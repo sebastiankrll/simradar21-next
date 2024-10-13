@@ -117,7 +117,7 @@ export async function initData(mapRef: RefObject<MapStorage>) {
     
     checkAndUpdateData(initData.database)
     updateFlightFeatures(mapRef, initData.vatsim)
-    initAirportFeatures(mapRef)
+    initAirportFeatures(mapRef, initData.vatsim)
 
     // if (!mapRef.current?.view.viewInit) {
     //     handleFirstView(mapRef, pathname)

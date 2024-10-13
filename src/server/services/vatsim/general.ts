@@ -2,13 +2,14 @@ import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
 import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'
-const airports = airportsJSON as FeatureCollection
 import fleetsJSON from '@/assets/data/fleets.json'
 import { Airlines, Fleet } from "@/types/misc"
-const fleets = fleetsJSON as Fleet[]
 import airlinesJSON from '@/assets/data/airlines.json'
 import { calculateDistance, convertVatsimDate } from "@/utils/common"
+
 const airlines = airlinesJSON as Airlines[]
+const airports = airportsJSON as FeatureCollection
+const fleets = fleetsJSON as Fleet[]
 
 export function updateGeneral() {
     updateGeneralData()
