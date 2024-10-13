@@ -65,7 +65,7 @@ function extractFIRs(data: string) {
             continue
         }
 
-        const [icao, name, prefix, boundary] = line.split('|')
+        const [icao, name, prefix] = line.split('|')
 
         if (prefix === '') {
             prefixes[icao] = icao

@@ -3,7 +3,7 @@ import AdmZip from 'adm-zip'
 import { Feature, MultiPolygon } from "geojson"
 import { checkVersion, closePolygons, setLabelPosition } from "./misc"
 
-let prefixes: { [key: string]: string } = {}
+const prefixes: { [key: string]: string } = {}
 
 export async function updateTRACONs(version: string): Promise<{ version: string, data: Feature<MultiPolygon>[] }> {
     const newVersion = await checkVersion('https://api.github.com/repos/vatsimnetwork/simaware-tracon-project/releases/latest', version)

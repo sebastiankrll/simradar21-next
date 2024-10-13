@@ -15,6 +15,9 @@ import { initSunLayer } from "./sun"
 import { fetcher } from "@/utils/api"
 import { VatsimDataWS } from "@/types/vatsim"
 import { updateFlightFeatures } from "./flights"
+import { DatabaseDataStorage } from "@/types/database"
+import { checkAndUpdateData } from "@/storage/db"
+import { initAirports } from "./airports"
 
 export function initLayers(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
@@ -110,9 +113,11 @@ export function initLayers(mapRef: RefObject<MapStorage>) {
 }
 
 export async function initData(mapRef: RefObject<MapStorage>) {
-    const initData: VatsimDataWS = await fetcher('/api/data/init')
-
-    updateFlightFeatures(mapRef, initData)
+    const initData: { vatsim: VatsimDataWS, database: DatabaseDataStorage } = await fetcher('/api/data/init')
+    
+    checkAndUpdateData(initData.database)
+    updateFlightFeatures(mapRef, initData.vatsim)
+    initAirports(mapRef)
 
     // if (!mapRef.current?.view.viewInit) {
     //     handleFirstView(mapRef, pathname)

@@ -3,7 +3,7 @@
 import './Overlay.css'
 import { Feature } from 'ol'
 import Image from 'next/image'
-import { useFlightStore } from '@/storage/zustand/flight'
+import { useFlightStore } from '@/storage/state/flight'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
 

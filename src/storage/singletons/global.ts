@@ -1,4 +1,4 @@
-import { DatabaseDataStorage } from "@/types/misc"
+import { DatabaseDataStorage } from "@/types/database"
 import { VatsimDataStorage } from "@/types/vatsim"
 
 declare const globalThis: {

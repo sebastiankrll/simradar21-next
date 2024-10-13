@@ -14,8 +14,8 @@ import { handleClick, handleHover, resetMap } from "./utils/misc"
 import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
-import { useSliderStore } from "@/storage/zustand/slider"
-import { useFlightStore } from "@/storage/zustand/flight"
+import { useSliderStore } from "@/storage/state/slider"
+import { useFlightStore } from "@/storage/state/flight"
 import { initTrack } from "./utils/track"
 
 export default function MapLayer({ }) {
@@ -66,7 +66,7 @@ export default function MapLayer({ }) {
             animateFlightFeatures(mapRef)
             animationFrameId = window.requestAnimationFrame(animate)
         }
-        animationFrameId = window.requestAnimationFrame(animate)
+        // animationFrameId = window.requestAnimationFrame(animate)
 
 
         return () => {

@@ -16,10 +16,10 @@ import useSWR from 'swr'
 import { fetcher } from '@/utils/api'
 import Spinner from '../common/spinner/Spinner'
 import { useEffect } from 'react'
-import { useFlightStore } from '@/storage/zustand/flight'
+import { useFlightStore } from '@/storage/state/flight'
 import { TrackData } from '@/types/vatsim'
 import { useRouter } from 'next/navigation'
-import { useSliderStore } from '@/storage/zustand/slider'
+import { useSliderStore } from '@/storage/state/slider'
 
 export default function Flight({ callsign }: { callsign: string }) {
     const router = useRouter()
