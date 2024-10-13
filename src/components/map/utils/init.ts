@@ -17,7 +17,7 @@ import { VatsimDataWS } from "@/types/vatsim"
 import { updateFlightFeatures } from "./flights"
 import { DatabaseDataStorage } from "@/types/database"
 import { checkAndUpdateData } from "@/storage/db"
-import { initAirports } from "./airports"
+import { initAirportFeatures } from "./airports"
 
 export function initLayers(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
@@ -117,7 +117,7 @@ export async function initData(mapRef: RefObject<MapStorage>) {
     
     checkAndUpdateData(initData.database)
     updateFlightFeatures(mapRef, initData.vatsim)
-    initAirports(mapRef)
+    initAirportFeatures(mapRef)
 
     // if (!mapRef.current?.view.viewInit) {
     //     handleFirstView(mapRef, pathname)

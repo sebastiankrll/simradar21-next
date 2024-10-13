@@ -17,6 +17,7 @@ import BaseEvent from "ol/events/Event"
 import { useSliderStore } from "@/storage/state/slider"
 import { useFlightStore } from "@/storage/state/flight"
 import { initTrack } from "./utils/track"
+import { updateAirportFeatures } from "./utils/airports"
 
 export default function MapLayer({ }) {
     const router = useRouter()
@@ -51,11 +52,17 @@ export default function MapLayer({ }) {
         })
 
         // Init hover events
-        const onHover = (event: BaseEvent | Event) => {
+        const onPointerMove = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
             handleHover(mapRef, targetEvent)
         }
-        map.on(['pointermove'], onHover)
+        map.on(['pointermove'], onPointerMove)
+
+        // Init hover events
+        const onMoveEnd = () => {
+            updateAirportFeatures(mapRef)
+        }
+        map.on(['moveend'], onMoveEnd)
 
         // Init overall data (api calls)
         initData(mapRef)
@@ -71,7 +78,8 @@ export default function MapLayer({ }) {
 
         return () => {
             map.setTarget('')
-            map.un(['pointermove'], onHover)
+            map.un(['pointermove'], onPointerMove)
+            map.un(['moveend'], onMoveEnd)
             unMessage()
             if (animationFrameId) {
                 window.cancelAnimationFrame(animationFrameId)
