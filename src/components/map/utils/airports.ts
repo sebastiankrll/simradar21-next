@@ -1,4 +1,4 @@
-import { getAirports } from "@/storage/db";
+import { getAllAirports } from "@/storage/client-database";
 import { IndexedAirportFeature, MapStorage } from "@/types/map";
 import bbox from "@turf/bbox";
 import { BBox } from "geojson";
@@ -9,10 +9,9 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { VatsimDataWS } from "@/types/vatsim";
 
 const rbush = new RBush<IndexedAirportFeature>()
-let controllers
 
 export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
-    const airportFeatures = await getAirports()
+    const airportFeatures = await getAllAirports()
     if (!airportFeatures) return
 
     const indexedFeatures: IndexedAirportFeature[] = airportFeatures.map((feature) => {
@@ -26,9 +25,6 @@ export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimD
         }
     })
     rbush.load(indexedFeatures)
-
-    controllers = vatsimData?.controllers
-    console.log(controllers)
     setAirportFeaturesByExtent(mapRef)
 }
 
@@ -68,6 +64,46 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
             features: featuresBySize
+        }, {
+            featureProjection: 'EPSG:3857',
+        })
+    )
+}
+
+export function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
+    const features = [] // Use separate storage for rbush and features itself to filter features here, otherwise everytime all feature would needed to be loaded here
+    const controllers = vatsimData?.controllers
+    if (!controllers) return
+
+    const keys = Object.keys(controllers)
+
+    for (const key of keys) {
+        let stations = [0, 0, 0, 0]
+
+        controllers[key].forEach(station => {
+            if (station.facility === -1) {
+                stations[3] = 1
+            }
+            if (station.fc === 2) {
+                stations[2] = 1
+            }
+            if (station.fc === 3) {
+                stations[1] = 1
+            }
+            if (station.fc === 4) {
+                stations[0] = 1
+            }
+        })
+
+        feature.properties.offset = parseInt(stations.join(''), 2) * 36
+        feature.properties.stations = airports[key]
+    }
+
+    mapRef.current?.sources.airportLabels.clear()
+    mapRef.current?.sources.airportLabels.addFeatures(
+        new GeoJSON().readFeatures({
+            type: 'FeatureCollection',
+            features: features
         }, {
             featureProjection: 'EPSG:3857',
         })

@@ -17,7 +17,7 @@ import BaseEvent from "ol/events/Event"
 import { useSliderStore } from "@/storage/state/slider"
 import { useFlightStore } from "@/storage/state/flight"
 import { initTrack } from "./utils/track"
-import { setAirportFeaturesByExtent } from "./utils/airports"
+import { setAirportFeaturesByExtent, updateAirportFeatures } from "./utils/airports"
 
 export default function MapLayer({ }) {
     const router = useRouter()
@@ -49,6 +49,7 @@ export default function MapLayer({ }) {
         // Init websocket updates
         const unMessage = onMessage((message: WsMessage) => {
             updateFlightFeatures(mapRef, message.data as VatsimDataWS)
+            updateAirportFeatures(mapRef, message.data as VatsimDataWS)
         })
 
         // Init hover events
