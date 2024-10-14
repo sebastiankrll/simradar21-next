@@ -2,7 +2,7 @@ import { getAllAirports, getSelectedAirports } from "@/storage/client-database";
 import { IndexedAirportFeature, MapStorage } from "@/types/map";
 import bbox from "@turf/bbox";
 import { BBox } from "geojson";
-import { transformExtent } from "ol/proj";
+import { fromLonLat, transformExtent } from "ol/proj";
 import RBush from "rbush";
 import { RefObject } from "react";
 import GeoJSON from 'ol/format/GeoJSON'
@@ -10,6 +10,8 @@ import { VatsimDataWS } from "@/types/vatsim";
 import { Feature } from "ol";
 import { Point } from "ol/geom";
 import { createAirportOverlay } from "./overlay";
+import { boundingExtent } from "ol/extent";
+import { webglConfig } from "./webgl";
 
 const rbush = new RBush<IndexedAirportFeature>()
 
@@ -154,4 +156,56 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
 
     const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>)
     mapRef.current.overlays.click = overlay
+}
+
+export async function showFlightRoute(mapRef: RefObject<MapStorage>) {
+    const clickedFeature = mapRef.current?.features.click
+    const map = mapRef.current?.map
+    if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
+
+    mapRef.current.view.lastView = map.getView().calculateExtent(map.getSize())
+
+    const airportIcaos: string[] | null = clickedFeature.get('airports')
+    if (!airportIcaos || airportIcaos.length < 2) return
+
+    const airports = await getSelectedAirports(airportIcaos)
+    if (!airports || airports.length < 2) return
+
+    const coords = [
+        fromLonLat(airports[0].geometry.coordinates),
+        fromLonLat(airports[1].geometry.coordinates)
+    ]
+    const extent = boundingExtent(coords)
+
+    map.getView().fit(extent, {
+        duration: 200,
+        padding: [150, 100, 100, 468]
+    })
+
+    const newFeatures = new GeoJSON().readFeatures({
+        type: "FeatureCollection",
+        features: airports
+    }, {
+        featureProjection: 'EPSG:3857',
+    })
+    newFeatures.forEach(feature => {
+        feature.set('hover', 1)
+    })
+    mapRef.current.sources.airportTops.addFeatures(newFeatures)
+
+    webglConfig.flights.variables.callsign = clickedFeature.get('callsign')
+    webglConfig.shadows.variables.callsign = clickedFeature.get('callsign')
+    webglConfig.airports.variables.show = ''
+    webglConfig.airportLabels.variables.dep = airportIcaos[0]
+    webglConfig.airportLabels.variables.arr = airportIcaos[1]
+}
+
+export async function hideFlightRoute(mapRef: RefObject<MapStorage>) {
+    mapRef.current?.sources.airportTops.clear()
+
+    webglConfig.flights.variables.callsign = 'all'
+    webglConfig.shadows.variables.callsign = 'all'
+    webglConfig.airports.variables.show = 'all'
+    webglConfig.airportLabels.variables.dep = ''
+    webglConfig.airportLabels.variables.arr = ''
 }

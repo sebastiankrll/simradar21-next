@@ -145,30 +145,8 @@ export function animateFlightFeatures(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | null) {
-    const map = mapRef.current?.map
-    if (!map) return
-
-    if (!action) {
-        clearInterval(followInterval)
-
-        if (mapRef.current?.view.lastView) {
-            map.getView().fit(mapRef.current.view.lastView, {
-                duration: 200
-            })
-        }
-        mapRef.current.view.lastView = null
-
-        return
-    }
-
-    if (action === 1) {
-        followFlightFeature(mapRef)
-    }
-}
-
 let followInterval: NodeJS.Timeout
-function followFlightFeature(mapRef: RefObject<MapStorage>) {
+export function followFlightFeature(mapRef: RefObject<MapStorage>) {
     const clickedFeature = mapRef.current?.features.click
     const map = mapRef.current?.map
     if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
@@ -179,6 +157,10 @@ function followFlightFeature(mapRef: RefObject<MapStorage>) {
     followInterval = setInterval(() => {
         moveViewToFeature(mapRef, clickedFeature)
     }, 5000)
+}
+
+export function unFollowFlightFeature() {
+    clearInterval(followInterval)
 }
 
 export function setClickedFlightFeature(mapRef: RefObject<MapStorage>, callsign: string) {

@@ -4,8 +4,8 @@ import { RefObject } from "react"
 import { createAirportOverlay, createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
-import { setClickedFlightFeature } from "./flights"
-import { setClickedAirportFeature } from "./airports"
+import { followFlightFeature, setClickedFlightFeature, unFollowFlightFeature } from "./flights"
+import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
@@ -220,4 +220,31 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Featur
         zoom: zoom,
         duration: 200
     })
+}
+
+export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | null) {
+    const map = mapRef.current?.map
+    if (!map) return
+
+    if (!action) {
+        unFollowFlightFeature()
+        hideFlightRoute(mapRef)
+
+        if (mapRef.current?.view.lastView) {
+            map.getView().fit(mapRef.current.view.lastView, {
+                duration: 200
+            })
+        }
+        mapRef.current.view.lastView = null
+
+        return
+    }
+
+    if (action === 1) {
+        showFlightRoute(mapRef)
+    }
+
+    if (action === 2) {
+        followFlightFeature(mapRef)
+    }
 }
