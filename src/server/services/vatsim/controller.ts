@@ -15,9 +15,9 @@ export function updateController() {
         if (newController) newControllers.push(newController)
     }
 
-    const firs = newControllers.filter(controller => controller.facility === 'fir')
-    const tracons = newControllers.filter(controller => controller.facility === 'tracon')
-    const airports = newControllers.filter(controller => controller.facility === 'airport')
+    const firs = newControllers.filter(controller => controller.type === 'fir')
+    const tracons = newControllers.filter(controller => controller.type === 'tracon')
+    const airports = newControllers.filter(controller => controller.type === 'airport')
 
     const filteredFirs = filterFirs(firs)
     const filteredTracons = filterTracons(tracons)
@@ -32,7 +32,8 @@ function getControllerData(controller: VatsimController): ControllerIndex | null
     }
 
     return {
-        facility: getFacility(controller.facility),
+        type: getStationType(controller.facility),
+        facility: controller.facility,
         callsign: controller.callsign,
         frequency: controller.frequency,
         text: controller.text_atis,
@@ -86,7 +87,8 @@ function filterAirports(controllers: ControllerIndex[], atiss: VatsimATIS[]): Co
         }
 
         const newController: ControllerIndex = {
-            facility: 'airport',
+            type: 'airport',
+            facility: -1,
             callsign: atis.callsign.replace('__', '_'),
             frequency: atis.frequency,
             text: atis.text_atis,
@@ -98,7 +100,7 @@ function filterAirports(controllers: ControllerIndex[], atiss: VatsimATIS[]): Co
     return filteredAirports
 }
 
-function getFacility(facility: number): string {
+function getStationType(facility: number): string {
     switch (facility) {
         case 1:
         case 6:

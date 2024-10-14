@@ -1,7 +1,7 @@
 import { Feature as oFeature, Map, Overlay } from "ol";
 import { LineString, Point as oPoint } from "ol/geom";
 import VectorSource from "ol/source/Vector";
-import { Feature, MultiPolygon, Point } from "geojson";
+import { Feature, Point } from "geojson";
 import { Extent } from "ol/extent";
 
 export interface VectorSources {
@@ -61,5 +61,5 @@ export interface IndexedAirportFeature {
     minY: number
     maxX: number
     maxY: number
-    feature: Feature<Point | MultiPolygon>
+    feature: Feature<Point>
 }

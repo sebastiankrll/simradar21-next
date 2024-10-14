@@ -1,9 +1,10 @@
 import { DatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
+import { Point } from "geojson"
 
 export const dbAirport = new Dexie("Airports") as Dexie & {
     data: EntityTable<
-        IndexedDBData,
+        IndexedDBData<Point>,
         'id'
     >
     versions: EntityTable<
@@ -18,7 +19,7 @@ dbAirport.version(1).stores({
 })
 
 export async function insertAirports(newData: DatabaseDataStorage) {
-    const inserts: IndexedDBData[] = []
+    const inserts: IndexedDBData<Point>[] = []
     newData.airports.data?.forEach(feature => {
         if (feature.id && feature.properties) {
             inserts.push({
@@ -32,23 +33,3 @@ export async function insertAirports(newData: DatabaseDataStorage) {
     await dbAirport.data.bulkPut(inserts)
     await dbAirport.versions.put({ id: 1, version: newData.airports.version })
 }
-
-// export async function getAllAirports(): Promise<Feature<Point, GeoJsonProperties>[] | Feature<MultiPolygon, GeoJsonProperties>[] | null> {
-//     if (!dbReady) {
-//         await dbPromise
-//     }
-
-//     return db.airports.get(1).then(data => {
-//         return data?.data ?? null
-//     })
-// }
-
-// export async function getSelectedAirports(): Promise<Feature<Point, GeoJsonProperties>[] | Feature<MultiPolygon, GeoJsonProperties>[] | null> {
-//     if (!dbReady) {
-//         await dbPromise
-//     }
-
-//     return db.airports.get(1).then(data => {
-//         return data?.data ?? null
-//     })
-// }

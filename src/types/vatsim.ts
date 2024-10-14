@@ -234,7 +234,8 @@ export interface TrackData {
 }
 
 export interface ControllerIndex {
-    facility: string,
+    type: string,
+    facility: number,
     callsign: string,
     frequency: string,
     text: string[] | null,

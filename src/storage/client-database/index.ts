@@ -3,6 +3,7 @@ import { fetcher } from "@/utils/api";
 import { dbAirport, insertAirports } from "./airport";
 import { dbFir, insertFIRs } from "./fir";
 import { dbTracon, insertTRACONs } from "./tracon";
+import { Feature, Point } from "geojson";
 
 let dbReady: boolean = false
 let dbPromise: Promise<void> | null = null
@@ -43,4 +44,24 @@ export async function checkAndUpdateData(versionData: DatabaseDataStorage) {
 
     await dbPromise
     dbReady = true
+}
+
+export async function getAllAirports(): Promise<Feature<Point>[] | null> {
+    if (!dbReady) {
+        await dbPromise
+    }
+
+    return dbAirport.data.toArray().then(data => {
+        return data.map(entry => entry.feature)
+    })
+}
+
+export async function getSelectedAirports(icaos: string[]): Promise<Feature<Point>[] | null> {
+    if (!dbReady) {
+        await dbPromise
+    }
+
+    return dbAirport.data.where('icao').anyOf(icaos).toArray().then(data => {
+        return data.map(entry => entry.feature)
+    })
 }

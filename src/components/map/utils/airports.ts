@@ -1,7 +1,7 @@
-import { getAllAirports } from "@/storage/client-database";
+import { getAllAirports, getSelectedAirports } from "@/storage/client-database";
 import { IndexedAirportFeature, MapStorage } from "@/types/map";
 import bbox from "@turf/bbox";
-import { BBox } from "geojson";
+import { BBox, Point } from "geojson";
 import { transformExtent } from "ol/proj";
 import RBush from "rbush";
 import { RefObject } from "react";
@@ -26,6 +26,7 @@ export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimD
     })
     rbush.load(indexedFeatures)
     setAirportFeaturesByExtent(mapRef)
+    updateAirportFeatures(mapRef, vatsimData)
 }
 
 export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
@@ -70,40 +71,48 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
     )
 }
 
-export function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
-    const features = [] // Use separate storage for rbush and features itself to filter features here, otherwise everytime all feature would needed to be loaded here
+export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     const controllers = vatsimData?.controllers
     if (!controllers) return
 
-    const keys = Object.keys(controllers)
+    const icaos = Object.keys(controllers)
+    const features = await getSelectedAirports(icaos)
+    if (!features) return
 
-    for (const key of keys) {
+    const newFeatures: typeof features = []
+
+    for (const feature of features) {
+        if (!feature.properties) continue
+
+        const icao: string = feature.properties.icao
         let stations = [0, 0, 0, 0]
 
-        controllers[key].forEach(station => {
+        controllers[icao].forEach(station => {
             if (station.facility === -1) {
                 stations[3] = 1
             }
-            if (station.fc === 2) {
+            if (station.facility === 2) {
                 stations[2] = 1
             }
-            if (station.fc === 3) {
+            if (station.facility === 3) {
                 stations[1] = 1
             }
-            if (station.fc === 4) {
+            if (station.facility === 4) {
                 stations[0] = 1
             }
         })
 
         feature.properties.offset = parseInt(stations.join(''), 2) * 36
-        feature.properties.stations = airports[key]
+        feature.properties.stations = controllers[icao]
+
+        newFeatures.push(feature)
     }
 
     mapRef.current?.sources.airportLabels.clear()
     mapRef.current?.sources.airportLabels.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
-            features: features
+            features: newFeatures
         }, {
             featureProjection: 'EPSG:3857',
         })

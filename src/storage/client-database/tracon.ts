@@ -1,9 +1,10 @@
 import { DatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
+import { MultiPolygon } from "geojson"
 
 export const dbTracon = new Dexie("TRACONs") as Dexie & {
     data: EntityTable<
-        IndexedDBData,
+        IndexedDBData<MultiPolygon>,
         'id'
     >
     versions: EntityTable<
@@ -18,7 +19,7 @@ dbTracon.version(1).stores({
 })
 
 export async function insertTRACONs(newData: DatabaseDataStorage) {
-    const inserts: IndexedDBData[] = []
+    const inserts: IndexedDBData<MultiPolygon>[] = []
     newData.tracons.data?.forEach(feature => {
         if (feature.id && feature.properties) {
             inserts.push({

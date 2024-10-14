@@ -16,10 +16,10 @@ export interface DatabaseDataStorage {
     tracons: DatabaseSectors
 }
 
-export interface IndexedDBData {
+export interface IndexedDBData<G extends Point | MultiPolygon> {
     id: number,
     icao: string,
-    feature: Feature<Point> | Feature<MultiPolygon>
+    feature: Feature<G>
 }
 
 export interface IndexedDBVersion {
