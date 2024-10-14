@@ -13,6 +13,7 @@ globalThis.vatsimDataStorage = {
     generalPre: null,
     statusPre: null,
     track: null,
+    controller: null,
     timestamp: new Date()
 }
 

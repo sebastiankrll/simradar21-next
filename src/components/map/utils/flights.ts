@@ -10,10 +10,10 @@ import { moveTrack, updateTrack } from "./track"
 import { moveViewToFeature } from "./misc"
 
 export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
-    if (!mapRef.current || !vatsimData?.flights.position) return
+    if (!mapRef.current || !vatsimData?.flights) return
 
     const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
-    const flights = structuredClone(vatsimData.flights.position)
+    const flights = structuredClone(vatsimData.flights)
     const prevFeatures = mapRef.current.sources.flights.getFeatures()
     const checked: PositionData[] = []
 

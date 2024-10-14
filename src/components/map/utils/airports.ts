@@ -14,6 +14,7 @@ import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
 
 const rbush = new RBush<IndexedAirportFeature>()
+let inOutBounds: { [key: string]: number[] } = {}
 
 export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
     const airportFeatures = await getAllAirports()
@@ -122,6 +123,35 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsi
             featureProjection: 'EPSG:3857',
         })
     )
+
+    calculateInAndOutBounds(vatsimData)
+}
+
+function calculateInAndOutBounds(vatsimData: VatsimDataWS) {
+    const flights = vatsimData.flights
+    if (!flights) return
+
+    inOutBounds = {}
+
+    for (const flight of flights) {
+        if (!flight.airports) continue
+
+        if (!inOutBounds[flight.airports[0]]) {
+            inOutBounds[flight.airports[0]] = [1, 0]
+        } else {
+            inOutBounds[flight.airports[0]][0]++
+        }
+
+        if (!inOutBounds[flight.airports[1]]) {
+            inOutBounds[flight.airports[1]] = [0, 1]
+        } else {
+            inOutBounds[flight.airports[1]][1]++
+        }
+    }
+}
+
+export function getInAndOutBounds(icao: string): number[] {
+    return inOutBounds[icao] ? inOutBounds[icao] : [0, 0]
 }
 
 export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, icao: string, feature: Feature<Point> | null) {

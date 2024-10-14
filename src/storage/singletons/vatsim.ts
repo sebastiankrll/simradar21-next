@@ -67,9 +67,7 @@ export function getVatsimWsData(): VatsimDataWS | null {
     if (!storage) return null
 
     return {
-        flights: {
-            position: storage.position
-        },
+        flights: storage.position,
         controllers: storage.controller,
         timestamp: storage.timestamp
     }

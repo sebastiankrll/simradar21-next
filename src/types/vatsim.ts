@@ -258,9 +258,7 @@ export interface VatsimDataStorage {
 }
 
 export interface VatsimDataWS {
-    flights: {
-        position: PositionData[] | null
-    },
+    flights: PositionData[] | null,
     controllers: ControllerData | null,
     timestamp: Date
 }

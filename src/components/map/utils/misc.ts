@@ -14,10 +14,10 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
     const overlays = mapRef.current.overlays
     const features = mapRef.current.features
 
-    // if (!(event.originalEvent.target instanceof HTMLCanvasElement)) {
-    //     map.getTargetElement().style.cursor = ''
-    //     return
-    // }
+    if (!(event.originalEvent.target instanceof HTMLCanvasElement)) {
+        map.getTargetElement().style.cursor = ''
+        return
+    }
 
     const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature, {
         layerFilter: function (layer) {
@@ -25,7 +25,10 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
         }
     }) as Feature<Point>
 
-    if (feature === features.hover || feature === features.click) return
+    if (feature === features.hover || feature === features.click) {
+        map.getTargetElement().style.cursor = 'pointer'
+        return
+    }
 
     if (overlays.hover) {
         const root = overlays.hover.get('root')

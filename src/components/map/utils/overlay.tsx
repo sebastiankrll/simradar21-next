@@ -6,6 +6,7 @@ import { AirportOverlay, FlightOverlay } from "../components/overlays"
 import { Point } from "ol/geom"
 import { LiveFlightData } from "@/types/flight"
 import { roundNumToX } from "@/utils/common"
+import { getInAndOutBounds } from "./airports"
 
 export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {
     if (!mapRef.current?.map) return null
