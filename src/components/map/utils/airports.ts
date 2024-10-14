@@ -1,12 +1,15 @@
 import { getAllAirports, getSelectedAirports } from "@/storage/client-database";
 import { IndexedAirportFeature, MapStorage } from "@/types/map";
 import bbox from "@turf/bbox";
-import { BBox, Point } from "geojson";
+import { BBox } from "geojson";
 import { transformExtent } from "ol/proj";
 import RBush from "rbush";
 import { RefObject } from "react";
 import GeoJSON from 'ol/format/GeoJSON'
 import { VatsimDataWS } from "@/types/vatsim";
+import { Feature } from "ol";
+import { Point } from "ol/geom";
+import { createAirportOverlay } from "./overlay";
 
 const rbush = new RBush<IndexedAirportFeature>()
 
@@ -117,4 +120,38 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsi
             featureProjection: 'EPSG:3857',
         })
     )
+}
+
+export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, icao: string, feature: Feature<Point> | null) {
+    if (!mapRef.current?.map) return
+
+    if (feature) {
+        mapRef.current.sources.airportTops.addFeature(feature)
+        return
+    }
+
+    const storedFeatures = await getSelectedAirports([icao])
+    if (!storedFeatures) return
+
+    const newFeature = new GeoJSON().readFeature(storedFeatures[0], {
+        featureProjection: 'EPSG:3857',
+    }) as Feature<Point>
+
+    // Clean up old previous overlay first (dev mode only due to strict mode)
+    if (mapRef.current.overlays.click) {
+        const root = mapRef.current.overlays.click.get('root')
+        setTimeout(() => {
+            root?.unmount()
+        }, 0)
+
+        mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
+        mapRef.current.overlays.click = null
+    }
+
+    newFeature.set('hover', 1)
+    mapRef.current?.sources.airportTops.addFeature(newFeature)
+    mapRef.current.features.click = newFeature
+
+    const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>)
+    mapRef.current.overlays.click = overlay
 }

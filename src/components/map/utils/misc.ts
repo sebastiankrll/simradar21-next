@@ -1,9 +1,11 @@
 import { MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
 import { RefObject } from "react"
-import { createFlightOverlay } from "./overlay"
+import { createAirportOverlay, createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
+import { setClickedFlightFeature } from "./flights"
+import { setClickedAirportFeature } from "./airports"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
@@ -67,12 +69,10 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
         overlays.hover = overlay
     }
 
-    // if (feature?.get('type')?.includes('airport')) {
-    //     const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, false)
-    //     overlays.hover = overlay
-    //     const atcFeature = vectorSourceRef.current.airportLabels.getFeatureById(feature.getId())
-    //     popupRef.current.hover = PopupHandler.createAirportPopup(map, atcFeature ? atcFeature : feature, airportsRef)
-    // }
+    if (feature?.get('type')?.includes('airport')) {
+        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>)
+        overlays.hover = overlay
+    }
 
     // if (feature?.get('type') === 'fir') {
     //     const polygon = vectorSourceRef.current.firs.getFeatureById(feature.getId())
@@ -118,14 +118,14 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
         return '/flight/' + feature.get('callsign')
     }
 
-    // if (feature?.get('type')?.includes('airport')) {
-    //     const atcFeature = vectorSourceRef.current.airportLabels.getFeatureById(feature.getId())
-    //     popupRef.current.click = PopupHandler.createAirportPopup(map, atcFeature ? atcFeature : feature, airportsRef)
+    if (feature?.get('type')?.includes('airport')) {
+        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>)
+        overlays.click = overlay
 
-    //     vectorSourceRef.current.airportTops.addFeature(feature)
+        setClickedAirportFeature(mapRef, feature.get('icao'), feature)
 
-    //     navigate(`/airport/${feature.get('icao')}`)
-    // }
+        return '/airport/' + feature.get('icao')
+    }
 
     // if (feature?.get('type') === 'tracon' || feature?.get('type') === 'fir') {
     //     popupRef.current.click = PopupHandler.createATCPopup(map, feature)
@@ -193,38 +193,18 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export function handleFirstView(mapRef: RefObject<MapStorage>, path: string) {
+export async function handleFirstView(mapRef: RefObject<MapStorage>, path: string) {
     if (!mapRef.current) return
 
     if (path.includes('flight')) {
-        setClickedFeature(mapRef, 'flight', path.split('/')[2])
+        setClickedFlightFeature(mapRef, path.split('/')[2])
         moveViewToFeature(mapRef, mapRef.current.features.click, 8)
     }
-    mapRef.current.view.viewInit = true
-}
-
-function setClickedFeature(mapRef: RefObject<MapStorage>, type: string, id: string | null) {
-    if (!mapRef.current?.map || !id) return
-
-    if (type === 'flight') {
-        const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
-
-        if (features.length > 0) {
-            const feature = features.find(feature => feature.get('callsign') === id)
-
-            if (!feature) {
-                return
-            }
-
-            feature.set('hover', 1)
-            mapRef.current.features.click = feature
-
-            const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
-            mapRef.current.overlays.click = overlay
-
-            return
-        }
+    if (path.includes('airport')) {
+        await setClickedAirportFeature(mapRef, path.split('/')[2], null)
+        moveViewToFeature(mapRef, mapRef.current.features.click, 13)
     }
+    mapRef.current.view.viewInit = true
 }
 
 export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null, zoom?: number) {

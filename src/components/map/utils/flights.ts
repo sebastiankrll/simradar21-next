@@ -5,7 +5,7 @@ import { RefObject } from "react"
 import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
-import { moveFlightOverlay, updateFlightOverlay } from "./overlay"
+import { createFlightOverlay, moveFlightOverlay, updateFlightOverlay } from "./overlay"
 import { moveTrack, updateTrack } from "./track"
 import { moveViewToFeature } from "./misc"
 
@@ -179,4 +179,33 @@ function followFlightFeature(mapRef: RefObject<MapStorage>) {
     followInterval = setInterval(() => {
         moveViewToFeature(mapRef, clickedFeature)
     }, 5000)
+}
+
+export function setClickedFlightFeature(mapRef: RefObject<MapStorage>, callsign: string) {
+    if (!mapRef.current?.map) return
+
+    const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
+    if (features.length > 0) {
+        const feature = features.find(feature => feature.get('callsign') === callsign)
+        if (!feature) return
+
+        // Clean up old previous overlay first (dev mode only due to strict mode)
+        if (mapRef.current.overlays.click) {
+            const root = mapRef.current.overlays.click.get('root')
+            setTimeout(() => {
+                root?.unmount()
+            }, 0)
+    
+            mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
+            mapRef.current.overlays.click = null
+        }
+
+        feature.set('hover', 1)
+        mapRef.current.features.click = feature
+
+        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
+        mapRef.current.overlays.click = overlay
+
+        return
+    }
 }

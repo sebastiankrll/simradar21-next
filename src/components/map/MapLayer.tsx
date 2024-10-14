@@ -65,9 +65,6 @@ export default function MapLayer({ }) {
         }
         map.on(['moveend'], onMoveEnd)
 
-        // Init overall data (api calls)
-        initData(mapRef)
-
         // Init flight feature animation
         let animationFrameId: number
         const animate = () => {
@@ -115,6 +112,10 @@ export default function MapLayer({ }) {
 
     // Handle path reset
     useEffect(() => {
+        if (!mapRef.current.view.viewInit) {
+            // Init overall data (api calls)
+            initData(mapRef, pathname)
+        }
         if (pathname === '/' && mapRef.current.view.viewInit) {
             resetMap(mapRef)
         }
