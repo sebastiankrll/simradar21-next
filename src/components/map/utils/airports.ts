@@ -162,10 +162,10 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
         return
     }
 
-    const storedFeatures = await getSelectedAirports([icao])
-    if (!storedFeatures) return
+    const storedFeature = await getSelectedAirports([icao])
+    if (!storedFeature) return
 
-    const newFeature = new GeoJSON().readFeature(storedFeatures[0], {
+    const newFeature = new GeoJSON().readFeature(storedFeature[0], {
         featureProjection: 'EPSG:3857',
     }) as Feature<Point>
 

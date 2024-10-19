@@ -1,6 +1,6 @@
 'use client'
 
-import { FlightData, StatusFlightData } from "@/types/info-panel"
+import { FlightData, StatusFlightData } from "@/types/panel"
 import { getUtcString } from "@/utils/common"
 
 export default function TimeSlots({ data, flightStatus }: { data: FlightData, flightStatus: StatusFlightData }) {

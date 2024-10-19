@@ -1,6 +1,5 @@
 'use client'
 
-import { FlightData } from "@/types/info-panel"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 import { useState } from "react"
 import Image from "next/image"
@@ -8,6 +7,7 @@ import LiveData from "./LiveData"
 import AttitudeChart from "./AttitudeChart"
 import FlagSprite from '@/assets/images/sprites/flagSprite.png'
 import { setHeight } from "@/utils/gui"
+import { FlightData } from "@/types/vatsim"
 
 export default function MainInfo({ data }: { data: FlightData | undefined | null }) {
     const [panelStates, setPanelStates] = useState({

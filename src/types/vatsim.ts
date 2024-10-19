@@ -129,10 +129,6 @@ export interface VatsimData {
     transceivers: VatsimTransceiversData[]
 }
 
-export interface VatsimParsedMetar {
-    [key: string]: IMetar | null
-}
-
 export interface PositionData {
     callsign: string,
     aircraft: string | null,
@@ -251,6 +247,23 @@ export interface ControllerData {
     [key: string]: ControllerIndex[]
 }
 
+export interface AirportData {
+    icao: string,
+    departures: {
+        n: number,
+        tDelay: number,
+        nDelay: number
+    },
+    arrivals: {
+        n: number,
+        tDelay: number,
+        nDelay: number
+    },
+    busiest: string,
+    connections: number,
+    routes?: Map<string, number>
+}
+
 export interface VatsimDataStorage {
     position: PositionData[] | null,
     general: GeneralData[] | null,
@@ -259,6 +272,7 @@ export interface VatsimDataStorage {
     statusPre: StatusData[] | null,
     track: TrackData[] | null,
     controller: ControllerData | null,
+    airport: AirportData[] | null
     timestamp: Date
 }
 
@@ -278,4 +292,24 @@ export interface FlightData {
     general: GeneralData | null,
     status: StatusData | null,
     track?: TrackData | null
+}
+
+export interface AirportWeather {
+    condition: string,
+    temperature: string,
+    dewPoint: string,
+    wind: string,
+    altimeters: string,
+    raw: string
+}
+
+export interface AirportTimezone {
+    abbreviation: string,
+    utc_offset: string,
+}
+
+export interface AirportAPIData {
+    data: AirportData | null,
+    weather: AirportWeather | null,
+    timezone: AirportTimezone | null
 }

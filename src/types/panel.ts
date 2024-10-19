@@ -15,3 +15,7 @@ export interface StatusFlightData {
     progress: number,
     startToEnd: string[]
 }
+
+export interface PanelStates {
+    [key: string]: boolean
+}

@@ -1,9 +1,9 @@
 import dynamic from 'next/dynamic';
 
-const Airport = dynamic(() => import('@/components/airport/Airport'), {
+const MainInfo = dynamic(() => import('@/components/airport/components/MainInfo'), {
     ssr: false
 })
 
 export default async function Page({ params }: { params: { icao: string } }) {
-    return <Airport icao={params.icao} />
+    return <MainInfo icao={params.icao} />
 }

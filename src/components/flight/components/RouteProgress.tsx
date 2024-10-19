@@ -1,6 +1,6 @@
 'use client'
 
-import { FlightData, StatusFlightData } from "@/types/info-panel"
+import { FlightData, StatusFlightData } from "@/types/panel"
 
 export default function RouteProgress({ data, flightStatus }: { data: FlightData, flightStatus: StatusFlightData }) {
     if (!data) return

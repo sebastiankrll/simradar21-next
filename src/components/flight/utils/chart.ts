@@ -1,5 +1,5 @@
 import { ChartJsConfig } from "@/components/common/chart/Chart"
-import { FlightData } from "@/types/info-panel"
+import { FlightData } from "@/types/panel"
 import { TrackPoint } from "@/types/vatsim"
 
 export const flightChartConfig: ChartJsConfig = {

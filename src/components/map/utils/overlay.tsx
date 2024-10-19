@@ -4,7 +4,7 @@ import { RefObject } from "react"
 import { createRoot } from "react-dom/client"
 import { AirportOverlay, FlightOverlay } from "../components/overlays"
 import { Point } from "ol/geom"
-import { LiveFlightData } from "@/types/info-panel"
+import { LiveFlightData } from "@/types/panel"
 import { roundNumToX } from "@/utils/common"
 
 export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {

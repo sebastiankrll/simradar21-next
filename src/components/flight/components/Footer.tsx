@@ -1,7 +1,7 @@
 'use client'
 
 import { useFlightStore } from "@/storage/state/flight"
-import { FlightData } from "@/types/info-panel"
+import { FlightData } from "@/types/vatsim"
 import { useState } from "react"
 
 export default function Footer({ data }: { data: FlightData | undefined | null }) {

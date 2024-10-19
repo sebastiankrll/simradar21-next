@@ -1,5 +1,5 @@
 import { Feature } from "ol"
-import { LiveFlightData } from "./info-panel"
+import { LiveFlightData } from "./panel"
 import { TrackPoint } from "./vatsim"
 
 export type FlightState = {
