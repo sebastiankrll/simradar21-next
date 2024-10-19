@@ -1,5 +1,5 @@
 import { DatabaseDataStorage } from "@/types/database";
-import { fetcher } from "@/utils/api";
+import { fetcher } from "@/utils/api/api";
 import { dbAirport, insertAirports } from "./airport";
 import { dbFir, insertFIRs } from "./fir";
 import { dbTracon, insertTRACONs } from "./tracon";

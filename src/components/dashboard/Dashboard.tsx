@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 import Spinner from '../common/spinner/Spinner'
 import './Dashboard.css'
-import { fetcher } from '@/utils/api'
+import { fetcher } from '@/utils/api/api'
 import { useRef, useState } from 'react'
 import { PanelStates } from '@/types/misc'
 import HistoryChart from './components/HistoryChart'

@@ -1,4 +1,4 @@
-import { FlightData, StatusFlightData } from "@/types/flight"
+import { FlightData, StatusFlightData } from "@/types/info-panel"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 
 export function getFlightStatus(data: FlightData | undefined | null): StatusFlightData {

@@ -1,6 +1,6 @@
 import { CronJob } from 'cron'
 import { updateVatsimData } from '../services/vatsim'
-import { updateDatabaseData } from '../services/database'
+import { updateDatabaseData } from '../services/client-database'
 
 CronJob.from({
     cronTime: '* * * * * *',

@@ -1,6 +1,6 @@
 'use client'
 
-import { FlightData } from "@/types/flight"
+import { FlightData } from "@/types/info-panel"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 import { useState } from "react"
 import Image from "next/image"

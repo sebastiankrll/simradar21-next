@@ -91,7 +91,7 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsi
         if (!feature.properties) continue
 
         const icao: string = feature.properties.icao
-        let stations = [0, 0, 0, 0]
+        const stations = [0, 0, 0, 0]
 
         controllers[icao].forEach(station => {
             if (station.facility === -1) {

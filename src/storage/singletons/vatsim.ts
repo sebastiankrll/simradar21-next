@@ -2,11 +2,11 @@ import { updateGeneral } from "@/server/services/vatsim/general";
 import { updatePosition } from "@/server/services/vatsim/position";
 import { updateTrack } from "@/server/services/vatsim/track";
 import { updateStatus } from "@/server/services/vatsim/status";
+import { updateController } from "@/server/services/vatsim/controller";
 import { VatsimDataStorage, RawDataStorage, TrackData } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
-import { FlightData } from "@/types/flight";
+import { FlightData } from "@/types/info-panel";
 import globalThis from "./global";
-import { updateController } from "@/server/services/vatsim/controller";
 
 export const rawDataStorage: RawDataStorage = {
     vatsim: null,

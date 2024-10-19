@@ -1,4 +1,5 @@
 import { Feature, GeoJsonProperties, Point } from "geojson"
+import { IMetar } from "metar-taf-parser"
 
 export interface VatsimGeneral {
     version: number
@@ -128,6 +129,10 @@ export interface VatsimData {
     transceivers: VatsimTransceiversData[]
 }
 
+export interface VatsimParsedMetar {
+    [key: string]: IMetar | null
+}
+
 export interface PositionData {
     callsign: string,
     aircraft: string | null,
@@ -234,9 +239,9 @@ export interface TrackData {
 }
 
 export interface ControllerIndex {
+    callsign: string,
     type: string,
     facility: number,
-    callsign: string,
     frequency: string,
     text: string[] | null,
     logon: Date
@@ -266,4 +271,11 @@ export interface VatsimDataWS {
 export interface RawDataStorage {
     vatsim: null | VatsimData,
     transveivers: null | VatsimTransceiversData[]
+}
+
+export interface FlightData {
+    position: PositionData | null,
+    general: GeneralData | null,
+    status: StatusData | null,
+    track?: TrackData | null
 }

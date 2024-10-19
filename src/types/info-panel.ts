@@ -1,12 +1,3 @@
-import { GeneralData, PositionData, StatusData, TrackData } from "./vatsim";
-
-export interface FlightData {
-    position: PositionData | null,
-    general: GeneralData | null,
-    status: StatusData | null,
-    track?: TrackData | null
-}
-
 export interface LiveFlightData {
     altitude: number,
     radar: number,

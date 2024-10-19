@@ -1,6 +1,9 @@
-import Airport from "@/components/airport/Airport";
+import dynamic from 'next/dynamic';
 
-export default function Page({ params }: { params: { icao: string } }) {
-    console.log(params.icao)
-    return <Airport />
+const Airport = dynamic(() => import('@/components/airport/Airport'), {
+    ssr: false
+})
+
+export default async function Page({ params }: { params: { icao: string } }) {
+    return <Airport icao={params.icao} />
 }
