@@ -1,3 +1,5 @@
+import { GeneralData, StatusData } from "./vatsim"
+
 export interface LiveFlightData {
     altitude: number,
     radar: number,
@@ -18,4 +20,17 @@ export interface StatusFlightData {
 
 export interface PanelStates {
     [key: string]: boolean
+}
+
+export interface FlightsSearchParam {
+    pagination: string,
+    icao: string,
+    direction: string,
+    timestamp: Date,
+    n: number
+}
+
+export interface AirportFlight {
+    general: GeneralData,
+    status: StatusData
 }

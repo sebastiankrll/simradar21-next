@@ -3,6 +3,10 @@ import axios from "axios"
 import { CloudQuantity, IMetar, IWeatherCondition, parseMetar } from "metar-taf-parser"
 import airportTimezonesJSON from '@/assets/data/airports_tz.json'
 import { WorldTimeData } from "@/types/misc"
+import { AirportFlight, FlightsSearchParam } from "@/types/panel"
+import mongoose from "mongoose"
+import { MongoFlightSchema } from "@/types/database"
+import { flightSchema } from "@/storage/database/schema/Flight"
 
 interface CachedMetar {
     raw: string,
@@ -204,4 +208,46 @@ async function fetchWorldtime(timezone: string): Promise<WorldTimeData | null> {
     }
 
     return null
+}
+
+const db = mongoose.createConnection('mongodb://127.0.0.1:27017/flights')
+const Flight = db.model<MongoFlightSchema>('Flight', flightSchema)
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+db.on('connected', () => console.log('Connected to mongodb: flights'))
+db.dropCollection('flights')
+db.createCollection('flights')
+
+export async function getAirportFlights(params: FlightsSearchParam): Promise<AirportFlight[] | undefined> {
+    try {
+        const flights = await fetchAirportFlights(params)
+        return flights?.map(flight => {
+            return {
+                general: flight.general,
+                status: flight.status
+            }
+        })
+    } catch (error) {
+        console.error(`Error fetching flights data for airport ${params.icao} / ${params.direction} from MongoDB:`, error)
+        throw error
+    }
+}
+
+async function fetchAirportFlights(params: FlightsSearchParam) {
+    if (params.direction === 'departure') {
+        return await Flight.find({
+            'general.airport.dep.properties.icao': params.icao,
+            'status.times.schedDep': params.pagination === 'next' ? { $gt: new Date(params.timestamp) } : { $lt: new Date(params.timestamp) }
+        })
+            .sort(params.pagination === 'next' ? { 'status.times.schedDep': 1 } : { 'status.times.schedDep': -1 })
+            .limit(params.n)
+    }
+    if (params.direction === 'arrivals') {
+        return await Flight.find({
+            'general.airport.arr.properties.icao': params.icao,
+            'status.times.schedArr': params.pagination === 'next' ? { $gt: new Date(params.timestamp) } : { $lt: new Date(params.timestamp) }
+        })
+            .sort(params.pagination === 'next' ? { 'status.times.schedArr': 1 } : { 'status.times.schedArr': -1 })
+            .limit(params.n)
+    }
 }
