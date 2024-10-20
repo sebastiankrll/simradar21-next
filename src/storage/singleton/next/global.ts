@@ -7,13 +7,14 @@ declare const globalThis: {
 } & typeof global
 
 globalThis.vatsimDataStorage = {
-    position: null,
-    general: null,
-    status: null,
-    generalPre: null,
-    statusPre: null,
-    track: null,
+    position: [],
+    general: [],
+    status: [],
+    generalPre: [],
+    statusPre: [],
+    track: [],
     controller: null,
+    airport: [],
     timestamp: new Date()
 }
 

@@ -1,4 +1,4 @@
-import { getDatabaseVersions } from "@/storage/singleton/database"
+import { getDatabaseVersions } from "@/storage/singleton/next/database"
 import { getVatsimWsData } from "@/storage/singleton/vatsim"
 import { NextResponse } from "next/server"
 
