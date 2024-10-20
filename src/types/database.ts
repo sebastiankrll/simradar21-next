@@ -1,4 +1,6 @@
 import { Feature, MultiPolygon, Point } from "geojson"
+import { Document } from "mongoose"
+import { GeneralData, StatusData } from "./vatsim"
 
 export interface DatabaseAirports {
     version: string,
@@ -25,4 +27,11 @@ export interface IndexedDBData<G extends Point | MultiPolygon> {
 export interface IndexedDBVersion {
     id: number,
     version: string
+}
+
+export interface MongoFlightSchema extends Document {
+    hash: string,
+    general: GeneralData,
+    status: StatusData,
+    expireAt: Date
 }

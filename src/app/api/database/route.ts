@@ -1,4 +1,4 @@
-import { getDatabaseStorage } from "@/storage/singletons/database"
+import { getDatabaseStorage } from "@/storage/singleton/database"
 import { DatabaseDataStorage } from "@/types/database"
 import { NextResponse } from "next/server"
 

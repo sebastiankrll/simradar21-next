@@ -1,4 +1,4 @@
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
 import { ControllerData, ControllerIndex, VatsimATIS, VatsimController } from "@/types/vatsim"
 import airportsJSON from '@/assets/data/airports_full.json'
 import { FeatureCollection } from "geojson"

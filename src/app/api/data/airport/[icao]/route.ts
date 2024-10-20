@@ -1,4 +1,4 @@
-import { getVatsimAirportData } from "@/storage/singletons/vatsim"
+import { getVatsimAirportData } from "@/storage/singleton/vatsim"
 import { AirportAPIData } from "@/types/vatsim"
 import { getAirportTimezone, getAirportWeather } from "@/utils/api/airport"
 import { NextResponse } from "next/server"

@@ -1,4 +1,4 @@
-import { vatsimDataStorage } from "@/storage/singletons/vatsim";
+import { vatsimDataStorage } from "@/storage/singleton/vatsim";
 import { AirportData, GeneralData, StatusData } from "@/types/vatsim";
 
 export function updateAirport() {

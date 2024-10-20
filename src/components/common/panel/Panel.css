@@ -137,6 +137,8 @@
 .info-panel-title-desc {
     font-weight: 700;
     font-size: 1.25rem;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .info-panel-title-content {

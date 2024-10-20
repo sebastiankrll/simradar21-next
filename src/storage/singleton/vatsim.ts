@@ -3,10 +3,11 @@ import { updatePosition } from "@/server/services/vatsim/position";
 import { updateTrack } from "@/server/services/vatsim/track";
 import { updateStatus } from "@/server/services/vatsim/status";
 import { updateController } from "@/server/services/vatsim/controller";
-import { VatsimDataStorage, RawDataStorage, TrackData, FlightData, AirportData } from "@/types/vatsim";
+import { VatsimDataStorage, RawDataStorage, TrackData, FlightData, AirportData, VatsimDisconnected } from "@/types/vatsim";
 import { VatsimDataWS } from "@/types/vatsim";
 import globalThis from "./global";
 import { updateAirport } from "@/server/services/vatsim/airport";
+import { updateDb } from "../database";
 
 export const rawDataStorage: RawDataStorage = {
     vatsim: null,
@@ -14,14 +15,14 @@ export const rawDataStorage: RawDataStorage = {
 }
 
 export let vatsimDataStorage: VatsimDataStorage = {
-    position: null,
-    general: null,
-    status: null,
-    generalPre: null,
-    statusPre: null,
-    track: null,
+    position: [],
+    general: [],
+    status: [],
+    generalPre: [],
+    statusPre: [],
+    track: [],
     controller: null,
-    airport: null,
+    airport: [],
     timestamp: new Date()
 }
 
@@ -40,6 +41,7 @@ export function updateVatsimStorage() {
     updateTrack()
     updateController()
     updateAirport()
+    updateDb()
 }
 
 export function getVatsimFlightData(callsign: string): FlightData {

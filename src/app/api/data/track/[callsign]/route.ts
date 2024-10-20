@@ -1,4 +1,4 @@
-import { getVatsimTrackData } from "@/storage/singletons/vatsim"
+import { getVatsimTrackData } from "@/storage/singleton/vatsim"
 import { NextResponse } from "next/server"
 
 export async function GET(

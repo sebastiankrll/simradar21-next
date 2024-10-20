@@ -5,7 +5,7 @@ import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
 import { MapStorage } from "@/types/map"
-import { mapStorage } from "@/storage/singletons/map"
+import { mapStorage } from "@/storage/singleton/map"
 import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"

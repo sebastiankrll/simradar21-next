@@ -145,6 +145,7 @@ export interface PositionData {
 }
 
 export interface GeneralIndex {
+    hash: string | null,
     cid: number,
     callsign: string,
     name: string,
@@ -193,6 +194,7 @@ export interface GeneralData {
 }
 
 export interface StatusIndex {
+    hash: string | null,
     callsign: string,
     transponder?: string,
     altimeters?: number,
@@ -265,15 +267,22 @@ export interface AirportData {
 }
 
 export interface VatsimDataStorage {
-    position: PositionData[] | null,
-    general: GeneralData[] | null,
-    status: StatusData[] | null,
-    generalPre: GeneralData[] | null,
-    statusPre: StatusData[] | null,
-    track: TrackData[] | null,
+    position: PositionData[],
+    general: GeneralData[],
+    status: StatusData[],
+    generalPre: GeneralData[],
+    statusPre: StatusData[],
+    track: TrackData[],
     controller: ControllerData | null,
-    airport: AirportData[] | null
+    airport: AirportData[]
     timestamp: Date
+}
+
+export interface VatsimDisconnected {
+    position: PositionData[],
+    general: GeneralData[],
+    status: StatusData[],
+    track: TrackData[]
 }
 
 export interface VatsimDataWS {

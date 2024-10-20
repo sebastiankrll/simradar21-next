@@ -1,6 +1,6 @@
 import { Redis } from "ioredis";
-import { setVatsimStorage } from "./storage/singletons/vatsim";
-import { setDatabaseStorage } from "./storage/singletons/database";
+import { setVatsimStorage } from "./storage/singleton/vatsim";
+import { setDatabaseStorage } from "./storage/singleton/database";
 
 export async function register() {
     const redisSub = new Redis()

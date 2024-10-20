@@ -1,4 +1,4 @@
-import { databaseDataStorage, updateDatabaseStorage } from '@/storage/singletons/database'
+import { databaseDataStorage, updateDatabaseStorage } from '@/storage/singleton/database'
 import { Redis } from 'ioredis'
 
 const redisPub = new Redis()

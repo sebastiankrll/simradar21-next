@@ -1,4 +1,4 @@
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
 import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'
@@ -6,6 +6,7 @@ import fleetsJSON from '@/assets/data/fleets.json'
 import { Airlines, Fleet } from "@/types/misc"
 import airlinesJSON from '@/assets/data/airlines.json'
 import { calculateDistance, convertVatsimDate } from "@/utils/common"
+import { createHash } from "crypto"
 
 const airlines = airlinesJSON as Airlines[]
 const airports = airportsJSON as FeatureCollection
@@ -31,18 +32,18 @@ export function updateGeneralData() {
         const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign)
         if (!pilot) continue
 
-        const noDataChange = prevGeneral ? checkSameData(pilot, prevGeneral) : false
         const newGeneral: GeneralData = {
-            index: prevGeneral?.index && noDataChange ? prevGeneral?.index : getIndexData(pilot),
+            index: getIndexData(pilot),
             airport: getAirportData(pilot),
             flightplan: getFlightPlanData(pilot),
-            aircraft: prevGeneral?.aircraft && noDataChange ? prevGeneral?.aircraft : getAircraftData(pilot),
-            airline: prevGeneral?.airline && noDataChange ? prevGeneral?.airline : getAirlineData(pilot)
+            aircraft: getAircraftData(pilot),
+            airline: getAirlineData(pilot)
         }
 
         if (newGeneral.flightplan && newGeneral.airport) {
             newGeneral.flightplan.dist = calculateDistance(newGeneral.airport.dep.geometry.coordinates, newGeneral.airport.arr.geometry.coordinates)
         }
+        generateHash(newGeneral)
 
         newGenerals.push(newGeneral)
     }
@@ -67,6 +68,7 @@ export function updateGeneralDataPrefile() {
         if (newGeneral.flightplan && newGeneral.airport) {
             newGeneral.flightplan.dist = calculateDistance(newGeneral.airport.dep.geometry.coordinates, newGeneral.airport.arr.geometry.coordinates)
         }
+        generateHash(newGeneral)
 
         newGenerals.push(newGeneral)
     }
@@ -74,16 +76,18 @@ export function updateGeneralDataPrefile() {
     vatsimDataStorage.generalPre = newGenerals
 }
 
-function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {
-    const airportsChange = pilot.flight_plan?.departure === prevGeneral.airport?.dep.properties?.icao && pilot.flight_plan?.arrival === prevGeneral.airport?.arr.properties?.icao
-    const flightplanChange = pilot.flight_plan?.route === prevGeneral.flightplan?.plan
+// function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {
+//     const airportsChange = pilot.flight_plan?.departure === prevGeneral.airport?.dep.properties?.icao && pilot.flight_plan?.arrival === prevGeneral.airport?.arr.properties?.icao
+//     const flightplanChange = pilot.flight_plan?.route === prevGeneral.flightplan?.plan
+//     const cidChange = pilot.cid === prevGeneral.index.cid
 
-    return airportsChange && flightplanChange
-}
+//     return airportsChange && flightplanChange && cidChange
+// }
 
 function getIndexData(pilot: VatsimPilot | VatsimPrefile): GeneralIndex {
     if ('pilot_rating' in pilot) {
         return {
+            hash: null,
             cid: pilot.cid,
             callsign: pilot.callsign,
             name: pilot.name,
@@ -92,6 +96,7 @@ function getIndexData(pilot: VatsimPilot | VatsimPrefile): GeneralIndex {
         }
     } else {
         return {
+            hash: null,
             cid: pilot.cid,
             callsign: pilot.callsign,
             name: pilot.name
@@ -236,4 +241,20 @@ function getAirlineData(pilot: VatsimPilot | VatsimPrefile): GeneralAirline {
         name: airline?.name ?? 'Unknown',
         flightno: airline?.iata ? airline.iata + pilot.callsign.substring(3) : pilot.callsign
     }
+}
+
+function generateHash(general: GeneralData) {
+    const depIcao = general.airport?.dep.properties?.icao
+    const arrIcao = general.airport?.arr.properties?.icao
+    const cid = general.index.cid
+    if (!depIcao || !arrIcao) return
+
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+
+    const raw = `${year}-${month}-${day}_${depIcao}_${arrIcao}_${cid}`
+
+    general.index.hash = createHash('sha256').update(raw).digest('hex').substring(0, 8)
 }

@@ -1,5 +1,5 @@
 import { calculateDistance, roundXMin } from "@/utils/common"
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singletons/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
 import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
 
 const taxiTime = 10 * 60000
@@ -17,8 +17,8 @@ export function updateStatusData() {
     const newStatuses = []
 
     for (const position of vatsimDataStorage.position) {
-        const prevStatus = vatsimDataStorage.status?.find(status => status.index.callsign === position.callsign) ?? null
         const general = vatsimDataStorage.general.find(general => general.index.callsign === position.callsign) ?? null
+        const prevStatus = vatsimDataStorage.status?.find(status => status.index.hash === general?.index.hash) ?? null
         const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign) ?? null
 
         const newStatus = getStatusData(prevStatus, position, general, pilot)
@@ -55,6 +55,7 @@ function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): 
     const arrDist = calculateDistance(depLoc, arrLoc) * 1.1
 
     const index: StatusIndex = {
+        hash: general.index.hash,
         callsign: prefile.callsign,
         altitude: 0
     }
@@ -99,6 +100,7 @@ function getStatusData(prevStatus: StatusData | null, position: PositionData, ge
     if (prevStatus?.times && prevStatus.progress.status !== 'prefile') {
         index = structuredClone(prevStatus.index)
         if (pilot) index = {
+            hash: general.index.hash,
             callsign: pilot.callsign,
             transponder: pilot.transponder,
             altimeters: pilot.qnh_mb,
@@ -113,6 +115,7 @@ function getStatusData(prevStatus: StatusData | null, position: PositionData, ge
     } else {
         if (!pilot?.flight_plan || !general.flightplan?.depTime) return
         index = {
+            hash: general.index.hash,
             callsign: pilot.callsign,
             transponder: pilot.transponder,
             altimeters: pilot.qnh_mb,
