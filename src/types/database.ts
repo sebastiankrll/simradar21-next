@@ -33,5 +33,5 @@ export interface MongoFlightSchema extends Document {
     hash: string,
     general: GeneralData,
     status: StatusData,
-    expireAt: Date
+    createdAt: Date
 }

@@ -10,7 +10,7 @@ export async function GET(
     const airport: AirportAPIData = {
         data: getVatsimAirportData(params.icao),
         weather: await getAirportWeather(params.icao),
-        timezone: await getAirportTimezone(params.icao)
+        timezone: null//await getAirportTimezone(params.icao)
     }
 
     return NextResponse.json(airport)

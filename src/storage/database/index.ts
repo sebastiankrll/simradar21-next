@@ -1,15 +1,15 @@
 import mongoose, { AnyBulkWriteOperation, UpdateOneModel } from "mongoose"
-import { flightSchema } from "./schema/Flight"
 import { vatsimDataStorage } from "../singleton/vatsim"
 import { MongoFlightSchema } from "@/types/database"
+import FlightSchema from "./schema/Flight"
 
-const db = mongoose.createConnection('mongodb://127.0.0.1:27017/flights')
-const Flight = db.model<MongoFlightSchema>('Flight', flightSchema)
+const conn = mongoose.createConnection('mongodb://127.0.0.1:27017/flights')
+conn.on('error', console.error.bind(console, 'MongoDB connection error:'))
+conn.on('connected', () => console.log('Connected to mongodb: flights'))
+conn.dropCollection('flights')
+conn.createCollection('flights')
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
-db.on('connected', () => console.log('Connected to mongodb: flights'))
-db.dropCollection('flights')
-db.createCollection('flights')
+const Flight = conn.model<MongoFlightSchema>('Flight', FlightSchema)
 
 export function updateDb() {
     updateFlights()

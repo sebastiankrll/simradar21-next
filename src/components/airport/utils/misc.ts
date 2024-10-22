@@ -54,8 +54,8 @@ export function getFlightDelayColor(data: AirportFlight, direction: string): str
     if (!times || data.status.progress.status === 'prefile') return 'rgb(183, 190, 206)'
 
     const delay = direction === 'departure' ?
-        Math.max((times.actDep.getTime() - times.schedDep.getTime()) / 1000 / 60, 0) :
-        Math.max((times.actArr.getTime() - times.schedArr.getTime()) / 1000 / 60, 0)
+        Math.max((new Date(times.actDep).getTime() - new Date(times.schedDep).getTime()) / 1000 / 60, 0) :
+        Math.max((new Date(times.actArr).getTime() - new Date(times.schedArr).getTime()) / 1000 / 60, 0)
 
     if (delay <= 15) return 'rgb(11, 211, 167)'
     if (delay > 15 && delay <= 30) return 'rgb(255, 244, 43)'
@@ -69,7 +69,7 @@ export function getFlightTimesArray(data: AirportFlight, direction: string): str
     const now = new Date()
 
     if (direction === 'departure') {
-        if (data.status.progress.status === 'prefile') return [getUtcString(data.status.times.actDep), 'SCHED']
+        if (data.status.progress.status === 'prefile') return ['SCHED', 'SCHED']
 
         if (new Date(data.status.times.actDep) <= now) {
             return [getUtcString(data.status.times.actDep), 'DEP']
@@ -79,7 +79,7 @@ export function getFlightTimesArray(data: AirportFlight, direction: string): str
     }
 
     if (direction === 'arrival') {
-        if (data.status.progress.status === 'prefile') return [getUtcString(data.status.times.actArr), 'SCHED']
+        if (data.status.progress.status === 'prefile') return ['SCHED', 'SCHED']
 
         if (new Date(data.status.times.actArr) <= now) {
             return [getUtcString(data.status.times.actArr), 'LND']

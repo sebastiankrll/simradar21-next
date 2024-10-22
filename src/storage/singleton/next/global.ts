@@ -1,36 +1,14 @@
-import { DatabaseDataStorage } from "@/types/database"
+import { DatabaseDataStorage, MongoFlightSchema } from "@/types/database"
 import { VatsimDataStorage } from "@/types/vatsim"
+import mongoose from "mongoose"
 
 declare const globalThis: {
-    vatsimDataStorage: VatsimDataStorage
-    databaseDataStorage: DatabaseDataStorage
+    vatsimDataStorage: VatsimDataStorage | null
+    databaseDataStorage: DatabaseDataStorage | null
+    FlightModel: mongoose.Model<MongoFlightSchema>
 } & typeof global
 
-globalThis.vatsimDataStorage = {
-    position: [],
-    general: [],
-    status: [],
-    generalPre: [],
-    statusPre: [],
-    track: [],
-    controller: null,
-    airport: [],
-    timestamp: new Date()
-}
-
-globalThis.databaseDataStorage = {
-    airports: {
-        version: "",
-        data: null
-    },
-    firs: {
-        version: "",
-        data: null
-    },
-    tracons: {
-        version: "",
-        data: null
-    }
-}
+globalThis.vatsimDataStorage = null
+globalThis.databaseDataStorage = null
 
 export default globalThis

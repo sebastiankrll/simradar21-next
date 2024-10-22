@@ -103,5 +103,8 @@ function setBusiestsAndRouteData(newAirports: { [key: string]: AirportData }) {
         airport.busiest = busiestRoute ?? '-'
         airport.connections = airport.routes?.size ?? 0
         delete airport.routes
+
+        airport.departures.tDelay = airport.departures.tDelay / airport.departures.n
+        airport.arrivals.tDelay = airport.arrivals.tDelay / airport.arrivals.n
     })
 }

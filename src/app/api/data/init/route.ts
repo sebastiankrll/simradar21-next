@@ -1,5 +1,5 @@
 import { getDatabaseVersions } from "@/storage/singleton/next/database"
-import { getVatsimWsData } from "@/storage/singleton/vatsim"
+import { getVatsimWsData } from "@/storage/singleton/next/vatsim"
 import { NextResponse } from "next/server"
 
 export const dynamic = 'force-dynamic'

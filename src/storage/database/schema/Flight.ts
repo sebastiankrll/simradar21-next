@@ -1,6 +1,7 @@
+import { MongoFlightSchema } from "@/types/database"
 import { Schema } from "mongoose"
 
-export const flightSchema: Schema = new Schema({
+const FlightSchema: Schema = new Schema<MongoFlightSchema>({
     hash: String,
     general: Object,
     status: Object,
@@ -9,6 +10,8 @@ export const flightSchema: Schema = new Schema({
     autoCreate: false,
 })
 
-flightSchema.index({ hash: 1 })
-flightSchema.index({ 'general.airport.dep.properties.icao': 1, 'status.times.schedDep': 1 })
-flightSchema.index({ 'general.airport.arr.properties.icao': 1, 'status.times.schedArr': 1 })
+FlightSchema.index({ hash: 1 })
+FlightSchema.index({ 'general.airport.dep.properties.icao': 1, 'status.times.schedDep': 1 })
+FlightSchema.index({ 'general.airport.arr.properties.icao': 1, 'status.times.schedArr': 1 })
+
+export default FlightSchema

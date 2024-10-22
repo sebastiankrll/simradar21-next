@@ -4,9 +4,7 @@ import { CloudQuantity, IMetar, IWeatherCondition, parseMetar } from "metar-taf-
 import airportTimezonesJSON from '@/assets/data/airports_tz.json'
 import { WorldTimeData } from "@/types/misc"
 import { AirportFlight, FlightsSearchParam } from "@/types/panel"
-import mongoose from "mongoose"
-import { MongoFlightSchema } from "@/types/database"
-import { flightSchema } from "@/storage/database/schema/Flight"
+import globalThis from "@/storage/singleton/next/global"
 
 interface CachedMetar {
     raw: string,
@@ -114,7 +112,7 @@ function getMetarCondition(conditions: IWeatherCondition[]): string | null {
 
         if (descriptive) {
             const idx = severityOrder.findIndex(severity => severity.code === descriptive)
-            if (idx && (!mostSevere?.index || idx < mostSevere.index)) mostSevere = {
+            if (idx !== -1 && (!mostSevere?.index || idx < mostSevere.index)) mostSevere = {
                 index: idx,
                 code: severityOrder[idx].code,
                 description: severityOrder[idx].description,
@@ -124,7 +122,7 @@ function getMetarCondition(conditions: IWeatherCondition[]): string | null {
 
         for (const phenomenon of condition.phenomenons) {
             const idx = severityOrder.findIndex(severity => severity.code === phenomenon)
-            if (idx && (!mostSevere?.index || idx < mostSevere.index)) mostSevere = {
+            if (idx !== -1 && (!mostSevere?.index || idx < mostSevere.index)) mostSevere = {
                 index: idx,
                 code: severityOrder[idx].code,
                 description: severityOrder[idx].description,
@@ -210,18 +208,12 @@ async function fetchWorldtime(timezone: string): Promise<WorldTimeData | null> {
     return null
 }
 
-const db = mongoose.createConnection('mongodb://127.0.0.1:27017/flights')
-const Flight = db.model<MongoFlightSchema>('Flight', flightSchema)
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
-db.on('connected', () => console.log('Connected to mongodb: flights'))
-db.dropCollection('flights')
-db.createCollection('flights')
-
 export async function getAirportFlights(params: FlightsSearchParam): Promise<AirportFlight[] | undefined> {
     try {
         const flights = await fetchAirportFlights(params)
-        return flights?.map(flight => {
+        const reversed = params.pagination === 'next' ? flights : flights?.reverse()
+
+        return reversed?.map(flight => {
             return {
                 general: flight.general,
                 status: flight.status
@@ -235,15 +227,15 @@ export async function getAirportFlights(params: FlightsSearchParam): Promise<Air
 
 async function fetchAirportFlights(params: FlightsSearchParam) {
     if (params.direction === 'departure') {
-        return await Flight.find({
+        return await globalThis.FlightModel.find({
             'general.airport.dep.properties.icao': params.icao,
             'status.times.schedDep': params.pagination === 'next' ? { $gt: new Date(params.timestamp) } : { $lt: new Date(params.timestamp) }
         })
             .sort(params.pagination === 'next' ? { 'status.times.schedDep': 1 } : { 'status.times.schedDep': -1 })
             .limit(params.n)
     }
-    if (params.direction === 'arrivals') {
-        return await Flight.find({
+    if (params.direction === 'arrival') {
+        return await globalThis.FlightModel.find({
             'general.airport.arr.properties.icao': params.icao,
             'status.times.schedArr': params.pagination === 'next' ? { $gt: new Date(params.timestamp) } : { $lt: new Date(params.timestamp) }
         })

@@ -1,30 +1,50 @@
-import { AirportFlight, FlightsSearchParam } from "@/types/panel";
+'use client'
+
+import '../AirportFlights.css'
+import { AirportFlight } from "@/types/panel";
 import { fetcher } from "@/utils/api/api";
-import { Fragment, useRef, useState } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { checkIfNewDay } from "../utils/misc";
 import { SingleFlight } from "./SingleFlight";
+import Spinner from '@/components/common/spinner/Spinner';
+import Delayboard from './Delayboard';
 
-export default function Flights({ icao, direction }: { icao: string, direction: string }) {
+export default function AirportFlights({ icao, direction }: { icao: string, direction: string }) {
     const [storedFlights, setStoredFlights] = useState<AirportFlight[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const [timeMode, setTimeMode] = useState<boolean>(false)
 
-    const searchParamsRef = useRef<FlightsSearchParam>({
-        pagination: 'next',
-        icao: icao,
-        direction: direction,
-        timestamp: new Date(),
-        n: 10
-    })
+    const initialFetchRef = useRef(false) // Handle component mounting twice in strict mode
+
+    useEffect(() => {
+        const timeModeInterval = setInterval(() => {
+            setTimeMode(prev => !prev)
+        }, 2000)
+
+        if (!initialFetchRef.current) {
+            fetchFlights()
+            initialFetchRef.current = true
+        }
+
+        return () => {
+            clearInterval(timeModeInterval)
+        }
+    }, [])
 
     const fetchFlights = async (pagination: 'next' | 'previous' = 'next') => {
         setLoading(true)
 
         try {
-            const url = new URL(`/api/flights`, window.location.origin)
+            const url = new URL(`/api/data/airport/${icao}/${direction}`, window.location.origin)
             url.searchParams.append('p', pagination)
-            url.searchParams.append('n', searchParamsRef.current.n.toString())
-            url.searchParams.append('t', searchParamsRef.current.timestamp.toUTCString())
+            url.searchParams.append('n', "10")
+            if (storedFlights.length === 0) {
+                url.searchParams.append('t', new Date().toISOString())
+            } else {
+                const edgeFlight = pagination === 'next' ? storedFlights[storedFlights.length - 1] : storedFlights[0]
+                const edgeTime = direction === 'departure' ? edgeFlight.status.times.schedDep : edgeFlight.status.times.schedArr
+                url.searchParams.append('t', new Date(edgeTime).toISOString())
+            }
 
             const flights = await fetcher(url.toString()) as AirportFlight[] | null
 
@@ -63,17 +83,17 @@ export default function Flights({ icao, direction }: { icao: string, direction: 
         })
     }
 
+    if (loading) return <Spinner show={true} />
+
     return (
         <>
-            <div className="info-panel-container column">
-                {/* {storedFlights ? <DelayBoard /> : null} */}
-            </div>
+            <Delayboard icao={icao} direction={direction} />
             <div className="info-panel-container column main scrollable">
-                <button className="flights-page-pagination" onClick={() => fetchFlights('previous')}>{storedFlights.length > 0 ? 'Load earlier flights' : 'No flights found'}</button>
-                <div className="flights-page-wrapper">
+                <button className="airport-flights-pagination" onClick={() => fetchFlights('previous')}>{storedFlights.length > 0 ? 'Load earlier flights' : 'No flights found'}</button>
+                <div className="airport-flights-wrapper">
                     {renderFlights()}
                 </div>
-                <button className="flights-page-pagination" onClick={() => fetchFlights('next')}>{storedFlights.length > 0 ? 'Load later flights' : 'No flights found'}</button>
+                <button className="airport-flights-pagination" onClick={() => fetchFlights('next')}>{storedFlights.length > 0 ? 'Load later flights' : 'No flights found'}</button>
             </div>
         </>
     )
@@ -85,7 +105,7 @@ function DateSeparator(date: Date, direction: string) {
     const prefix = direction === 'departures' ? 'DEPARTURES - ' : 'ARRIVALS - '
 
     return (
-        <div className="flights-page-dateline">
+        <div className="airport-flights-dateline">
             {prefix + formattedDate}
         </div>
     )
