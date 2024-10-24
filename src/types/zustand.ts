@@ -4,14 +4,14 @@ import { TrackPoint } from "./vatsim"
 
 export type FlightState = {
     feature: Feature | null,
-    action: number | null,
+    action: number | string | null,
     liveData: LiveFlightData | null,
     trackPoints: TrackPoint[] | null,
     timer: ReturnType<typeof setInterval> | null
 }
 
 export type FlightActions = {
-    setAction: (id: number | null) => void
+    setAction: (id: number | string | null) => void
     setLiveData: (feature: Feature | null) => void
     setTrackPoints: (points: TrackPoint[] | null) => void
 }

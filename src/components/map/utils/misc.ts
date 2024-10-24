@@ -4,7 +4,7 @@ import { RefObject } from "react"
 import { createAirportOverlay, createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
-import { followFlightFeature, setClickedFlightFeature, unFollowFlightFeature } from "./flights"
+import { followFlightFeature, setActiveFlightFeature, unFollowFlightFeature } from "./flights"
 import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
@@ -200,7 +200,7 @@ export async function handleFirstView(mapRef: RefObject<MapStorage>, path: strin
     if (!mapRef.current) return
 
     if (path.includes('flight')) {
-        setClickedFlightFeature(mapRef, path.split('/')[2])
+        setActiveFlightFeature(mapRef, path.split('/')[2])
         moveViewToFeature(mapRef, mapRef.current.features.click, 8)
     }
     if (path.includes('airport')) {
@@ -225,7 +225,7 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Featur
     })
 }
 
-export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | null) {
+export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | string | null) {
     const map = mapRef.current?.map
     if (!map) return
 
@@ -240,6 +240,21 @@ export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: n
         }
         mapRef.current.view.lastView = null
 
+        if (mapRef.current.features.hover) {
+            mapRef.current.features.hover.set('hover', 0)
+            mapRef.current.features.hover = null
+        }
+
+        if (mapRef.current.overlays.hover) {
+            const root = mapRef.current.overlays.hover.get('root')
+            setTimeout(() => {
+                root?.unmount()
+            }, 0)
+
+            mapRef.current.map?.removeOverlay(mapRef.current.overlays.hover)
+            mapRef.current.overlays.hover = null
+        }
+
         return
     }
 
@@ -249,5 +264,9 @@ export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: n
 
     if (action === 2) {
         followFlightFeature(mapRef)
+    }
+
+    if (typeof action === 'string') {
+        setActiveFlightFeature(mapRef, action, 'hover')
     }
 }

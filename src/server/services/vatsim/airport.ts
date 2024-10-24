@@ -104,7 +104,7 @@ function setBusiestsAndRouteData(newAirports: { [key: string]: AirportData }) {
         airport.connections = airport.routes?.size ?? 0
         delete airport.routes
 
-        airport.departures.tDelay = airport.departures.tDelay / airport.departures.n
-        airport.arrivals.tDelay = airport.arrivals.tDelay / airport.arrivals.n
+        airport.departures.tDelay = Math.round(airport.departures.tDelay / airport.departures.n)
+        airport.arrivals.tDelay = Math.round(airport.arrivals.tDelay / airport.arrivals.n)
     })
 }

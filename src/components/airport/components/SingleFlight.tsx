@@ -1,19 +1,23 @@
 import { AirportFlight } from "@/types/panel"
 import { getUtcString } from "@/utils/common"
 import { getFlightDelayColor, getFlightTimesArray } from "../utils/misc"
+import { useFlightStore } from "@/storage/state/flight"
 
 export function SingleFlight({ data, timeMode, direction }: { data: AirportFlight, timeMode: boolean, direction: string }) {
+    const { setAction } = useFlightStore()
 
-    const clickOpen = () => {
+    const onClick = () => {
         // navigate(`/flight/${flight.callsign}`)
+    }
+
+    const onHover = () => {
+        setAction(data.general.index.callsign)
     }
 
     const timesArray = getFlightTimesArray(data, direction)
 
-    // onMouseEnter={() => setHoveredFlight(flight.callsign)} onMouseLeave={() => setHoveredFlight(null)}
-
     return (
-        <div className="airport-flights-flight" onClick={clickOpen} style={{ borderLeft: '5px solid ' + getFlightDelayColor(data, direction) }}>
+        <div className="airport-flights-flight" onClick={onClick} style={{ borderLeft: '5px solid ' + getFlightDelayColor(data, direction) }} onMouseEnter={onHover} onMouseLeave={onHover}>
             <figure className="airport-flights-airline">
                 <img src={'https://images.kiwi.com/airlines/64/' + data.general.airline.iata + '.png'} alt="" />
             </figure>

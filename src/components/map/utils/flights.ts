@@ -163,7 +163,7 @@ export function unFollowFlightFeature() {
     clearInterval(followInterval)
 }
 
-export function setClickedFlightFeature(mapRef: RefObject<MapStorage>, callsign: string) {
+export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: string, type: 'click' | 'hover' = 'click') {
     if (!mapRef.current?.map) return
 
     const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
@@ -172,21 +172,21 @@ export function setClickedFlightFeature(mapRef: RefObject<MapStorage>, callsign:
         if (!feature) return
 
         // Clean up old previous overlay first (dev mode only due to strict mode)
-        if (mapRef.current.overlays.click) {
-            const root = mapRef.current.overlays.click.get('root')
+        if (mapRef.current.overlays[type]) {
+            const root = mapRef.current.overlays[type].get('root')
             setTimeout(() => {
                 root?.unmount()
             }, 0)
-    
-            mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
-            mapRef.current.overlays.click = null
+
+            mapRef.current.map.removeOverlay(mapRef.current.overlays[type])
+            mapRef.current.overlays[type] = null
         }
 
         feature.set('hover', 1)
-        mapRef.current.features.click = feature
+        mapRef.current.features[type] = feature
 
         const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
-        mapRef.current.overlays.click = overlay
+        mapRef.current.overlays[type] = overlay
 
         return
     }

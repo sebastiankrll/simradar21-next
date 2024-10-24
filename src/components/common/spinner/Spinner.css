@@ -27,6 +27,18 @@
     animation-delay: .4s;
 }
 
+.loader-absolute {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(180deg, rgba(77, 95, 131, 1) 20%, rgba(77, 95, 131, 0) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @keyframes rotate {
     0% {
         transform: translate(-50%, -50%) rotateZ(0deg);
