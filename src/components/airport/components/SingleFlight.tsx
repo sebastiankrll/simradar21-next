@@ -2,12 +2,18 @@ import { AirportFlight } from "@/types/panel"
 import { getUtcString } from "@/utils/common"
 import { getFlightDelayColor, getFlightTimesArray } from "../utils/misc"
 import { useFlightStore } from "@/storage/state/flight"
+import { useRouter } from "next/navigation"
+import { useSliderStore } from "@/storage/state/slider"
 
 export function SingleFlight({ data, timeMode, direction }: { data: AirportFlight, timeMode: boolean, direction: string }) {
     const { setAction } = useFlightStore()
+    const { setPage } = useSliderStore()
+    const router = useRouter()
 
     const onClick = () => {
-        // navigate(`/flight/${flight.callsign}`)
+        const route = `/flight/${data.general.index.callsign}`
+        router.prefetch(route)
+        setPage(route)
     }
 
     const onHover = () => {

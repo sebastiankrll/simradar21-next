@@ -10,7 +10,7 @@ import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleFlightPanelAction, handleHover, resetMap } from "./utils/misc"
+import { handleClick, handleFlightPanelAction, handleHover } from "./utils/misc"
 import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
@@ -112,13 +112,7 @@ export default function MapLayer({ }) {
 
     // Handle path reset
     useEffect(() => {
-        if (!mapRef.current.view.viewInit) {
-            // Init overall data (api calls)
-            initData(mapRef, pathname)
-        }
-        if (pathname === '/' && mapRef.current.view.viewInit) {
-            resetMap(mapRef)
-        }
+        initData(mapRef, pathname)
     }, [pathname])
 
     // Draw track when flight is loaded

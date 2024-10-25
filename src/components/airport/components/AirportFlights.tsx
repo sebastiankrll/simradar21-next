@@ -84,17 +84,19 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
             const date = direction === 'departure' ? new Date(flight.status.times.schedDep) : new Date(flight.status.times.schedArr)
             const isNewDay = checkIfNewDay(latestDay, date)
 
+            const uid = flight.general.index.callsign + '_' + flight.general.index.hash
+
             if (isNewDay) {
                 latestDay = date
                 return (
-                    <Fragment key={flight.general.index.hash}>
+                    <Fragment key={uid}>
                         {DateSeparator(date, direction)}
                         <SingleFlight data={flight} timeMode={timeMode} direction={direction} />
                     </Fragment>
                 )
             }
 
-            return <SingleFlight key={flight.general.index.hash} data={flight} timeMode={timeMode} direction={direction} />
+            return <SingleFlight key={uid} data={flight} timeMode={timeMode} direction={direction} />
         })
     }
 
