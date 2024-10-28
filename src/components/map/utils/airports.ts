@@ -9,7 +9,7 @@ import GeoJSON from 'ol/format/GeoJSON'
 import { VatsimDataWS } from "@/types/vatsim";
 import { Feature } from "ol";
 import { Point } from "ol/geom";
-import { createAirportOverlay } from "./overlay";
+import { createAirportOverlay, updateAirportOverlay } from "./overlay";
 import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
 
@@ -125,6 +125,7 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsi
     )
 
     calculateInAndOutBounds(vatsimData)
+    updateAirportOverlay(mapRef)
 }
 
 function calculateInAndOutBounds(vatsimData: VatsimDataWS) {
@@ -170,7 +171,7 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
     }) as Feature<Point>
 
     // Clean up old previous overlay first (dev mode only due to strict mode)
-    if (mapRef.current.overlays.click) {
+    if (mapRef.current.overlays.click && process.env.NODE_ENV === 'development') {
         const root = mapRef.current.overlays.click.get('root')
         setTimeout(() => {
             root?.unmount()
@@ -178,6 +179,10 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
 
         mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
         mapRef.current.overlays.click = null
+    }
+
+    if (mapRef.current.features.click && process.env.NODE_ENV === 'development') {
+        mapRef.current?.sources.airportTops.removeFeature(mapRef.current.features.click)
     }
 
     newFeature.set('hover', 1)

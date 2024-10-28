@@ -27,48 +27,6 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feat
     return overlay
 }
 
-export function createAirportOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>): Overlay | null {
-    if (!mapRef.current?.map) return null
-
-    const id = feature.getId()
-    const labelFeature = id ? mapRef.current.sources.airportLabels.getFeatureById(id) : null
-
-    const element = document.createElement('div')
-    const root = createRoot(element)
-    root.render(<AirportOverlay feature={labelFeature ?? feature} />)
-
-    const overlay = new Overlay({
-        element,
-        position: feature.getGeometry()?.getCoordinates(),
-        positioning: 'bottom-center',
-        offset: [0, -22],
-        id: feature.get('callsign')
-    })
-    overlay.set('root', root)
-    mapRef.current?.map.addOverlay(overlay)
-
-    return overlay
-}
-
-// export const createATCPopup = (map, feature) => {
-//     const element = document.createElement('div')
-//     const root = createRoot(element)
-//     root.render(<ATCPopup feature={feature} />)
-
-//     const popupOverlay = new Overlay({
-//         element,
-//         position: feature.getGeometry().getCoordinates(),
-//         positioning: 'bottom-center',
-//         offset: [0, -24],
-//         id: feature.get('desc')
-//     })
-//     popupOverlay.set('root', root)
-
-//     map.addOverlay(popupOverlay)
-
-//     return popupOverlay
-// }
-
 export function moveFlightOverlay(mapRef: RefObject<MapStorage>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
@@ -114,3 +72,66 @@ export function getLiveData(feature: Feature | null): LiveFlightData | null {
         fpm: attitude.altitudes[1] >= 0 ? '+' + attitude.altitudes[1] : '-' + Math.abs(attitude.altitudes[1])
     }
 }
+
+export function createAirportOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>): Overlay | null {
+    if (!mapRef.current?.map) return null
+
+    const id = feature.getId()
+    const labelFeature = id ? mapRef.current.sources.airportLabels.getFeatureById(id) : null
+
+    const element = document.createElement('div')
+    const root = createRoot(element)
+    root.render(<AirportOverlay feature={labelFeature ?? feature} />)
+
+    const overlay = new Overlay({
+        element,
+        position: feature.getGeometry()?.getCoordinates(),
+        positioning: 'bottom-center',
+        offset: [0, -22],
+        id: feature.get('callsign')
+    })
+    overlay.set('root', root)
+    mapRef.current?.map.addOverlay(overlay)
+
+    return overlay
+}
+
+export function updateAirportOverlay(mapRef: RefObject<MapStorage>) {
+    const overlays = mapRef.current?.overlays
+    const features = mapRef.current?.features
+
+    if (overlays?.hover && features?.hover?.get('type')?.includes('airport')) {
+        const id = features.hover.getId()
+        const labelFeature = id ? mapRef.current!.sources.airportLabels.getFeatureById(id) : null
+
+        const root = overlays.hover.get('root')
+        root.render(<AirportOverlay feature={labelFeature ?? features.hover} />)
+    }
+
+    if (overlays?.click && features?.click?.get('type')?.includes('airport')) {
+        const id = features.click.getId()
+        const labelFeature = id ? mapRef.current!.sources.airportLabels.getFeatureById(id) : null
+
+        const root = overlays.click.get('root')
+        root.render(<AirportOverlay feature={labelFeature ?? features.click} />)
+    }
+}
+
+// export const createATCPopup = (map, feature) => {
+//     const element = document.createElement('div')
+//     const root = createRoot(element)
+//     root.render(<ATCPopup feature={feature} />)
+
+//     const popupOverlay = new Overlay({
+//         element,
+//         position: feature.getGeometry().getCoordinates(),
+//         positioning: 'bottom-center',
+//         offset: [0, -24],
+//         id: feature.get('desc')
+//     })
+//     popupOverlay.set('root', root)
+
+//     map.addOverlay(popupOverlay)
+
+//     return popupOverlay
+// }

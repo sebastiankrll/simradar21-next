@@ -172,7 +172,7 @@ export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: 
         if (!feature) return
 
         // Clean up old previous overlay first (dev mode only due to strict mode)
-        if (mapRef.current.overlays[type]) {
+        if (mapRef.current.overlays[type] && process.env.NODE_ENV === 'development') {
             const root = mapRef.current.overlays[type].get('root')
             setTimeout(() => {
                 root?.unmount()

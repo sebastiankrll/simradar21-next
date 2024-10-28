@@ -207,7 +207,6 @@ export async function handlePathChange(mapRef: RefObject<MapStorage>, path: stri
         moveViewToFeature(mapRef, mapRef.current.features.click, 8)
     }
     if (path.includes('airport') && !mapRef.current.features.click?.get('type')?.includes('airport')) {
-        console.log('Here')
         await setClickedAirportFeature(mapRef, path.split('/')[2], null)
         moveViewToFeature(mapRef, mapRef.current.features.click, 13)
     }
