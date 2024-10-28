@@ -118,6 +118,7 @@
     grid-template-columns: 3rem auto;
     grid-template-rows: 1fr auto;
     gap: 0rem 1rem;
+    width: 100%;
 }
 
 .info-panel-title-logo {

@@ -1,0 +1,56 @@
+.marquee-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.marquee-offset {
+    position: absolute;
+    left: -5px;
+    right: -5px;
+    display: flex;
+}
+
+.marquee-offset::before,
+.marquee-offset::after {
+    content: "";
+    z-index: 1;
+    position: absolute;
+    pointer-events: none;
+    width: 5px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.marquee-offset::before {
+    left: 0;
+    background-image: linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 100%);
+}
+
+.marquee-offset::after {
+    right: 0;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 100%);
+}
+
+.marquee-overflow {
+    overflow: hidden;
+}
+
+.marquee-content {
+    display: inline-block;
+    animation: marquee infinite;
+}
+
+@keyframes marquee {
+
+    0% {
+        transform: translateX(5px);
+    }
+
+    50% {
+        transform: translateX(var(--max-translate));
+    }
+
+    100% {
+        transform: translateX(5px);
+    }
+}

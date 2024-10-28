@@ -19,6 +19,7 @@ import { useFlightStore } from '@/storage/state/flight'
 import { FlightData, TrackData } from '@/types/vatsim'
 import { useRouter } from 'next/navigation'
 import { useSliderStore } from '@/storage/state/slider'
+import Marquee from '../common/marquee/Marquee'
 
 export default function Flight({ callsign }: { callsign: string }) {
     const router = useRouter()
@@ -63,7 +64,9 @@ export default function Flight({ callsign }: { callsign: string }) {
                     <figure className="info-panel-title-logo">
                         <Image src={'https://images.kiwi.com/airlines/64/' + flightData?.general?.airline.iata + '.png'} alt={`${flightData?.general?.airline.iata}.png`} width={64} height={64} />
                     </figure>
-                    <div className="info-panel-title-desc">{flightData?.general?.airline.name}</div>
+                    <Marquee>
+                        <div className="info-panel-title-desc">{flightData?.general?.airline.name}</div>
+                    </Marquee>
                     <div className="info-panel-title-content">
                         <div className="info-panel-title-content-item">
                             <div className="info-panel-title-content-icon">

@@ -13,6 +13,7 @@ import useSWR from 'swr'
 import { fetcher } from '@/utils/api/api'
 import Spinner from '../common/spinner/Spinner'
 import { getAirportTime } from './utils/misc'
+import Marquee from '../common/marquee/Marquee'
 
 export default function Airport({ icao, children }: { icao: string, children: React.ReactNode }) {
     const router = useRouter()
@@ -57,7 +58,7 @@ export default function Airport({ icao, children }: { icao: string, children: Re
     return (
         <div className='info-panel'>
             <div className="info-panel-container header">
-                <div className='info-panel-id'>{icao} - {feature?.properties?.iata}</div>
+                <div className='info-panel-id'>{icao}{feature?.properties?.iata ? ` - ${feature?.properties?.iata}` : ''}</div>
                 <CloseButton onButtonClick={clickClose} />
             </div>
             <div className="info-panel-container">
@@ -65,7 +66,9 @@ export default function Airport({ icao, children }: { icao: string, children: Re
                     <figure className="info-panel-title-logo">
                         <img src={'https://images.kiwi.com/airlines/64/null.png'} alt="" />
                     </figure>
-                    <div className="info-panel-title-desc">{feature?.properties?.name}</div>
+                    <Marquee>
+                        <div className='info-panel-title-desc'>{feature?.properties?.name}</div>
+                    </Marquee>
                     <div className="info-panel-title-content">
                         <div className="info-panel-title-content-item">
                             <div className="info-panel-title-content-icon">
