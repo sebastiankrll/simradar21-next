@@ -94,7 +94,7 @@ function addControllerConnectionCounts(controllers: ControllerMap, transceiversB
             pilotTransceivers.forEach(pilot => {
                 const closestController = {
                     callsign: "",
-                    distance: 0
+                    distance: Infinity
                 }
                 const pilotPos = [pilot.transceiver.lonDeg, pilot.transceiver.latDeg]
 
@@ -108,7 +108,9 @@ function addControllerConnectionCounts(controllers: ControllerMap, transceiversB
                     }
                 })
 
-                if (closestController.callsign === callsign) { controllers[callsign].connections++ }
+                if (closestController.callsign === callsign) {
+                    controllers[callsign].connections++
+                }
             })
         }
     }

@@ -65,7 +65,9 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
 export function AirportOverlay({ feature }: { feature: Feature }) {
     const [active, setActive] = useState<string | null>(null)
 
-    const stations: ControllerIndex[] = feature.get('stations')
+    const stations: ControllerIndex[] | null = feature.get('stations')
+    stations?.sort((a, b) => a.facility - b.facility)
+
     const airportCode = feature.get('iata') ? feature.get('iata') + '/' + feature.get('icao') : feature.get('icao')
     const inOutBounds = getInAndOutBounds(feature.get('icao'))
 
