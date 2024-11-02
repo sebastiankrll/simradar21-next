@@ -78,7 +78,7 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
 }
 
 export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
-    const controllers = vatsimData?.controllers
+    const controllers = vatsimData?.controllers?.airports
     if (!controllers) return
 
     const icaos = Object.keys(controllers)

@@ -94,6 +94,7 @@ export function AirportOverlay({ feature }: { feature: Feature }) {
                             <div key={station.callsign} className="popup-side-item" onMouseEnter={() => setActive(station.callsign)}>
                                 <div className="popup-content-header side">
                                     {station.callsign}
+                                    <span className='popup-content-box connections'>{station.connections}</span>
                                     <span className={`popup-content-box frequency ${getFrequencyColor(station.facility)}`}>{station.frequency}</span>
                                     <span className='popup-content-box logon'>{getOnlineTime(station.logon)}</span>
                                 </div>

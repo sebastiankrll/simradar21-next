@@ -242,11 +242,14 @@ export interface ControllerIndex {
     facility: number,
     frequency: string,
     text: string[] | null,
+    connections: number,
     logon: Date
 }
 
 export interface ControllerData {
-    [key: string]: ControllerIndex[]
+    airports: { [key: string]: ControllerIndex[] },
+    firs: { [key: string]: ControllerIndex[] },
+    tracons: { [key: string]: ControllerIndex[] }
 }
 
 export interface AirportData {

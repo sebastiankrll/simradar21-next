@@ -21,6 +21,7 @@ function sendWsData(data: string) {
 
     const gzip = createGzip()
     const storage = getVatsimWsData()
+    
     gzip.write(JSON.stringify({
         event: 'set_vatsim',
         data: storage,
