@@ -3,7 +3,7 @@
 import './Overlay.css'
 import { Feature } from 'ol'
 import Image from 'next/image'
-import { useFlightStore } from '@/storage/state/flight'
+import { useControllerStore, useFlightStore } from '@/storage/state/flight'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
 import { ControllerIndex } from '@/types/vatsim'
@@ -62,25 +62,39 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
     )
 }
 
-export function AirportOverlay({ feature }: { feature: Feature }) {
+export function AirportOverlay({ feature, click }: { feature: Feature, click: boolean }) {
     const [active, setActive] = useState<string | null>(null)
+    const { stationsData: sharedStationsData, setStationsData: setSharedStationsData } = useControllerStore()
+    const [privateStationsData, setPrivateStationsData] = useState<ControllerIndex[]>([])
 
-    const stations: ControllerIndex[] | null = feature.get('stations')
-    stations?.sort((a, b) => a.facility - b.facility)
+    const stationsData = click ? sharedStationsData : privateStationsData
+
+    useEffect(() => {
+        const stations: ControllerIndex[] | null = feature.get('stations')
+        stations?.sort((a, b) => a.facility - b.facility)
+
+        if (click) {
+            setSharedStationsData(stations ?? [])
+        } else {
+            setPrivateStationsData(stations ?? [])
+        }
+
+        return () => { }
+    }, [feature, click])
 
     const airportCode = feature.get('iata') ? feature.get('iata') + '/' + feature.get('icao') : feature.get('icao')
     const inOutBounds = getInAndOutBounds(feature.get('icao'))
 
     return (
         <div className='popup popup-tip'>
-            {stations &&
+            {stationsData &&
                 <div className="popup-side-info">
                     <div className={`popup-side-info-text ${!active ? 'show' : ''}`}>Hover a station for more information.</div>
-                    {stations.map(station => {
+                    {stationsData.map(station => {
                         return (
                             <div className={`popup-side-info-text ${station.callsign === active ? 'show' : ''}`} key={station.callsign}>{
                                 station.facility === -1 || !station.text ?
-                                    <p>{!station.text ? 'Currently not available.' : station.text}</p>
+                                    <p>{!station.text ? 'Currently not available.' : station.text.join(' ')}</p>
                                     :
                                     station.text.map((text, i) => {
                                         return <p key={station.callsign + '_' + i}>{text === '' ? 'Currently not available.' : text}</p>
@@ -89,9 +103,9 @@ export function AirportOverlay({ feature }: { feature: Feature }) {
                         )
                     })}
                 </div>}
-            {stations &&
+            {stationsData &&
                 <div className="popup-content side">
-                    {stations.map(station => {
+                    {stationsData.map(station => {
                         return (
                             <div key={station.callsign} className="popup-side-item" onMouseEnter={() => setActive(station.callsign)}>
                                 <div className="popup-content-header side">
@@ -129,7 +143,7 @@ export function AirportOverlay({ feature }: { feature: Feature }) {
     )
 }
 
-function getFrequencyColor(facility: number): string {
+export function getFrequencyColor(facility: number): string {
     switch (facility) {
         case -1:
             return 'atis'
@@ -144,7 +158,7 @@ function getFrequencyColor(facility: number): string {
     }
 }
 
-function getOnlineTime(logonTime: Date | string): string {
+export function getOnlineTime(logonTime: Date | string): string {
     let dT = Date.now() - new Date(logonTime).getTime()
 
     const hours = Math.floor(dT / (1000 * 60 * 60))

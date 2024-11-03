@@ -298,3 +298,23 @@
 .info-panel-footer-button.highlight svg {
     fill: white;
 }
+
+.info-panel-controller-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .125rem 0rem;
+}
+
+.info-panel-controller-header p {
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.info-panel-controller-info {
+    display: flex;
+    gap: 1rem;
+    padding-top: .125rem;
+    padding-bottom: .25rem;
+    align-items: center;
+}

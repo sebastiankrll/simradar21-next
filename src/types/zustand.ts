@@ -1,6 +1,6 @@
 import { Feature } from "ol"
 import { LiveFlightData } from "./panel"
-import { TrackPoint } from "./vatsim"
+import { ControllerIndex, TrackPoint } from "./vatsim"
 
 export type FlightState = {
     feature: Feature | null,
@@ -27,3 +27,13 @@ export type SliderActions = {
 }
 
 export type SliderStore = SliderState & SliderActions
+
+export type ControllerState = {
+    stationsData: ControllerIndex[]
+}
+
+export type ControllerActions = {
+    setStationsData: (stationsData: ControllerIndex[]) => void
+}
+
+export type ControllerStore = ControllerState & ControllerActions

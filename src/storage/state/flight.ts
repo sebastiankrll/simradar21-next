@@ -1,5 +1,5 @@
 import { getLiveData } from '@/components/map/utils/overlay'
-import { FlightStore } from '@/types/zustand'
+import { ControllerStore, FlightStore } from '@/types/zustand'
 import { create } from 'zustand'
 
 export const useFlightStore = create<FlightStore>((set, get) => ({
@@ -29,4 +29,9 @@ export const useFlightStore = create<FlightStore>((set, get) => ({
         set((state) => ({ timer: state.timer = timerId }))
     },
     setTrackPoints: (points) => set((state) => ({ trackPoints: state.trackPoints = points }))
+}))
+
+export const useControllerStore = create<ControllerStore>((set) => ({
+    stationsData: [],
+    setStationsData: (newStations) => set((state) => ({ stationsData: state.stationsData = newStations }))
 }))

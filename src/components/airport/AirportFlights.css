@@ -169,7 +169,7 @@
 
 .airport-flights-times {
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     flex-direction: column;
     padding: 0rem .5rem;
     font-size: .875rem;

@@ -5,7 +5,7 @@ const FlightSchema: Schema = new Schema<MongoFlightSchema>({
     hash: String,
     general: Object,
     status: Object,
-    createdAt: { type: Date, expires: 60 }
+    createdAt: { type: Date, expires: 60 * 60 }
 }, {
     autoCreate: false,
 })

@@ -189,7 +189,7 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
     mapRef.current?.sources.airportTops.addFeature(newFeature)
     mapRef.current.features.click = newFeature
 
-    const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>)
+    const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>, true)
     mapRef.current.overlays.click = overlay
 }
 

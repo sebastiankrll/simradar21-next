@@ -73,7 +73,7 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
     }
 
     if (feature?.get('type')?.includes('airport')) {
-        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>)
+        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>, false)
         overlays.hover = overlay
     }
 
@@ -122,7 +122,7 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     }
 
     if (feature?.get('type')?.includes('airport')) {
-        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>)
+        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>, true)
         overlays.click = overlay
 
         setClickedAirportFeature(mapRef, feature.get('icao'), feature)
