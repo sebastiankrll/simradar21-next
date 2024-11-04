@@ -1,6 +1,6 @@
 'use client'
 
-import { useControllerStore } from "@/storage/state/flight"
+import { useControllerStore } from "@/storage/state/panel"
 import { AirportAPIData } from "@/types/vatsim"
 import { fetcher } from "@/utils/api/api"
 import { setHeight } from "@/utils/gui"

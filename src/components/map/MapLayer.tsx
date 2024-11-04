@@ -16,7 +16,7 @@ import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
 import { useSliderStore } from "@/storage/state/slider"
-import { useFlightStore } from "@/storage/state/flight"
+import { useFlightStore } from "@/storage/state/panel"
 import { initTrack } from "./utils/track"
 import { setAirportFeaturesByExtent, updateAirportFeatures } from "./utils/airports"
 
@@ -127,6 +127,9 @@ export default function MapLayer({ }) {
     }, [action])
 
     return (
-        <div id="map" />
+        <>
+            <div id="map" />
+            {/* <div id='map-popup-notfound' className={notFound ? 'show' : ''}>{notFound}</div> */}
+        </>
     )
 }

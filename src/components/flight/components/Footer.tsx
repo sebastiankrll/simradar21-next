@@ -1,6 +1,6 @@
 'use client'
 
-import { useFlightStore } from "@/storage/state/flight"
+import { useFlightStore } from "@/storage/state/panel"
 import { FlightData } from "@/types/vatsim"
 import { useState } from "react"
 

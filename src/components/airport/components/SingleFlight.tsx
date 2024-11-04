@@ -1,7 +1,7 @@
 import { AirportFlight } from "@/types/panel"
 import { getUtcString } from "@/utils/common"
 import { getFlightDelayColor, getFlightTimesArray } from "../utils/misc"
-import { useFlightStore } from "@/storage/state/flight"
+import { useFlightStore } from "@/storage/state/panel"
 import { useRouter } from "next/navigation"
 import { useSliderStore } from "@/storage/state/slider"
 

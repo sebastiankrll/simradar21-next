@@ -2,7 +2,7 @@
 
 import Chart from "@/components/common/chart/Chart";
 import { flightChartConfig, setFlightChartData, updateFlightChartData } from "../utils/chart";
-import { useFlightStore } from "@/storage/state/flight";
+import { useFlightStore } from "@/storage/state/panel";
 import { useEffect } from "react";
 import { FlightData } from "@/types/panel";
 

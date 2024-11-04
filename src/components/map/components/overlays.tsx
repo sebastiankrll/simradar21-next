@@ -2,7 +2,7 @@
 
 import { Feature } from 'ol'
 import Image from 'next/image'
-import { useControllerStore, useFlightStore } from '@/storage/state/flight'
+import { useControllerStore, useFlightStore } from '@/storage/state/panel'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
 import { ControllerIndex } from '@/types/vatsim'
