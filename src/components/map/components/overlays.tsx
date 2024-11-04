@@ -1,6 +1,5 @@
 'use client'
 
-import './Overlay.css'
 import { Feature } from 'ol'
 import Image from 'next/image'
 import { useControllerStore, useFlightStore } from '@/storage/state/flight'
@@ -107,7 +106,7 @@ export function AirportOverlay({ feature, click }: { feature: Feature, click: bo
                 <div className="popup-content side">
                     {stationsData.map(station => {
                         return (
-                            <div key={station.callsign} className="popup-side-item" onMouseEnter={() => setActive(station.callsign)}>
+                            <div key={station.callsign} className={`popup-side-item ${station.callsign === active ? 'active' : ''}`} onMouseEnter={() => setActive(station.callsign)}>
                                 <div className="popup-content-header side">
                                     {station.callsign}
                                     <span className='popup-content-box connections'>{station.connections}</span>

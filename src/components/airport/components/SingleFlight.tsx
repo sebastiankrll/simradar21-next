@@ -32,7 +32,7 @@ export function SingleFlight({ data, timeMode, direction }: { data: AirportFligh
                 <div className="airport-flights-airport-flightno">{data.general.index.callsign}</div>
             </div>
             <div className="airport-flights-status-short">
-                <div className="airport-flights-airport-iata">{direction === 'departure' ? data.general.airport?.arr.properties?.iata : data.general.airport?.dep.properties?.iata}</div>
+                <div className={`airport-flights-airport-iata${data.completed ? ' not-live' : ''}`}>{direction === 'departure' ? data.general.airport?.arr.properties?.iata : data.general.airport?.dep.properties?.iata}</div>
                 <div className="airport-flights-airport-ac">{data.general.aircraft?.icao}</div>
             </div>
             <div className="airport-flights-times">

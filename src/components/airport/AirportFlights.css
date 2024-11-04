@@ -66,6 +66,13 @@
     gap: .375rem;
 }
 
+.airport-flights-wrapper p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0rem;
+}
+
 .airport-flights-flight {
     padding: 0rem .5rem;
     display: grid;
@@ -140,6 +147,12 @@
     background-color: var(--color-green);
     color: white;
     text-align: center;
+}
+
+.airport-flights-airport-iata.not-live {
+    background-color: white;
+    background-color: var(--color-light-grey);
+    color: var(--color-light-text);
 }
 
 .airport-flights-flight:hover .airport-flights-airport-iata {

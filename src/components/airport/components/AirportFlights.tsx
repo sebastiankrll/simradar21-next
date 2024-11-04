@@ -10,6 +10,10 @@ import Spinner from '@/components/common/spinner/Spinner';
 import Delayboard from './Delayboard';
 import { flushSync } from 'react-dom';
 
+const FETCH_PARAMS = {
+    n: 10
+}
+
 export default function AirportFlights({ icao, direction }: { icao: string, direction: string }) {
     const [storedFlights, setStoredFlights] = useState<AirportFlight[]>([])
     const [loading, setLoading] = useState<boolean>(false)
@@ -17,6 +21,10 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
 
     const initialFetchRef = useRef<boolean>(false) // Handle component mounting twice in strict mode
     const scrollRef = useRef<HTMLDivElement | null>(null)
+    const limitsReachedRef = useRef({
+        previous: false,
+        next: false
+    })
 
     useEffect(() => {
         const timeModeInterval = setInterval(() => {
@@ -43,7 +51,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
         try {
             const url = new URL(`/api/data/airport/${icao}/${direction}`, window.location.origin)
             url.searchParams.append('p', pagination)
-            url.searchParams.append('n', "10")
+            url.searchParams.append('n', (FETCH_PARAMS.n + 1).toString())
 
             if (storedFlights.length === 0) {
                 url.searchParams.append('t', new Date().toISOString())
@@ -55,8 +63,10 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
 
             const flights = await fetcher(url.toString()) as AirportFlight[] | null
             if (!flights || flights.length < 1) return
+            if (flights.length < 11) { limitsReachedRef.current[pagination] = true }
 
             if (pagination === 'previous' && scrollDiv) {
+                flights.shift()
                 flushSync(() => setStoredFlights((prev) => [...flights, ...prev]))
 
                 setTimeout(() => {
@@ -64,6 +74,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
                     scrollDiv.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight)
                 }, 0)
             } else {
+                flights.pop()
                 setStoredFlights((prev) =>
                     pagination === 'next' ? [...prev, ...flights] : [...flights, ...prev]
                 )
@@ -76,7 +87,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
     }
 
     const renderFlights = () => {
-        if (storedFlights.length < 1) return 'No flights found. Try earlier flights.'
+        if (storedFlights.length < 1) return
 
         let latestDay = new Date(0)
 
@@ -104,12 +115,15 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
         <>
             <Delayboard icao={icao} direction={direction} />
             <div className="info-panel-container column main scrollable" ref={scrollRef}>
-                {loading && <div className='loader-absolute'><Spinner show={loading} /></div>}
-                <button className="airport-flights-pagination" onClick={() => fetchFlights('previous')}>Load earlier flights</button>
+                {loading && <div className='loader-absolute overlay'><Spinner show={loading} /></div>}
+                {!limitsReachedRef.current.previous && <button className="airport-flights-pagination" onClick={() => fetchFlights('previous')}>Load earlier flights</button>}
                 <div className="airport-flights-wrapper">
-                    {renderFlights()}
+                    {storedFlights.length > 0 ?
+                        renderFlights() :
+                        <p>No flights found. Try earlier flights.</p>
+                    }
                 </div>
-                {storedFlights.length !== 0 && <button className="airport-flights-pagination" onClick={() => fetchFlights('next')}>Load later flights</button>}
+                {(storedFlights.length !== 0 && !limitsReachedRef.current.next) && <button className="airport-flights-pagination" onClick={() => fetchFlights('next')}>Load later flights</button>}
             </div>
         </>
     )

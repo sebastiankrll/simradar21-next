@@ -32,5 +32,6 @@ export interface FlightsSearchParam {
 
 export interface AirportFlight {
     general: GeneralData,
-    status: StatusData
+    status: StatusData,
+    completed: boolean
 }

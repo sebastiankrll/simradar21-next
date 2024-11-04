@@ -228,13 +228,14 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Featur
     })
 }
 
+let prevAction: null | string | number = null
 export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | string | null) {
     const map = mapRef.current?.map
     if (!map) return
 
     if (!action) {
         unFollowFlightFeature()
-        hideFlightRoute(mapRef)
+        if (prevAction === 1) { hideFlightRoute(mapRef) }
 
         if (mapRef.current?.view.lastView) {
             map.getView().fit(mapRef.current.view.lastView, {
@@ -257,8 +258,6 @@ export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: n
             mapRef.current.map?.removeOverlay(mapRef.current.overlays.hover)
             mapRef.current.overlays.hover = null
         }
-
-        return
     }
 
     if (action === 1) {
@@ -272,4 +271,6 @@ export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: n
     if (typeof action === 'string') {
         setActiveFlightFeature(mapRef, action, 'hover')
     }
+
+    prevAction = action
 }

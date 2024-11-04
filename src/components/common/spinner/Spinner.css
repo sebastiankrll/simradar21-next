@@ -39,6 +39,10 @@
     justify-content: center;
 }
 
+.loader-absolute.overlay {
+    background: rgba(77, 95, 131, .4);
+}
+
 @keyframes rotate {
     0% {
         transform: translate(-50%, -50%) rotateZ(0deg);

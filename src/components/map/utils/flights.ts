@@ -182,10 +182,12 @@ export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: 
             mapRef.current.overlays[type] = null
         }
 
+        mapRef.current.features[type]?.set('hover', 0)
+
         feature.set('hover', 1)
         mapRef.current.features[type] = feature
 
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
+        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, type === 'click' ? true : false)
         mapRef.current.overlays[type] = overlay
 
         return

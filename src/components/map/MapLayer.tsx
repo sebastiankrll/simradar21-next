@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
+import './components/Overlay.css'
 import { MapStorage } from "@/types/map"
 import { mapStorage } from "@/storage/singleton/map"
 import { onMessage } from "@/utils/ws"

@@ -216,7 +216,8 @@ export async function getAirportFlights(params: FlightsSearchParam): Promise<Air
         return reversed?.map(flight => {
             return {
                 general: flight.general,
-                status: flight.status
+                status: flight.status,
+                completed: flight.createdAt.getTime() < Date.now() - 1000 * 120
             }
         })
     } catch (error) {

@@ -190,6 +190,15 @@
     cursor: pointer;
 }
 
+.popup-side-item.active {
+    background-color: var(--color-main-text);
+}
+
+.popup-side-item.active * {
+    color: white;
+    background-color: var(--color-main-text);
+}
+
 .popup-side-info {
     position: absolute;
     background: var(--color-red);

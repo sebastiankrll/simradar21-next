@@ -1,4 +1,4 @@
-import mongoose, { AnyBulkWriteOperation, UpdateOneModel } from "mongoose"
+import mongoose, { AnyBulkWriteOperation, DeleteOneModel, UpdateOneModel } from "mongoose"
 import { vatsimDataStorage } from "../singleton/vatsim"
 import { MongoFlightSchema } from "@/types/database"
 import FlightSchema from "./schema/Flight"
@@ -16,12 +16,13 @@ export function updateDb() {
 }
 
 let updateInProgress = false
+let prevPrefileHashes: string[] = []
 
 async function updateFlights() {
     if (updateInProgress) return
     updateInProgress = true
 
-    const bulkOps: AnyBulkWriteOperation<UpdateOneModel>[] = []
+    const bulkOps: AnyBulkWriteOperation<UpdateOneModel | DeleteOneModel>[] = []
     const now = Date.now()
 
     for (const general of vatsimDataStorage.general) {
@@ -36,6 +37,18 @@ async function updateFlights() {
                     createdAt: now
                 },
                 upsert: true
+            }
+        })
+    }
+
+    const newPrefileHashes = vatsimDataStorage.generalPre.map(prefile => `${prefile.index.callsign}_${prefile.index.hash}`)
+    const removedPrefileHashes = prevPrefileHashes.filter(hash => !newPrefileHashes.includes(hash))
+    prevPrefileHashes = newPrefileHashes
+
+    for (const prefileHash of removedPrefileHashes) {
+        bulkOps.push({
+            deleteOne: {
+                filter: { hash: prefileHash }
             }
         })
     }
