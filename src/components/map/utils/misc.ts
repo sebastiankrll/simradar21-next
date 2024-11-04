@@ -6,6 +6,7 @@ import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 import { followFlightFeature, setActiveFlightFeature, unFollowFlightFeature } from "./flights"
 import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
+import { intersects } from "ol/extent"
 
 export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
@@ -218,11 +219,15 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Featur
 
     const map = mapRef.current.map
     const view = map.getView()
-    const extent = feature.getGeometry()?.getExtent()
-    if (!zoom) zoom = view.getZoom()
+    if (!zoom) { zoom = view.getZoom() }
+
+    const featureExtent = feature.getGeometry()?.getExtent()
+    const viewExtent = view.calculateExtent(map.getSize())
+
+    if (!featureExtent || intersects(viewExtent, featureExtent)) return
 
     view.animate({
-        center: extent,
+        center: featureExtent,
         zoom: zoom,
         duration: 200
     })
