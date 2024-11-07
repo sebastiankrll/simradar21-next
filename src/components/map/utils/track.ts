@@ -1,3 +1,4 @@
+import { getSelectedAirports } from "@/storage/client-database"
 import { Attitude, MapStorage } from "@/types/map"
 import { TrackPoint } from "@/types/vatsim"
 import { Feature } from "ol"
@@ -6,13 +7,16 @@ import { fromLonLat } from "ol/proj"
 import { Stroke, Style } from "ol/style"
 import { RefObject } from "react"
 
-export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null) {
+export async function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null) {
     const trackFeatures: Feature<LineString>[] = []
 
     if (!trackPoints || !mapRef.current) return
 
+    const destinationSegment = await initDestinationSegment(mapRef, trackPoints)
+    if (destinationSegment) { trackFeatures.push(destinationSegment) }
+
     let combined = []
-    let index = 0
+    let index = 1
 
     // Add all recorded track segments
     for (let i = 0; i < trackPoints.length - 1; i++) {
@@ -31,7 +35,8 @@ export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint
             color: getRouteColor(start.altitudes[0], start.altitudes[1], start.connected).getColor()
         })
         const trackStyle = new Style({
-            stroke: getRouteColor(start.altitudes[0], start.altitudes[1], start.connected)
+            stroke: getRouteColor(start.altitudes[0], start.altitudes[1], start.connected),
+
         })
         trackFeature.setStyle(trackStyle)
         trackFeature.setId(i)
@@ -45,6 +50,47 @@ export function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint
     mapRef.current.sources.tracks.addFeatures(trackFeatures)
 
     firstInterpolation(mapRef, index)
+}
+
+async function initDestinationSegment(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null): Promise<Feature<LineString> | undefined> {
+    if (!trackPoints || !mapRef.current) return
+
+    const airports = mapRef.current.features.click?.get('airports') as string[] | undefined
+    if (!airports) return
+
+    const geojsons = await getSelectedAirports([airports[1]])
+    if (!geojsons || geojsons.length < 1) return
+
+    const start = trackPoints[trackPoints.length - 1].coordinates
+    const end = geojsons[0].geometry.coordinates
+
+    const trackFeature = new Feature({
+        geometry: new LineString([fromLonLat(start), fromLonLat(end)]),
+        type: 'route',
+        color: getRouteColor(0, 0, false).getColor()
+    })
+
+    const stroke = getRouteColor(0, 0, false)
+    stroke.setColor('rgba(77, 95, 131, 0)')
+
+    const trackStyle = new Style({
+        stroke: stroke
+    })
+    trackFeature.setStyle(trackStyle)
+    trackFeature.setId(0)
+
+    return trackFeature
+}
+
+function updateDestinationSegment(mapRef: RefObject<MapStorage>, start: number[]) {
+    const segment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
+    if (!segment) return
+
+    const coords = segment.getGeometry()?.getCoordinates()
+    coords?.shift()
+    coords?.unshift(start)
+
+    if (coords) segment.getGeometry()?.setCoordinates(coords)
 }
 
 function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
@@ -70,6 +116,8 @@ function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
 
     mapRef.current.features.track = trackFeature
     mapRef.current.sources.tracks.addFeature(trackFeature)
+
+    updateDestinationSegment(mapRef, end)
 }
 
 export function updateTrack(mapRef: RefObject<MapStorage>) {
@@ -126,7 +174,9 @@ export function moveTrack(mapRef: RefObject<MapStorage>) {
     coords?.pop()
     coords?.push(end)
 
-    if (coords) interpolatedFeature.getGeometry()?.setCoordinates(coords)
+    if (coords) { interpolatedFeature.getGeometry()?.setCoordinates(coords) }
+
+    updateDestinationSegment(mapRef, end)
 }
 
 function getRouteColor(altitude: number | null, radar: number | null, connected: boolean): Stroke {

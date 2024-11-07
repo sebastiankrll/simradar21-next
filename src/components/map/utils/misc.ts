@@ -218,7 +218,9 @@ export async function handlePathChange(mapRef: RefObject<MapStorage>, path: stri
         return
     }
 
-    handleNotFound(false)
+    if (!path.includes('flight') && !path.includes('airport')) {
+        handleNotFound(false)
+    }
 }
 
 export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null, zoom?: number) {
