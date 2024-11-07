@@ -6,3 +6,57 @@
     left: 0;
     right: 0;
 }
+
+.notfound {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1;
+}
+
+.notfound * {
+    color: white;
+}
+
+.notfound-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-red);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    flex-flow: column;
+    box-shadow: 1px 1px 5px 1px var(--color-box-shadow);
+    gap: 1rem;
+    width: 30rem;
+}
+
+.notfound .info-panel-close {
+    position: absolute;
+    right: 0rem;
+    top: 0rem;
+    background-color: white;
+}
+
+.notfound .info-panel-close svg {
+    fill: var(--color-main-text);
+}
+
+.notfound-title {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    font-weight: 800;
+}
+
+.notfound-info span {
+    background-color: white;
+    color: var(--color-main-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0rem .375rem;
+    margin: 0rem .25rem;
+}

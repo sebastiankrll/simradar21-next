@@ -155,16 +155,16 @@ export function getInAndOutBounds(icao: string): number[] {
     return inOutBounds[icao] ? inOutBounds[icao] : [0, 0]
 }
 
-export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, icao: string, feature: Feature<Point> | null) {
-    if (!mapRef.current?.map) return
+export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, icao: string, feature: Feature<Point> | null): Promise<boolean> {
+    if (!mapRef.current?.map) return false
 
     if (feature) {
         mapRef.current.sources.airportTops.addFeature(feature)
-        return
+        return true
     }
 
     const storedFeature = await getSelectedAirports([icao])
-    if (!storedFeature) return
+    if (!storedFeature || storedFeature.length < 1) return false
 
     const newFeature = new GeoJSON().readFeature(storedFeature[0], {
         featureProjection: 'EPSG:3857',
@@ -191,6 +191,8 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
 
     const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>, true)
     mapRef.current.overlays.click = overlay
+
+    return true
 }
 
 export async function showFlightRoute(mapRef: RefObject<MapStorage>) {

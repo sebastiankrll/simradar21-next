@@ -18,7 +18,6 @@ import { updateFlightFeatures } from "./flights"
 import { DatabaseDataStorage } from "@/types/database"
 import { checkAndUpdateData } from "@/storage/client-database"
 import { initAirportFeatures } from "./airports"
-import { handlePathChange } from "./misc"
 
 export function initLayers(mapRef: RefObject<MapStorage>) {
     if (!mapRef.current?.map) return
@@ -113,8 +112,8 @@ export function initLayers(mapRef: RefObject<MapStorage>) {
     initSunLayer(mapRef)
 }
 
-export async function initData(mapRef: RefObject<MapStorage>, path: string) {
-    if (!mapRef.current?.view.viewInit) {
+export async function initData(mapRef: RefObject<MapStorage>) {
+    if (mapRef.current && !mapRef.current.view.viewInit) {
         const initData: { vatsim: VatsimDataWS, database: DatabaseDataStorage } = await fetcher('/api/data/init')
 
         // Init indexed-db
@@ -123,7 +122,7 @@ export async function initData(mapRef: RefObject<MapStorage>, path: string) {
         // Init features (flights, airports, sectors)
         updateFlightFeatures(mapRef, initData.vatsim)
         initAirportFeatures(mapRef, initData.vatsim)
-    }
 
-    handlePathChange(mapRef, path)
+        mapRef.current.view.viewInit = true
+    }
 }

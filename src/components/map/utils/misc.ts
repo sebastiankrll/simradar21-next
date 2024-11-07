@@ -197,21 +197,28 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export async function handlePathChange(mapRef: RefObject<MapStorage>, path: string) {
+export async function handlePathChange(mapRef: RefObject<MapStorage>, path: string, handleNotFound: (found: boolean, path?: string) => void) {
     if ((path === '/' && mapRef.current?.view.viewInit) || !mapRef.current) {
         resetMap(mapRef)
         return
     }
 
     if (path.includes('flight') && mapRef.current.features.click?.get('type') !== 'flight') {
-        setActiveFlightFeature(mapRef, path.split('/')[2])
+        const found = setActiveFlightFeature(mapRef, path.split('/')[2])
         moveViewToFeature(mapRef, mapRef.current.features.click, 8)
+
+        handleNotFound(found, path)
+        return
     }
     if (path.includes('airport') && !mapRef.current.features.click?.get('type')?.includes('airport')) {
-        await setClickedAirportFeature(mapRef, path.split('/')[2], null)
+        const found = await setClickedAirportFeature(mapRef, path.split('/')[2], null)
         moveViewToFeature(mapRef, mapRef.current.features.click, 13)
+
+        handleNotFound(found, path)
+        return
     }
-    mapRef.current.view.viewInit = true
+
+    handleNotFound(false)
 }
 
 export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null, zoom?: number) {

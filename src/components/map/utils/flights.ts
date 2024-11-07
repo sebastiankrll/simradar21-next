@@ -163,33 +163,33 @@ export function unFollowFlightFeature() {
     clearInterval(followInterval)
 }
 
-export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: string, type: 'click' | 'hover' = 'click') {
-    if (!mapRef.current?.map) return
+export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: string, type: 'click' | 'hover' = 'click'): boolean {
+    if (!mapRef.current?.map) return false
 
     const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
-    if (features.length > 0) {
-        const feature = features.find(feature => feature.get('callsign') === callsign)
-        if (!feature) return
+    if (features.length < 1) return false
 
-        // Clean up old previous overlay first (dev mode only due to strict mode)
-        if (mapRef.current.overlays[type] && process.env.NODE_ENV === 'development') {
-            const root = mapRef.current.overlays[type].get('root')
-            setTimeout(() => {
-                root?.unmount()
-            }, 0)
+    const feature = features.find(feature => feature.get('callsign') === callsign)
+    if (!feature) return false
 
-            mapRef.current.map.removeOverlay(mapRef.current.overlays[type])
-            mapRef.current.overlays[type] = null
-        }
+    // Clean up old previous overlay first (dev mode only due to strict mode)
+    if (mapRef.current.overlays[type] && process.env.NODE_ENV === 'development') {
+        const root = mapRef.current.overlays[type].get('root')
+        setTimeout(() => {
+            root?.unmount()
+        }, 0)
 
-        mapRef.current.features[type]?.set('hover', 0)
-
-        feature.set('hover', 1)
-        mapRef.current.features[type] = feature
-
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, type === 'click' ? true : false)
-        mapRef.current.overlays[type] = overlay
-
-        return
+        mapRef.current.map.removeOverlay(mapRef.current.overlays[type])
+        mapRef.current.overlays[type] = null
     }
+
+    mapRef.current.features[type]?.set('hover', 0)
+
+    feature.set('hover', 1)
+    mapRef.current.features[type] = feature
+
+    const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, type === 'click' ? true : false)
+    mapRef.current.overlays[type] = overlay
+
+    return true
 }

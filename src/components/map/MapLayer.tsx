@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
@@ -11,7 +11,7 @@ import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleFlightPanelAction, handleHover } from "./utils/misc"
+import { handleClick, handleFlightPanelAction, handleHover, handlePathChange } from "./utils/misc"
 import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
@@ -19,12 +19,14 @@ import { useSliderStore } from "@/storage/state/slider"
 import { useFlightStore } from "@/storage/state/panel"
 import { initTrack } from "./utils/track"
 import { setAirportFeaturesByExtent, updateAirportFeatures } from "./utils/airports"
+import NotFound from "./components/NotFound"
 
 export default function MapLayer({ }) {
     const router = useRouter()
     const pathname = usePathname()
     const { setPage } = useSliderStore()
     const { trackPoints, action } = useFlightStore()
+    const [notFound, setNotFound] = useState<null | string[]>(null)
 
     const mapRef = useRef<MapStorage>(mapStorage)
 
@@ -113,7 +115,19 @@ export default function MapLayer({ }) {
 
     // Handle path reset
     useEffect(() => {
-        initData(mapRef, pathname)
+        const handleNotFound = (found: boolean, path?: string) => {
+            if (!found) {
+                setPage('/')
+                router.prefetch('/')
+
+                if (path) {
+                    setNotFound(path.split('/'))
+                }
+            }
+        }
+
+        initData(mapRef)
+        handlePathChange(mapRef, pathname, handleNotFound)
     }, [pathname])
 
     // Draw track when flight is loaded
@@ -129,7 +143,7 @@ export default function MapLayer({ }) {
     return (
         <>
             <div id="map" />
-            {/* <div id='map-popup-notfound' className={notFound ? 'show' : ''}>{notFound}</div> */}
+            {notFound && <NotFound path={notFound} close={() => setNotFound(null)} />}
         </>
     )
 }
