@@ -9,6 +9,7 @@
     border: 1px solid var(--color-border);
     box-sizing: border-box;
     overflow: hidden;
+    pointer-events: initial;
 }
 
 .info-panel.loading {
