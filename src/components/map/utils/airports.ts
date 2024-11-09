@@ -13,6 +13,7 @@ import { createAirportOverlay, updateAirportOverlay } from "./overlay";
 import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
 import { Style } from "ol/style";
+import { toggleDestinationSegment } from "./track";
 
 const rbush = new RBush<IndexedAirportFeature>()
 let inOutBounds: { [key: string]: number[] } = {}
@@ -237,14 +238,7 @@ export async function showFlightRoute(mapRef: RefObject<MapStorage>) {
     webglConfig.airportLabels.variables.dep = airportIcaos[0]
     webglConfig.airportLabels.variables.arr = airportIcaos[1]
 
-    const trackSegment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
-    if (!trackSegment) return
-
-    const style = trackSegment.getStyle() as Style
-    const stroke = style.getStroke()
-
-    stroke?.setColor('rgba(77, 95, 131, 0.7)')
-    trackSegment.setStyle(style)
+    toggleDestinationSegment(mapRef, true)
 }
 
 export async function hideFlightRoute(mapRef: RefObject<MapStorage>) {
@@ -256,12 +250,5 @@ export async function hideFlightRoute(mapRef: RefObject<MapStorage>) {
     webglConfig.airportLabels.variables.dep = ''
     webglConfig.airportLabels.variables.arr = ''
 
-    const trackSegment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
-    if (!trackSegment) return
-
-    const style = trackSegment.getStyle() as Style
-    const stroke = style.getStroke()
-
-    stroke?.setColor('rgba(77, 95, 131, 0)')
-    trackSegment.setStyle(style)
+    toggleDestinationSegment(mapRef, false)
 }

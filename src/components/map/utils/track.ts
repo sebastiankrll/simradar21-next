@@ -93,6 +93,17 @@ function updateDestinationSegment(mapRef: RefObject<MapStorage>, start: number[]
     if (coords) segment.getGeometry()?.setCoordinates(coords)
 }
 
+export function toggleDestinationSegment(mapRef: RefObject<MapStorage>, toggle: boolean) {
+    const trackSegment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
+    if (!trackSegment) return
+
+    const style = trackSegment.getStyle() as Style
+    const stroke = style.getStroke()
+
+    stroke?.setColor(toggle ? 'rgba(77, 95, 131, 0.7)' : 'rgba(77, 95, 131, 0)')
+    trackSegment.setStyle(style)
+}
+
 function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
     const clickedFeature = mapRef.current?.features.click
     if (!clickedFeature) return
