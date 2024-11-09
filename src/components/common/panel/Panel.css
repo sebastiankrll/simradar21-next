@@ -44,6 +44,11 @@
     gap: 0rem;
 }
 
+.info-panel-container.dashboard {
+    padding: 0rem;
+    gap: 1rem;
+}
+
 .scrollable {
     position: relative;
     overflow-y: auto;
@@ -64,22 +69,16 @@
 }
 
 .info-panel-container.sub {
-    flex-shrink: 0;
     gap: 0rem;
     padding: 0rem;
     box-shadow: none;
 }
 
-.info-panel-container.overview {
-    flex-shrink: 0;
-    gap: 0rem;
-    padding: 0rem;
-}
-
 .info-panel-container.dropdown {
     overflow: hidden;
-    height: 2rem;
+    height: 0rem;
     transition: ease .2s height;
+    flex-shrink: 0;
 }
 
 .info-panel-container.dropdown.open {
