@@ -1,9 +1,6 @@
-import dynamic from 'next/dynamic';
+import Flight from "@/components/flight/Flight";
 
-const Flight = dynamic(() => import('@/components/flight/Flight'), {
-    ssr: false
-})
-
-export default async function Page({ params }: { params: { callsign: string } }) {
+export default async function Page(props: { params: Promise<{ callsign: string }> }) {
+    const params = await props.params;
     return <Flight callsign={params.callsign} />
 }

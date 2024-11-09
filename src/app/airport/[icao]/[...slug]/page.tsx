@@ -1,9 +1,6 @@
-import dynamic from 'next/dynamic';
+import AirportFlights from "@/components/airport/components/AirportFlights";
 
-const AirportFlights = dynamic(() => import('@/components/airport/components/AirportFlights'), {
-    ssr: false
-})
-
-export default async function Page({ params }: { params: { icao: string, slug: string[] } }) {
+export default async function Page(props: { params: Promise<{ icao: string, slug: string[] }> }) {
+    const params = await props.params;
     return <AirportFlights icao={params.icao} direction={params.slug[0]} />
 }

@@ -7,7 +7,7 @@ import { fromLonLat } from "ol/proj"
 import { Stroke, Style } from "ol/style"
 import { RefObject } from "react"
 
-export async function initTrack(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null) {
+export async function initTrack(mapRef: RefObject<MapStorage | null>, trackPoints: TrackPoint[] | null) {
     const trackFeatures: Feature<LineString>[] = []
 
     if (!trackPoints || !mapRef.current) return
@@ -52,7 +52,7 @@ export async function initTrack(mapRef: RefObject<MapStorage>, trackPoints: Trac
     firstInterpolation(mapRef, index)
 }
 
-async function initDestinationSegment(mapRef: RefObject<MapStorage>, trackPoints: TrackPoint[] | null): Promise<Feature<LineString> | undefined> {
+async function initDestinationSegment(mapRef: RefObject<MapStorage | null>, trackPoints: TrackPoint[] | null): Promise<Feature<LineString> | undefined> {
     if (!trackPoints || !mapRef.current) return
 
     const airports = mapRef.current.features.click?.get('airports') as string[] | undefined
@@ -82,7 +82,7 @@ async function initDestinationSegment(mapRef: RefObject<MapStorage>, trackPoints
     return trackFeature
 }
 
-function updateDestinationSegment(mapRef: RefObject<MapStorage>, start: number[]) {
+function updateDestinationSegment(mapRef: RefObject<MapStorage | null>, start: number[]) {
     const segment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
     if (!segment) return
 
@@ -93,7 +93,7 @@ function updateDestinationSegment(mapRef: RefObject<MapStorage>, start: number[]
     if (coords) segment.getGeometry()?.setCoordinates(coords)
 }
 
-export function toggleDestinationSegment(mapRef: RefObject<MapStorage>, toggle: boolean) {
+export function toggleDestinationSegment(mapRef: RefObject<MapStorage | null>, toggle: boolean) {
     const trackSegment = mapRef.current?.sources.tracks.getFeatureById(0) as Feature<LineString>
     if (!trackSegment) return
 
@@ -104,7 +104,7 @@ export function toggleDestinationSegment(mapRef: RefObject<MapStorage>, toggle: 
     trackSegment.setStyle(style)
 }
 
-function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
+function firstInterpolation(mapRef: RefObject<MapStorage | null>, index: number) {
     const clickedFeature = mapRef.current?.features.click
     if (!clickedFeature) return
 
@@ -131,7 +131,7 @@ function firstInterpolation(mapRef: RefObject<MapStorage>, index: number) {
     updateDestinationSegment(mapRef, end)
 }
 
-export function updateTrack(mapRef: RefObject<MapStorage>) {
+export function updateTrack(mapRef: RefObject<MapStorage | null>) {
     const clickedFeature = mapRef.current?.features.click
     if (!clickedFeature || mapRef.current.sources.tracks.getFeatures().length === 0) return
 
@@ -173,7 +173,7 @@ export function updateTrack(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export function moveTrack(mapRef: RefObject<MapStorage>) {
+export function moveTrack(mapRef: RefObject<MapStorage | null>) {
     const clickedFeature = mapRef.current?.features.click
     const interpolatedFeature = mapRef.current?.features.track
     if (!clickedFeature || !interpolatedFeature) return

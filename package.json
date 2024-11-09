@@ -26,12 +26,12 @@
     "maplibre-gl": "^4.7.0",
     "metar-taf-parser": "^9.0.1",
     "mongoose": "^8.7.2",
-    "next": "^14.2.12",
+    "next": "15.0.3",
     "ol": "^10.2.1",
     "rbush": "^4.0.1",
-    "react": "^18",
+    "react": "19.0.0-rc-66855b96-20241106",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
     "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "swr": "^2.2.5",
@@ -40,13 +40,17 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
     "@types/ws": "^8.5.12",
     "eslint": "^8",
-    "eslint-config-next": "14.2.9",
+    "eslint-config-next": "15.0.3",
     "threads-plugin": "^1.4.0",
     "tsx": "^4.19.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
   }
 }

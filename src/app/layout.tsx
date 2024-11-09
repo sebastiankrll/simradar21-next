@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import Header from "@/components/header/Header"
 import "./globals.css"
-import dynamic from "next/dynamic"
 import { Manrope } from 'next/font/google'
 import Slider from "@/components/common/slider/Slider"
 import '@/components/common/panel/Panel.css'
+import MapLayer from "@/components/map/MapLayer"
 
 export const metadata: Metadata = {
     title: "simradar21",
@@ -16,10 +16,6 @@ const manrope = Manrope({
     display: 'swap'
 })
 
-const Map = dynamic(() => import('@/components/map/MapLayer'), {
-    ssr: false
-})
-
 export default async function RootLayout({
     children
 }: Readonly<{
@@ -29,7 +25,7 @@ export default async function RootLayout({
         <html lang="en" className={manrope.className}>
             <body>
                 <Header />
-                <Map />
+                <MapLayer />
                 <Slider>
                     {children}
                 </Slider>

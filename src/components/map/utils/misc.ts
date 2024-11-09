@@ -8,7 +8,7 @@ import { followFlightFeature, setActiveFlightFeature, unFollowFlightFeature } fr
 import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
 import { intersects } from "ol/extent"
 
-export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>) => {
+export const handleHover = (mapRef: RefObject<MapStorage | null>, event: MapBrowserEvent<UIEvent>) => {
     if (!mapRef.current?.map) return
 
     const map = mapRef.current.map
@@ -93,7 +93,7 @@ export const handleHover = (mapRef: RefObject<MapStorage>, event: MapBrowserEven
     // }
 }
 
-export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEvent<UIEvent>): string {
+export function handleClick(mapRef: RefObject<MapStorage | null>, event: MapBrowserEvent<UIEvent>): string {
     if (!mapRef.current?.map) return '/'
 
     const map = mapRef.current.map
@@ -140,7 +140,7 @@ export function handleClick(mapRef: RefObject<MapStorage>, event: MapBrowserEven
     return '/'
 }
 
-export function resetMap(mapRef: RefObject<MapStorage>) {
+export function resetMap(mapRef: RefObject<MapStorage | null>) {
     if (!mapRef.current?.map) return
 
     mapRef.current.features.track = null
@@ -197,7 +197,7 @@ export function resetMap(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export async function handlePathChange(mapRef: RefObject<MapStorage>, path: string, handleNotFound: (found: boolean, path?: string) => void) {
+export async function handlePathChange(mapRef: RefObject<MapStorage | null>, path: string, handleNotFound: (found: boolean, path?: string) => void) {
     if ((path === '/' && mapRef.current?.view.viewInit) || !mapRef.current) {
         resetMap(mapRef)
         return
@@ -223,7 +223,7 @@ export async function handlePathChange(mapRef: RefObject<MapStorage>, path: stri
     }
 }
 
-export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Feature | null, zoom?: number) {
+export function moveViewToFeature(mapRef: RefObject<MapStorage | null>, feature: Feature | null, zoom?: number) {
     if (!mapRef.current?.map || !feature) return
 
     const map = mapRef.current.map
@@ -243,7 +243,7 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage>, feature: Featur
 }
 
 let prevAction: null | string | number = null
-export function handleFlightPanelAction(mapRef: RefObject<MapStorage>, action: number | string | null) {
+export function handleFlightPanelAction(mapRef: RefObject<MapStorage | null>, action: number | string | null) {
     const map = mapRef.current?.map
     if (!map) return
 

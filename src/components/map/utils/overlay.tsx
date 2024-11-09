@@ -7,7 +7,7 @@ import { Point } from "ol/geom"
 import { LiveFlightData } from "@/types/panel"
 import { roundNumToX } from "@/utils/common"
 
-export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {
+export function createFlightOverlay(mapRef: RefObject<MapStorage | null>, feature: Feature<Point>, click: boolean): Overlay | null {
     if (!mapRef.current?.map) return null
 
     const element = document.createElement('div')
@@ -27,7 +27,7 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage>, feature: Feat
     return overlay
 }
 
-export function moveFlightOverlay(mapRef: RefObject<MapStorage>) {
+export function moveFlightOverlay(mapRef: RefObject<MapStorage | null>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
 
@@ -42,7 +42,7 @@ export function moveFlightOverlay(mapRef: RefObject<MapStorage>) {
     }
 }
 
-export function updateFlightOverlay(mapRef: RefObject<MapStorage>) {
+export function updateFlightOverlay(mapRef: RefObject<MapStorage | null>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
 
@@ -73,7 +73,7 @@ export function getLiveData(feature: Feature | null): LiveFlightData | null {
     }
 }
 
-export function createAirportOverlay(mapRef: RefObject<MapStorage>, feature: Feature<Point>, click: boolean): Overlay | null {
+export function createAirportOverlay(mapRef: RefObject<MapStorage | null>, feature: Feature<Point>, click: boolean): Overlay | null {
     if (!mapRef.current?.map) return null
 
     const id = feature.getId()
@@ -96,7 +96,7 @@ export function createAirportOverlay(mapRef: RefObject<MapStorage>, feature: Fea
     return overlay
 }
 
-export function updateAirportOverlay(mapRef: RefObject<MapStorage>) {
+export function updateAirportOverlay(mapRef: RefObject<MapStorage | null>) {
     const overlays = mapRef.current?.overlays
     const features = mapRef.current?.features
 

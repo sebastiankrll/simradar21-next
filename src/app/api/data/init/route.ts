@@ -2,8 +2,6 @@ import { getDatabaseVersions } from "@/storage/singleton/next/database"
 import { getVatsimWsData } from "@/storage/singleton/next/vatsim"
 import { NextResponse } from "next/server"
 
-export const dynamic = 'force-dynamic'
-
 export async function GET() {
     const vatsim = getVatsimWsData()
     const database = getDatabaseVersions()

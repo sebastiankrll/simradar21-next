@@ -1,15 +1,16 @@
-import dynamic from 'next/dynamic';
+import Airport from "@/components/airport/Airport";
 
-const Airport = dynamic(() => import('@/components/airport/Airport'), {
-    ssr: false
-})
+export default async function Layout(
+    props: Readonly<{
+        children: React.ReactNode,
+        params: { icao: string }
+    }>
+) {
+    const params = await props.params;
 
-export default async function Layout({
-    children,
-    params
-}: Readonly<{
-    children: React.ReactNode,
-    params: { icao: string }
-}>) {
+    const {
+        children
+    } = props;
+
     return <Airport icao={params.icao} children={children} />
 }

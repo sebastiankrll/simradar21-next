@@ -18,7 +18,7 @@ import { toggleDestinationSegment } from "./track";
 const rbush = new RBush<IndexedAirportFeature>()
 let inOutBounds: { [key: string]: number[] } = {}
 
-export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
+export async function initAirportFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
     const airportFeatures = await getAllAirports()
     if (!airportFeatures) return
 
@@ -37,7 +37,7 @@ export async function initAirportFeatures(mapRef: RefObject<MapStorage>, vatsimD
     updateAirportFeatures(mapRef, vatsimData)
 }
 
-export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
+export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage | null>) {
     const map = mapRef.current?.map
     const resolution = map?.getView().getResolution()
     if (!resolution || !map) {
@@ -79,7 +79,7 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage>) {
     )
 }
 
-export async function updateAirportFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
+export async function updateAirportFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
     const controllers = vatsimData?.controllers?.airports
     if (!controllers) return
 
@@ -157,7 +157,7 @@ export function getInAndOutBounds(icao: string): number[] {
     return inOutBounds[icao] ? inOutBounds[icao] : [0, 0]
 }
 
-export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, icao: string, feature: Feature<Point> | null): Promise<boolean> {
+export async function setClickedAirportFeature(mapRef: RefObject<MapStorage | null>, icao: string, feature: Feature<Point> | null): Promise<boolean> {
     if (!mapRef.current?.map) return false
 
     if (feature) {
@@ -197,7 +197,7 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage>, ic
     return true
 }
 
-export async function showFlightRoute(mapRef: RefObject<MapStorage>) {
+export async function showFlightRoute(mapRef: RefObject<MapStorage | null>) {
     const clickedFeature = mapRef.current?.features.click
     const map = mapRef.current?.map
     if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
@@ -241,7 +241,7 @@ export async function showFlightRoute(mapRef: RefObject<MapStorage>) {
     toggleDestinationSegment(mapRef, true)
 }
 
-export async function hideFlightRoute(mapRef: RefObject<MapStorage>) {
+export async function hideFlightRoute(mapRef: RefObject<MapStorage | null>) {
     mapRef.current?.sources.airportTops.clear()
 
     webglConfig.flights.variables.callsign = 'all'

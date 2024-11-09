@@ -9,7 +9,7 @@ import { createFlightOverlay, moveFlightOverlay, updateFlightOverlay } from "./o
 import { moveTrack, updateTrack } from "./track"
 import { moveViewToFeature } from "./misc"
 
-export function updateFlightFeatures(mapRef: RefObject<MapStorage>, vatsimData: VatsimDataWS | null) {
+export function updateFlightFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
     if (!mapRef.current || !vatsimData?.flights) return
 
     const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
@@ -115,7 +115,7 @@ function getInterpolatedPosition(position: Attitude, timeElapsed: number): numbe
     return [newLon, newLat]
 }
 
-export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
+export function moveFlightFeatures(mapRef: RefObject<MapStorage | null>) {
     const features = mapRef.current?.sources.flights.getFeatures() as Feature<Point>[]
 
     features.forEach(feature => {
@@ -129,7 +129,7 @@ export function moveFlightFeatures(mapRef: RefObject<MapStorage>) {
 }
 
 let then: number = Date.now()
-export function animateFlightFeatures(mapRef: RefObject<MapStorage>) {
+export function animateFlightFeatures(mapRef: RefObject<MapStorage | null>) {
     if (!mapRef.current?.map) return
 
     const fpsInterval = 1000 / 30
@@ -146,7 +146,7 @@ export function animateFlightFeatures(mapRef: RefObject<MapStorage>) {
 }
 
 let followInterval: NodeJS.Timeout
-export function followFlightFeature(mapRef: RefObject<MapStorage>) {
+export function followFlightFeature(mapRef: RefObject<MapStorage | null>) {
     const clickedFeature = mapRef.current?.features.click
     const map = mapRef.current?.map
     if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
@@ -163,7 +163,7 @@ export function unFollowFlightFeature() {
     clearInterval(followInterval)
 }
 
-export function setActiveFlightFeature(mapRef: RefObject<MapStorage>, callsign: string, type: 'click' | 'hover' = 'click'): boolean {
+export function setActiveFlightFeature(mapRef: RefObject<MapStorage | null>, callsign: string, type: 'click' | 'hover' = 'click'): boolean {
     if (!mapRef.current?.map) return false
 
     const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]

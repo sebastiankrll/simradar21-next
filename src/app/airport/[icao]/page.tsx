@@ -1,9 +1,6 @@
-import dynamic from 'next/dynamic';
+import MainInfo from "@/components/airport/components/MainInfo";
 
-const MainInfo = dynamic(() => import('@/components/airport/components/MainInfo'), {
-    ssr: false
-})
-
-export default async function Page({ params }: { params: { icao: string } }) {
+export default async function Page(props: { params: Promise<{ icao: string }> }) {
+    const params = await props.params;
     return <MainInfo icao={params.icao} />
 }

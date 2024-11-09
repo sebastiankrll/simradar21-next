@@ -2,12 +2,8 @@ import Image from 'next/image'
 import logo from '@/assets/images/logo.svg'
 
 import './Header.css'
-import dynamic from 'next/dynamic'
 import Search from './components/Search'
-
-const Clock = dynamic(() => import('./components/Clock'), {
-    ssr: false
-})
+import Clock from './components/Clock'
 
 export default function Header() {
     return (

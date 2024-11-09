@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { icao: string, slug: string[] } }
+    props: { params: Promise<{ icao: string, slug: string[] }> }
 ) {
+    const params = await props.params;
     if (params.slug[0] !== 'departure' && params.slug[0] !== 'arrival') return NextResponse.json(null)
 
     const searchParams = request.nextUrl.searchParams
@@ -21,7 +22,7 @@ export async function GET(
         n: n ? parseInt(n) : 10
     }
 
-    const flights = await getAirportFlights(flightSearchParams) ?? null
+    const flights = (await getAirportFlights(flightSearchParams)) ?? null
 
     return NextResponse.json(flights)
 }
