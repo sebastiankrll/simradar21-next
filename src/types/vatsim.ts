@@ -129,6 +129,12 @@ export interface VatsimData {
     transceivers: VatsimTransceiversData[]
 }
 
+export interface PositionAirline {
+    iata: string,
+    bg?: string,
+    font?: string
+}
+
 export interface PositionData {
     callsign: string,
     aircraft: string | null,
@@ -138,7 +144,7 @@ export interface PositionData {
     groundspeeds: number[],
     frequency: string,
     airports: string[] | null,
-    airline: string | null,
+    airline: PositionAirline,
     type: number,
     connected: boolean,
     timestamp: Date

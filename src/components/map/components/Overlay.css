@@ -61,7 +61,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    box-sizing: border-box;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--color-main-text);
+}
+
+.popup-content-logo p {
+    font-weight: 800;
+    font-size: 1rem;
 }
 
 .popup-content-logo img {

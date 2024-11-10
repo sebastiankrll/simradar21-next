@@ -58,9 +58,13 @@ export default function MainInfo({ data }: { data: FlightData | undefined | null
                                         <p>ENROUTE TIME</p>
                                         <div className="info-panel-data-content">{getDurationString(data.general.flightplan.enrouteTime * 60 * 1000)}</div>
                                     </div>
-                                    <div className="info-panel-data">
-                                        <figure id="aircraft-panel-more-airline">
-                                            <Image src={'https://images.kiwi.com/airlines/64/' + data.general.airline.iata + '.png'} alt={`${data.general.airline.iata}.png`} width={64} height={64} />
+                                    <div className="info-panel-data" id="aircraft-panel-more-airline">
+                                        <figure style={{ backgroundColor: data.position?.airline?.bg ?? '' }}>
+                                            <p style={{
+                                                color: data.position?.airline?.font ?? ''
+                                            }}>
+                                                {data.position?.airline?.iata}
+                                            </p>
                                         </figure>
                                     </div>
                                 </div>

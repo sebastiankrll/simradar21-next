@@ -1,11 +1,14 @@
 import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim";
-import { GeneralData, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/vatsim";
+import { GeneralData, PositionAirline, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
-const airlines = airlinesJSON as Airlines[]
 import aircraftsJSON from '@/assets/data/aircrafts.json'
+import airlineColorsJSON from '@/assets/data/airline_colors.json'
 import { Aircrafts, Airlines } from "@/types/misc";
 import { calculateDistance, toDegrees, toRadians } from "@/utils/common";
+
+const airlines = airlinesJSON as Airlines[]
 const aircrafts = aircraftsJSON as Aircrafts
+const airlineColors = airlineColorsJSON as Record<string, { bg: string, font: string }>
 
 export function updatePosition() {
     if (!rawDataStorage.vatsim?.pilots) return
@@ -44,7 +47,6 @@ function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, 
 
     const radarHeight = transceiver ? Math.round(transceiver.heightAglM * 3.28084) : pilot.altitude
     const frequency = transceiver ? (transceiver?.frequency / 1000000).toFixed(3) : '122.800'
-    const airline = airlines.find(airline => airline.icao === pilot.callsign.substring(0, 3))
 
     return {
         callsign: pilot.callsign,
@@ -55,10 +57,26 @@ function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, 
         heading: pilot.heading,
         frequency: frequency,
         airports: pilot.flight_plan?.departure && pilot.flight_plan.arrival ? [pilot.flight_plan?.departure, pilot.flight_plan?.arrival] : null,
-        airline: airline?.iata ?? null,
+        airline: getAirlineColor(pilot),
         type: getAircraftType(pilot),
         connected: true,
         timestamp: new Date(pilot.last_updated)
+    }
+}
+
+function getAirlineColor(pilot: VatsimPilot): PositionAirline {
+    const airline = airlines.find(airline => airline.icao === pilot.callsign.substring(0, 3))
+    const iata = airline?.iata && airline.iata !== '' ? airline.iata : pilot.callsign.substring(0, 3)
+
+    if (!airline?.icao) return { iata: iata }
+
+    const colors = airlineColors[airline.icao]
+    if (!colors) return { iata: iata }
+
+    return {
+        iata: iata,
+        bg: colors.bg,
+        font: colors.font
     }
 }
 

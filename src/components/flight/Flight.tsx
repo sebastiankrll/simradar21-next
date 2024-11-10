@@ -61,8 +61,13 @@ export default function Flight({ callsign }: { callsign: string }) {
             </div>
             <div className="info-panel-container">
                 <div className="info-panel-title-main">
-                    <figure className="info-panel-title-logo">
-                        <Image src={'https://images.kiwi.com/airlines/64/' + flightData?.general?.airline.iata + '.png'} alt={`${flightData?.general?.airline.iata}.png`} width={64} height={64} />
+                    <figure className="info-panel-title-logo" style={{ backgroundColor: flightData?.position?.airline?.bg ?? '' }}>
+                        <p style={{
+                            color: flightData?.position?.airline?.font ?? '',
+                            fontSize: flightData?.position?.airline.iata.length && flightData.position.airline.iata.length > 2 ? '1.2rem' : ''
+                        }}>
+                            {flightData?.position?.airline?.iata}
+                        </p>
                     </figure>
                     <Marquee>
                         <div className="info-panel-title-desc">{flightData?.general?.airline.name}</div>

@@ -63,8 +63,8 @@ export default function Airport({ icao, children }: { icao: string, children: Re
             </div>
             <div className="info-panel-container">
                 <div className="info-panel-title-main">
-                    <figure className="info-panel-title-logo">
-                        <img src={'https://images.kiwi.com/airlines/64/null.png'} alt="" />
+                    <figure className='info-panel-title-logo'>
+                        <p style={{ fontSize: feature?.properties?.iata !== '' ? '1.2rem' : '.9rem' }}>{feature?.properties?.iata !== '' ? feature?.properties?.iata : icao}</p>
                     </figure>
                     <Marquee>
                         <div className='info-panel-title-desc'>{feature?.properties?.name}</div>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useControllerStore, useFlightStore } from '@/storage/state/panel'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
-import { ControllerIndex } from '@/types/vatsim'
+import { ControllerIndex, PositionAirline } from '@/types/vatsim'
 import { getInAndOutBounds } from '../utils/airports'
 
 export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
@@ -37,6 +37,7 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
     }, [click, feature, setSharedLiveData])
 
     const airports = feature.get('airports')
+    const airline = feature.get('airline') as PositionAirline
 
     return (
         <div className='popup popup-tip'>
@@ -47,8 +48,13 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
                 <div className="popup-content-vnav"><span>HDG</span>{liveData?.heading}</div>
             </div>
             <div className="popup-content flight">
-                <figure className="popup-content-logo">
-                    <Image src={'https://images.kiwi.com/airlines/64/' + feature.get('airline') + '.png'} alt={`${feature.get('airline')}.png`} width={64} height={64} />
+                <figure className="popup-content-logo" style={{ backgroundColor: airline.bg ?? 'white' }}>
+                    <p style={{
+                        color: airline.font ?? 'var(--color-green)',
+                        fontSize: airline.iata.length && airline.iata.length > 2 ? '.8rem' : ''
+                    }}>
+                        {airline.iata}
+                    </p>
                 </figure>
                 <div className="popup-content-main flight">
                     <div className="popup-content-header">{feature.get('callsign')}</div>
