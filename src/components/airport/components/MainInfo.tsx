@@ -1,19 +1,14 @@
 'use client'
 
 import { useControllerStore } from "@/storage/state/panel"
-import { AirportAPIData } from "@/types/vatsim"
-import { fetcher } from "@/utils/api/api"
-import { setHeight } from "@/utils/gui"
+import { useAirport } from "@/utils/api/api"
 import { useState } from "react"
-import useSWR from "swr"
 import ActiveController from "./ActiveController"
 import { PanelStates } from "@/types/panel"
 import Dropdown from "@/components/common/panel/Dropdown"
 
 export default function MainInfo({ icao }: { icao: string }) {
-    const { data } = useSWR<AirportAPIData | null>(`/api/data/airport/${icao}`, fetcher, {
-        revalidateOnFocus: false
-    })
+    const { airport } = useAirport(icao)
     const [panelStates, setPanelStates] = useState<PanelStates>({
         metar: false,
         stations: false
@@ -33,30 +28,30 @@ export default function MainInfo({ icao }: { icao: string }) {
         return '.75rem'
     }
 
-    if (!data || (!data.data && !data.weather)) return
+    if (!airport || (!airport.data && !airport.weather)) return
 
     return (
         <>
-            {data.weather &&
+            {airport.weather &&
                 <div className="info-panel-container column">
                     <div id="airport-panel-weather">
                         <div className="airport-weather-condition">
                             <div className="airport-weather-header">CONDITIONS</div>
-                            <p style={{ fontSize: getDynamicFont(data.weather.condition) }}>{data.weather.condition}</p>
+                            <p style={{ fontSize: getDynamicFont(airport.weather.condition) }}>{airport.weather.condition}</p>
                         </div>
                         <div className="airport-weather-condition">
                             <div className="airport-weather-header">TEMPERATURE</div>
-                            <p>{data.weather.temperature}</p>
+                            <p>{airport.weather.temperature}</p>
                         </div>
                         <div className="airport-weather-condition">
                             <div className="airport-weather-header">WIND</div>
-                            <p>{data.weather.wind}</p>
+                            <p>{airport.weather.wind}</p>
                         </div>
                     </div>
                 </div>
             }
             <div className="info-panel-container column main scrollable">
-                {data.weather &&
+                {airport.weather &&
                     <>
                         <button className='info-panel-container-header' onClick={() => openDropdown('metar')}>
                             <p>More weather & METAR</p>
@@ -74,11 +69,11 @@ export default function MainInfo({ icao }: { icao: string }) {
                                 <div className="info-panel-container-content" id='airport-panel-metar'>
                                     <div className="info-panel-data">
                                         <p>AIR PRESSURE</p>
-                                        <div className="info-panel-data-content">{data.weather.altimeters}</div>
+                                        <div className="info-panel-data-content">{airport.weather.altimeters}</div>
                                     </div>
                                     <div className="info-panel-data">
                                         <p>DEW POINT</p>
-                                        <div className="info-panel-data-content">{data.weather.dewPoint}</div>
+                                        <div className="info-panel-data-content">{airport.weather.dewPoint}</div>
                                     </div>
                                     <div className="info-panel-data">
                                         <p>HUMIDITY</p>
@@ -86,7 +81,7 @@ export default function MainInfo({ icao }: { icao: string }) {
                                     </div>
                                     <div className="info-panel-data">
                                         <p>LATEST METAR</p>
-                                        <div className="info-panel-data-content" style={{ fontSize: '0.75rem' }}>{data.weather.raw}</div>
+                                        <div className="info-panel-data-content" style={{ fontSize: '0.75rem' }}>{airport.weather.raw}</div>
                                     </div>
                                 </div>
                             </div>
@@ -102,19 +97,19 @@ export default function MainInfo({ icao }: { icao: string }) {
                     <div className="info-panel-container-content" id='airport-panel-flights'>
                         <div className="info-panel-data">
                             <p>DEPARTURES</p>
-                            <div className="info-panel-data-content">{data.data?.departures.n ?? 0}</div>
+                            <div className="info-panel-data-content">{airport.data?.departures.n ?? 0}</div>
                         </div>
                         <div className="info-panel-data">
                             <p>ARRIVALS</p>
-                            <div className="info-panel-data-content">{data.data?.arrivals.n ?? 0}</div>
+                            <div className="info-panel-data-content">{airport.data?.arrivals.n ?? 0}</div>
                         </div>
                         <div className="info-panel-data">
                             <p>BUSIEST ROUTE</p>
-                            <div className="info-panel-data-content">{data.data?.busiest ?? '-'}</div>
+                            <div className="info-panel-data-content">{airport.data?.busiest ?? '-'}</div>
                         </div>
                         <div className="info-panel-data">
                             <p>ACTIVE ROUTES</p>
-                            <div className="info-panel-data-content">{data.data?.connections ?? 0}</div>
+                            <div className="info-panel-data-content">{airport.data?.connections ?? 0}</div>
                         </div>
                     </div>
                 </div>

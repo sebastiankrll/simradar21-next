@@ -8,30 +8,23 @@ import TimeSlots from './components/TimeSlots'
 import RouteProgress from './components/RouteProgress'
 import MainInfo from './components/MainInfo'
 import Footer from './components/Footer'
-import Image from 'next/image'
 import FlightStatusSprite from '@/assets/images/sprites/flightstatusSprite.png'
 import { getFlightStatus } from './utils/update'
-import useSWR from 'swr'
-import { fetcher } from '@/utils/api/api'
+import { useFlight, useTrack } from '@/utils/api/api'
 import Spinner from '../common/spinner/Spinner'
 import { useEffect } from 'react'
 import { useFlightStore } from '@/storage/state/panel'
-import { FlightData, TrackData } from '@/types/vatsim'
 import { useRouter } from 'next/navigation'
 import { useSliderStore } from '@/storage/state/slider'
 import Marquee from '../common/marquee/Marquee'
 
 export default function Flight({ callsign }: { callsign: string }) {
     const router = useRouter()
-    const { data: flightData, isLoading } = useSWR<FlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, {
-        refreshInterval: 20000
-    })
-    const { data: trackData } = useSWR<TrackData | undefined | null>(`/api/data/track/${callsign}`, fetcher, {
-        revalidateOnFocus: false
-    })
+    const { flight, isLoading } = useFlight(callsign)
+    const { track } = useTrack(callsign)
     const { setTrackPoints, setAction } = useFlightStore()
     const { setPage } = useSliderStore()
-    const flightStatus = getFlightStatus(flightData)
+    const flightStatus = getFlightStatus(flight)
 
     const clickClose = () => {
         setAction(null)
@@ -40,12 +33,12 @@ export default function Flight({ callsign }: { callsign: string }) {
     }
 
     useEffect(() => {
-        setTrackPoints(trackData?.points ?? null)
+        setTrackPoints(track?.points ?? null)
 
         return () => {
             setTrackPoints(null)
         }
-    }, [trackData, setTrackPoints])
+    }, [track, setTrackPoints])
 
     if (isLoading) return (
         <div className='info-panel loading'>
@@ -61,36 +54,36 @@ export default function Flight({ callsign }: { callsign: string }) {
             </div>
             <div className="info-panel-container">
                 <div className="info-panel-title-main">
-                    <figure className="info-panel-title-logo" style={{ backgroundColor: flightData?.position?.airline?.bg ?? '' }}>
+                    <figure className="info-panel-title-logo" style={{ backgroundColor: flight?.position?.airline?.bg ?? '' }}>
                         <p style={{
-                            color: flightData?.position?.airline?.font ?? '',
-                            fontSize: flightData?.position?.airline.iata.length && flightData.position.airline.iata.length > 2 ? '1.2rem' : ''
+                            color: flight?.position?.airline?.font ?? '',
+                            fontSize: flight?.position?.airline.iata.length && flight.position.airline.iata.length > 2 ? '1.2rem' : ''
                         }}>
-                            {flightData?.position?.airline?.iata}
+                            {flight?.position?.airline?.iata}
                         </p>
                     </figure>
                     <Marquee>
-                        <div className="info-panel-title-desc">{flightData?.general?.airline.name}</div>
+                        <div className="info-panel-title-desc">{flight?.general?.airline.name}</div>
                     </Marquee>
                     <div className="info-panel-title-content">
                         <div className="info-panel-title-content-item">
                             <div className="info-panel-title-content-icon">
                                 #
                             </div>
-                            <div className="info-panel-title-content-text">{flightData?.general?.airline.flightno}</div>
+                            <div className="info-panel-title-content-text">{flight?.general?.airline.flightno}</div>
                         </div>
                         <div className="info-panel-title-content-item">
                             <div className="info-panel-title-content-icon">
                                 A
                             </div>
-                            <div className="info-panel-title-content-text">{flightData?.general?.aircraft?.icao}</div>
+                            <div className="info-panel-title-content-text">{flight?.general?.aircraft?.icao}</div>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="info-panel-container column">
                 <div id="aircraft-panel-route">
-                    <AirportLink airport={flightData?.general?.airport?.dep} />
+                    <AirportLink airport={flight?.general?.airport?.dep} />
                     <div id='aircraft-panel-airport-line'></div>
                     <div id="aircraft-panel-route-logo">
                         <figure style={{
@@ -98,17 +91,17 @@ export default function Flight({ callsign }: { callsign: string }) {
                             backgroundPositionY: flightStatus.imgOffset + 'px'
                         }}></figure>
                     </div>
-                    <AirportLink airport={flightData?.general?.airport?.arr} />
+                    <AirportLink airport={flight?.general?.airport?.arr} />
                 </div>
-                {flightData?.status?.progress &&
+                {flight?.status?.progress &&
                     <>
-                        <TimeSlots data={flightData} flightStatus={flightStatus} />
-                        <RouteProgress data={flightData} flightStatus={flightStatus} />
+                        <TimeSlots data={flight} flightStatus={flightStatus} />
+                        <RouteProgress data={flight} flightStatus={flightStatus} />
                     </>
                 }
             </div>
-            <MainInfo data={flightData} />
-            <Footer data={flightData} />
+            <MainInfo data={flight} />
+            <Footer data={flight} />
         </div>
     )
 }

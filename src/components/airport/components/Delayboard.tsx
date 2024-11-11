@@ -1,13 +1,11 @@
-import { AirportAPIData } from "@/types/vatsim"
-import { fetcher } from "@/utils/api/api"
-import useSWR from "swr"
+import { useAirport } from "@/utils/api/api"
 
 export default function Delayboard({ icao, direction }: { icao: string, direction: string }) {
-    const { data } = useSWR<AirportAPIData | null>(`/api/data/airport/${icao}`, fetcher)
+    const { airport } = useAirport(icao)
 
-    if (!data?.data) return
+    if (!airport?.data) return
 
-    const delay = direction === 'departure' ? data.data.departures.tDelay : data.data.arrivals.tDelay
+    const delay = direction === 'departure' ? airport.data.departures.tDelay : airport.data.arrivals.tDelay
 
     return (
         <div className="info-panel-container column">
@@ -42,7 +40,7 @@ export default function Delayboard({ icao, direction }: { icao: string, directio
                             FLIGHTS DELAYED
                         </div>
                         <div className="airport-flights-delayboard-content">
-                            {direction === 'departure' ? data.data.departures.nDelay : data.data.arrivals.nDelay}
+                            {direction === 'departure' ? airport.data.departures.nDelay : airport.data.arrivals.nDelay}
                         </div>
                     </div>
                 </div>

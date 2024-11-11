@@ -8,9 +8,7 @@ import { getSelectedAirports } from '@/storage/client-database'
 import { useEffect, useState } from 'react'
 import { Feature, Point } from 'geojson'
 import Footer from './components/Footer'
-import { AirportAPIData } from '@/types/vatsim'
-import useSWR from 'swr'
-import { fetcher } from '@/utils/api/api'
+import { useAirport } from '@/utils/api/api'
 import Spinner from '../common/spinner/Spinner'
 import { getAirportTime } from './utils/misc'
 import Marquee from '../common/marquee/Marquee'
@@ -18,9 +16,7 @@ import Marquee from '../common/marquee/Marquee'
 export default function Airport({ icao, children }: { icao: string, children: React.ReactNode }) {
     const router = useRouter()
     const { setPage } = useSliderStore()
-    const { data, isLoading } = useSWR<AirportAPIData | null>(`/api/data/airport/${icao}`, fetcher, {
-        refreshInterval: 20000
-    })
+    const { airport, isLoading } = useAirport(icao)
     const [feature, setFeature] = useState<Feature<Point> | null>(null)
     const [time, setTime] = useState<string>('N/A')
 
@@ -29,13 +25,13 @@ export default function Airport({ icao, children }: { icao: string, children: Re
     }, [])
 
     useEffect(() => {
-        setTime(getAirportTime(data))
+        setTime(getAirportTime(airport))
         const interval = setInterval(() => {
-            setTime(getAirportTime(data))
+            setTime(getAirportTime(airport))
         }, 1000)
 
         return () => clearInterval(interval)
-    }, [data])
+    }, [airport])
 
     const initAirportFeature = async () => {
         const feature = await getSelectedAirports([icao])

@@ -11,8 +11,7 @@ import Chart from '../common/chart/Chart'
 
 export default function Dashboard() {
     const { isLoading } = useSWR<null>('/api/data/dashboard', fetcher, {
-        refreshInterval: 60000,
-        revalidateOnFocus: false
+        refreshInterval: 60000
     })
     const [panelStates, setPanelStates] = useState<PanelStates>({
         chart: false,
