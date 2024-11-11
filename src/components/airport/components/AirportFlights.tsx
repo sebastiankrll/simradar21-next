@@ -3,7 +3,7 @@
 import '../AirportFlights.css'
 import { AirportFlight } from "@/types/panel";
 import { fetcher } from "@/utils/api/api";
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { checkIfNewDay } from "../utils/misc";
 import { SingleFlight } from "./SingleFlight";
 import Spinner from '@/components/common/spinner/Spinner';
@@ -26,22 +26,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
         next: false
     })
 
-    useEffect(() => {
-        const timeModeInterval = setInterval(() => {
-            setTimeMode(prev => !prev)
-        }, 2000)
-
-        if (!initialFetchRef.current) {
-            fetchFlights()
-            initialFetchRef.current = true
-        }
-
-        return () => {
-            clearInterval(timeModeInterval)
-        }
-    }, [])
-
-    const fetchFlights = async (pagination: 'next' | 'previous' = 'next') => {
+    const fetchFlights = useCallback(async (pagination: 'next' | 'previous' = 'next') => {
         setLoading(true)
 
         const scrollDiv = scrollRef.current
@@ -84,7 +69,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
         } finally {
             setLoading(false)
         }
-    }
+    }, [setLoading, setStoredFlights])
 
     const renderFlights = () => {
         if (storedFlights.length < 1) return
@@ -110,6 +95,21 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
             return <SingleFlight key={uid} data={flight} timeMode={timeMode} direction={direction} />
         })
     }
+
+    useEffect(() => {
+        const timeModeInterval = setInterval(() => {
+            setTimeMode(prev => !prev)
+        }, 2000)
+
+        if (!initialFetchRef.current) {
+            fetchFlights()
+            initialFetchRef.current = true
+        }
+
+        return () => {
+            clearInterval(timeModeInterval)
+        }
+    }, [fetchFlights])
 
     return (
         <>

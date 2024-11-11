@@ -188,7 +188,9 @@ export interface GeneralAirline {
     icao: string,
     iata: string,
     name: string,
-    flightno: string
+    flightno: string,
+    bg?: string,
+    font?: string
 }
 
 export interface GeneralData {
@@ -308,8 +310,7 @@ export interface RawDataStorage {
 export interface FlightData {
     position: PositionData | null,
     general: GeneralData | null,
-    status: StatusData | null,
-    track?: TrackData | null
+    status: StatusData | null
 }
 
 export interface AirportWeather {

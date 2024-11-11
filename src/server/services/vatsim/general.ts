@@ -7,10 +7,12 @@ import { Airlines, Fleet } from "@/types/misc"
 import airlinesJSON from '@/assets/data/airlines.json'
 import { calculateDistance, convertVatsimDate } from "@/utils/common"
 import { createHash } from "crypto"
+import airlineColorsJSON from '@/assets/data/airline_colors.json'
 
 const airlines = airlinesJSON as Airlines[]
 const airports = airportsJSON as FeatureCollection
 const fleets = fleetsJSON as Fleet[]
+const airlineColors = airlineColorsJSON as Record<string, { bg: string, font: string }>
 
 export function updateGeneral() {
     updateGeneralData()
@@ -235,11 +237,24 @@ function getAirlineData(pilot: VatsimPilot | VatsimPrefile): GeneralAirline {
     const icao = pilot.callsign.substring(0, 3)
     const airline = airlines.find(airline => airline.icao === icao)
 
+    const colors = getAirlineColor(icao)
+
     return {
         icao: icao,
-        iata: airline?.iata ?? icao,
-        name: airline?.name ?? 'Unknown',
-        flightno: airline?.iata ? airline.iata + pilot.callsign.substring(3) : pilot.callsign
+        iata: airline?.iata || icao,
+        name: airline?.name || 'Unknown',
+        flightno: airline?.iata ? airline.iata + pilot.callsign.substring(3) : pilot.callsign,
+        ...(colors ? { bg: colors.bg, font: colors.font } : {})
+    }
+}
+
+function getAirlineColor(icao: string): { bg: string, font: string } | null {
+    const colors = airlineColors[icao]
+    if (!colors) return null
+
+    return {
+        bg: colors.bg,
+        font: colors.font
     }
 }
 

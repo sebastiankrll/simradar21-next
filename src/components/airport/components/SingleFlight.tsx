@@ -24,8 +24,13 @@ export function SingleFlight({ data, timeMode, direction }: { data: AirportFligh
 
     return (
         <div className="airport-flights-flight" onClick={onClick} style={{ borderLeft: '5px solid ' + getFlightDelayColor(data, direction) }} onMouseEnter={onHover} onMouseLeave={onHover}>
-            <figure className="airport-flights-airline">
-                <img src={'https://images.kiwi.com/airlines/64/' + data.general.airline.iata + '.png'} alt="" />
+            <figure className="airport-flights-airline" style={{ backgroundColor: data.general?.airline?.bg ?? '' }}>
+                <p style={{
+                    color: data?.general?.airline?.font ?? '',
+                    fontSize: data?.general?.airline.iata.length && data.general.airline.iata.length > 2 ? '.9rem' : ''
+                }}>
+                    {data?.general?.airline?.iata}
+                </p>
             </figure>
             <div className="airport-flights-status">
                 <div className="airport-flights-airport-name">{direction === 'departure' ? data.general.airport?.arr.properties?.city : data.general.airport?.dep.properties?.city}</div>

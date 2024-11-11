@@ -6,11 +6,13 @@ export default async function Layout(
         params: { icao: string }
     }>
 ) {
-    const params = await props.params;
+    const params = await props.params
 
     const {
         children
-    } = props;
+    } = props
 
-    return <Airport icao={params.icao} children={children} />
+    return <Airport icao={params.icao}>
+        {children}
+    </Airport>
 }

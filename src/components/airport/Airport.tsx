@@ -21,6 +21,13 @@ export default function Airport({ icao, children }: { icao: string, children: Re
     const [time, setTime] = useState<string>('N/A')
 
     useEffect(() => {
+        const initAirportFeature = async () => {
+            const feature = await getSelectedAirports([icao])
+            if (!feature) return
+
+            setFeature(feature[0])
+        }
+
         initAirportFeature()
     }, [])
 
@@ -32,13 +39,6 @@ export default function Airport({ icao, children }: { icao: string, children: Re
 
         return () => clearInterval(interval)
     }, [airport])
-
-    const initAirportFeature = async () => {
-        const feature = await getSelectedAirports([icao])
-        if (!feature) return
-
-        setFeature(feature[0])
-    }
 
     const clickClose = () => {
         setPage('/')
