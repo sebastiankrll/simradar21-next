@@ -10,7 +10,7 @@ import { onMessage } from "@/utils/ws"
 import { updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
-import { handleClick, handleFlightPanelAction, handleHover, handlePathChange } from "./utils/misc"
+import { handleClick, handleFlightPanelAction, handleHover } from "./utils/misc"
 import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
@@ -75,7 +75,7 @@ export default function OlMap({ }) {
 
 
         return () => {
-            map.setTarget('')
+            map.setTarget(undefined)
             map.un(['pointermove'], onPointerMove)
             map.un(['moveend'], onMoveEnd)
             unMessage()
@@ -123,8 +123,7 @@ export default function OlMap({ }) {
             }
         }
 
-        initData()
-        handlePathChange(pathname, handleNotFound)
+        initData(pathname, handleNotFound)
     }, [pathname, router, setPage])
 
     // Draw track when flight is loaded

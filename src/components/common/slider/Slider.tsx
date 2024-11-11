@@ -15,10 +15,10 @@ export default function Slider({
     const { page } = useSliderStore()
     const [isSliding, setIsSliding] = useState<boolean>(false)
 
-    const currentTypeRef = useRef<string | null>(null)
+    const currentTypeRef = useRef<string>('')
 
     useEffect(() => {
-        const type = page.split('/')[1]
+        const type = page.split('/')[1] || ''
 
         if (type === currentTypeRef.current) {
             router.replace(page)
@@ -26,7 +26,6 @@ export default function Slider({
         }
 
         setIsSliding(true)
-        currentTypeRef.current = type
 
         setTimeout(() => {
             router.replace(page)
@@ -34,6 +33,9 @@ export default function Slider({
     }, [page, router])
 
     useEffect(() => {
+        const type = pathname.split('/')[1] || ''
+        currentTypeRef.current = type
+
         setIsSliding(false)
     }, [pathname])
 

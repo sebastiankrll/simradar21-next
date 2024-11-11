@@ -24,6 +24,7 @@ export const handleHover = (event: MapBrowserEvent<UIEvent>) => {
             return layer.get('type') === 'airports' || layer.get('type') === 'airportTops' || layer.get('type') === 'flights' || layer.get('type') === 'firLabels'
         }
     }) as Feature<Point>
+    console.log(feature)
 
     if (feature === features.hover || feature === features.click) {
         map.getTargetElement().style.cursor = 'pointer'

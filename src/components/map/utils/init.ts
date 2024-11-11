@@ -17,6 +17,7 @@ import { DatabaseDataStorage } from "@/types/database"
 import { checkAndUpdateData } from "@/storage/client-database"
 import { initAirportFeatures } from "./airports"
 import { mapStorage } from "@/storage/singleton/map"
+import { handlePathChange } from "./misc"
 
 export function initLayers() {
     if (!mapStorage.map) return
@@ -111,7 +112,7 @@ export function initLayers() {
     initSunLayer()
 }
 
-export async function initData() {
+export async function initData(pathname: string, handleNotFound: (found: boolean, path?: string) => void) {
     if (!mapStorage.view.viewInit) {
         const initData: { vatsim: VatsimDataWS, database: DatabaseDataStorage } = await fetcher('/api/data/init')
 
@@ -124,4 +125,6 @@ export async function initData() {
 
         mapStorage.view.viewInit = true
     }
+
+    handlePathChange(pathname, handleNotFound)
 }
