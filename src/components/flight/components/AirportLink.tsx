@@ -1,6 +1,6 @@
 'use client'
 
-import { useSliderStore } from "@/storage/state/slider"
+import { useSliderStore } from "@/storage/zustand/slider"
 import { Feature, GeoJsonProperties, Point } from "geojson"
 import { useRouter } from "next/navigation"
 

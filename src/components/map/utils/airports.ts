@@ -1,23 +1,30 @@
-import { getAllAirports, getSelectedAirports } from "@/storage/client-database";
-import { IndexedAirportFeature } from "@/types/map";
 import bbox from "@turf/bbox";
-import { BBox } from "geojson";
+import { BBox, Feature, Point } from "geojson";
 import { fromLonLat, transformExtent } from "ol/proj";
 import RBush from "rbush";
 import GeoJSON from 'ol/format/GeoJSON'
-import { VatsimDataWS } from "@/types/vatsim";
-import { Feature } from "ol";
-import { Point } from "ol/geom";
+import { Feature as oFeature } from "ol";
+import { Point as oPoint } from "ol/geom";
 import { createAirportOverlay, updateAirportOverlay } from "./overlay";
 import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
 import { toggleDestinationSegment } from "./track";
-import { mapStorage } from "@/storage/singleton/map";
+import { mapStorage } from "@/storage/client/map";
+import { VatsimMinimalData } from "@/types/vatsim";
+import { getAllAirports, getSelectedAirports } from "@/storage/client/database";
+
+interface IndexedAirportFeature {
+    minX: number
+    minY: number
+    maxX: number
+    maxY: number
+    feature: Feature<Point>
+}
 
 const rbush = new RBush<IndexedAirportFeature>()
 let inOutBounds: { [key: string]: number[] } = {}
 
-export async function initAirportFeatures(vatsimData: VatsimDataWS | null) {
+export async function initAirportFeatures(vatsimData: VatsimMinimalData | null) {
     const airportFeatures = await getAllAirports()
     if (!airportFeatures) return
 
@@ -78,7 +85,7 @@ export function setAirportFeaturesByExtent() {
     )
 }
 
-export async function updateAirportFeatures(vatsimData: VatsimDataWS | null) {
+export async function updateAirportFeatures(vatsimData: VatsimMinimalData | null) {
     const controllers = vatsimData?.controllers?.airports
     if (!controllers) return
 
@@ -129,8 +136,8 @@ export async function updateAirportFeatures(vatsimData: VatsimDataWS | null) {
     updateAirportOverlay()
 }
 
-function calculateInAndOutBounds(vatsimData: VatsimDataWS) {
-    const flights = vatsimData.flights
+function calculateInAndOutBounds(vatsimData: VatsimMinimalData) {
+    const flights = vatsimData.positions
     if (!flights) return
 
     inOutBounds = {}
@@ -156,7 +163,7 @@ export function getInAndOutBounds(icao: string): number[] {
     return inOutBounds[icao] ? inOutBounds[icao] : [0, 0]
 }
 
-export async function setClickedAirportFeature(icao: string, feature: Feature<Point> | null): Promise<boolean> {
+export async function setClickedAirportFeature(icao: string, feature: oFeature<oPoint> | null): Promise<boolean> {
     if (!mapStorage.map) return false
 
     if (feature) {
@@ -169,7 +176,7 @@ export async function setClickedAirportFeature(icao: string, feature: Feature<Po
 
     const newFeature = new GeoJSON().readFeature(storedFeature[0], {
         featureProjection: 'EPSG:3857',
-    }) as Feature<Point>
+    }) as oFeature<oPoint>
 
     // Clean up old previous overlay first (dev mode only due to strict mode)
     if (mapStorage.overlays.click && process.env.NODE_ENV === 'development') {
@@ -190,7 +197,7 @@ export async function setClickedAirportFeature(icao: string, feature: Feature<Po
     mapStorage.sources.airportTops.addFeature(newFeature)
     mapStorage.features.click = newFeature
 
-    const overlay = createAirportOverlay(newFeature as Feature<Point>, true)
+    const overlay = createAirportOverlay(newFeature as oFeature<oPoint>, true)
     mapStorage.overlays.click = overlay
 
     return true

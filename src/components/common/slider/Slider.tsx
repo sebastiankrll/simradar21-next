@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import "./Slider.css"
-import { useSliderStore } from "@/storage/state/slider"
+import { useSliderStore } from "@/storage/zustand/slider"
 import { usePathname, useRouter } from "next/navigation"
 
 export default function Slider({

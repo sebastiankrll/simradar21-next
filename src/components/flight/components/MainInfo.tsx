@@ -5,11 +5,11 @@ import { useState } from "react"
 import LiveData from "./LiveData"
 import AttitudeChart from "./AttitudeChart"
 import FlagSprite from '@/assets/images/sprites/flagSprite.png'
-import { FlightData } from "@/types/vatsim"
 import Dropdown from "@/components/common/panel/Dropdown"
 import { PanelStates } from "@/types/panel"
+import { VatsimFlightData } from "@/types/vatsim"
 
-export default function MainInfo({ data }: { data: FlightData | undefined | null }) {
+export default function MainInfo({ data }: { data: VatsimFlightData | undefined | null }) {
     const [panelStates, setPanelStates] = useState<PanelStates>({
         more: false,
         pilot: false,

@@ -1,10 +1,9 @@
 'use client'
 
 import './Airport.css'
-import { useSliderStore } from '@/storage/state/slider'
+import { useSliderStore } from '@/storage/zustand/slider'
 import CloseButton from '../common/panel/CloseButton'
 import { useRouter } from 'next/navigation'
-import { getSelectedAirports } from '@/storage/client-database'
 import { useEffect, useState } from 'react'
 import { Feature, Point } from 'geojson'
 import Footer from './components/Footer'
@@ -12,6 +11,7 @@ import { useAirport } from '@/utils/api/api'
 import Spinner from '../common/spinner/Spinner'
 import { getAirportTime } from './utils/misc'
 import Marquee from '../common/marquee/Marquee'
+import { getSelectedAirports } from '@/storage/client/database'
 
 export default function Airport({ icao, children }: { icao: string, children: React.ReactNode }) {
     const router = useRouter()

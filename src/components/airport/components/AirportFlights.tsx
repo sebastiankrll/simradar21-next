@@ -1,13 +1,13 @@
 'use client'
 
 import '../AirportFlights.css'
-import { AirportFlight } from "@/types/panel";
 import { fetcher } from "@/utils/api/api";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { checkIfNewDay } from "../utils/misc";
 import { SingleFlight } from "./SingleFlight";
 import Spinner from '@/components/common/spinner/Spinner';
 import Delayboard from './Delayboard';
+import { VatsimAirportFlightData } from '@/types/vatsim';
 
 const FETCH_PARAMS = {
     n: 10
@@ -17,7 +17,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
     const [loading, setLoading] = useState<boolean>(false)
     const [timeMode, setTimeMode] = useState<boolean>(false)
 
-    const storedFlightsRef = useRef<AirportFlight[]>([])
+    const storedFlightsRef = useRef<VatsimAirportFlightData[]>([])
     const initialFetchRef = useRef<boolean>(false) // Handle component mounting twice in strict mode
     const scrollRef = useRef<HTMLDivElement | null>(null)
     const limitsReachedRef = useRef({
@@ -45,7 +45,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
                 url.searchParams.append('t', new Date(edgeTime).toISOString())
             }
 
-            const flights = await fetcher(url.toString()) as AirportFlight[] | null
+            const flights = await fetcher(url.toString()) as VatsimAirportFlightData[] | null
             if (!flights || flights.length < 1) return
             if (flights.length < 11) { limitsReachedRef.current[pagination] = true }
 

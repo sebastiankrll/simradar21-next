@@ -1,4 +1,4 @@
-import { DatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
+import { ClientDatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
 import { Point } from "geojson"
 
@@ -18,7 +18,7 @@ dbAirport.version(1).stores({
     versions: "id"
 })
 
-export async function insertAirports(newData: DatabaseDataStorage) {
+export async function insertAirports(newData: ClientDatabaseDataStorage) {
     const inserts: IndexedDBData<Point>[] = []
     newData.airports.data?.forEach(feature => {
         if (feature.id && feature.properties) {

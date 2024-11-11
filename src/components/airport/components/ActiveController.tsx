@@ -1,7 +1,7 @@
 import { getFrequencyColor, getOnlineTime } from "@/components/map/components/overlays";
-import { ControllerIndex } from "@/types/vatsim";
+import { VatsimStorageControllerIndex } from "@/types/vatsim";
 
-export default function ActiveController({ station }: { station: ControllerIndex }) {
+export default function ActiveController({ station }: { station: VatsimStorageControllerIndex }) {
     return (
         <div className="info-panel-data">
             <div className="info-panel-controller-header">

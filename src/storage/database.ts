@@ -1,6 +1,6 @@
-import globalThis from './global'
 import Redis from 'ioredis'
-import { DatabaseDataStorage } from '@/types/database'
+import globalThis from './global'
+import { ClientDatabaseDataStorage } from '@/types/database'
 
 if (!globalThis.databaseDataStorage) {
     const redisGet = new Redis()
@@ -15,15 +15,15 @@ if (!globalThis.databaseDataStorage) {
     redisGet.quit()
 }
 
-export function setDatabaseStorage(data: DatabaseDataStorage) {
+export function setDatabaseStorage(data: ClientDatabaseDataStorage) {
     globalThis.databaseDataStorage = data
 }
 
-export function getDatabaseStorage(): DatabaseDataStorage | null {
+export function getDatabaseStorage(): ClientDatabaseDataStorage | null {
     return globalThis.databaseDataStorage
 }
 
-export function getDatabaseVersions(): DatabaseDataStorage {
+export function getDatabaseVersions(): ClientDatabaseDataStorage {
     return {
         airports: {
             version: globalThis.databaseDataStorage?.airports.version ?? '',

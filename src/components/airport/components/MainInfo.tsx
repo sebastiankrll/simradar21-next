@@ -1,6 +1,6 @@
 'use client'
 
-import { useControllerStore } from "@/storage/state/panel"
+import { useControllerStore } from "@/storage/zustand/panel"
 import { useAirport } from "@/utils/api/api"
 import { useState } from "react"
 import ActiveController from "./ActiveController"

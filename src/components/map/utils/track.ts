@@ -1,13 +1,13 @@
-import { getSelectedAirports } from "@/storage/client-database"
-import { mapStorage } from "@/storage/singleton/map"
-import { Attitude } from "@/types/map"
-import { TrackPoint } from "@/types/vatsim"
+import { getSelectedAirports } from "@/storage/client/database"
+import { mapStorage } from "@/storage/client/map"
+import { OlFlightFeatureAttitude } from "@/types/map"
+import { VatsimStorageTrackPoint } from "@/types/vatsim"
 import { Feature } from "ol"
 import { LineString } from "ol/geom"
 import { fromLonLat } from "ol/proj"
 import { Stroke, Style } from "ol/style"
 
-export async function initTrack(trackPoints: TrackPoint[] | null) {
+export async function initTrack(trackPoints: VatsimStorageTrackPoint[] | null) {
     const trackFeatures: Feature<LineString>[] = []
 
     if (!trackPoints) return
@@ -52,7 +52,7 @@ export async function initTrack(trackPoints: TrackPoint[] | null) {
     firstInterpolation(index)
 }
 
-async function initDestinationSegment(trackPoints: TrackPoint[] | null): Promise<Feature<LineString> | undefined> {
+async function initDestinationSegment(trackPoints: VatsimStorageTrackPoint[] | null): Promise<Feature<LineString> | undefined> {
     if (!trackPoints) return
 
     const airports = mapStorage.features.click?.get('airports') as string[] | undefined
@@ -108,7 +108,7 @@ function firstInterpolation(index: number) {
     const clickedFeature = mapStorage.features.click
     if (!clickedFeature) return
 
-    const attitude = clickedFeature.get('attitude') as Attitude
+    const attitude = clickedFeature.get('attitude') as OlFlightFeatureAttitude
     const start = fromLonLat(attitude.coordinates)
     const end = clickedFeature.getGeometry()?.getCoordinates()
 
@@ -143,7 +143,7 @@ export function updateTrack() {
     }
 
     // Add new track segment to latest recorded position
-    const attitude = clickedFeature.get('attitude') as Attitude
+    const attitude = clickedFeature.get('attitude') as OlFlightFeatureAttitude
     const start = interpolatedFeature?.getGeometry()?.getCoordinates()[0]
     const end = fromLonLat(attitude.coordinates)
     const id = interpolatedFeature?.getId()

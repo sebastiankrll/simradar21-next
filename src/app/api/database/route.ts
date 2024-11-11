@@ -1,4 +1,4 @@
-import { getDatabaseStorage } from "@/storage/singleton/next/database"
+import { getDatabaseStorage } from "@/storage/database"
 import { NextResponse } from "next/server"
 
 export async function GET() {

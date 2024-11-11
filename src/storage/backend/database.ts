@@ -1,10 +1,10 @@
 import airportsJSON from '@/assets/data/airports_short.json'
+import { ClientDatabaseDataStorage } from '@/types/database'
 import { FeatureCollection, Point } from 'geojson'
-import { DatabaseDataStorage } from '@/types/database'
 
 const airports = airportsJSON as FeatureCollection<Point>
 
-export const databaseDataStorage: DatabaseDataStorage = {
+export const databaseDataStorage: ClientDatabaseDataStorage = {
     airports: {
         version: "0.1",
         data: airports.features

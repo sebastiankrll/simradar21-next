@@ -1,11 +1,11 @@
-import { DatabaseDataStorage, MongoFlightSchema } from "@/types/database"
+import { ClientDatabaseDataStorage, MongoDbFlightSchema } from "@/types/database"
 import { VatsimDataStorage } from "@/types/vatsim"
 import mongoose from "mongoose"
 
 declare const globalThis: {
     vatsimDataStorage: VatsimDataStorage | null
-    databaseDataStorage: DatabaseDataStorage | null
-    FlightModel: mongoose.Model<MongoFlightSchema>
+    databaseDataStorage: ClientDatabaseDataStorage | null
+    FlightModel: mongoose.Model<MongoDbFlightSchema>
 } & typeof global
 
 globalThis.vatsimDataStorage = null

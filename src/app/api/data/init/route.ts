@@ -1,5 +1,5 @@
-import { getDatabaseVersions } from "@/storage/singleton/next/database"
-import { getVatsimWsData } from "@/storage/singleton/next/vatsim"
+import { getDatabaseVersions } from "@/storage/database"
+import { getVatsimWsData } from "@/storage/vatsim"
 import { NextResponse } from "next/server"
 
 export async function GET() {

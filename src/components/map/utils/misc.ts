@@ -5,7 +5,7 @@ import { webglConfig } from "./webgl"
 import { followFlightFeature, setActiveFlightFeature, unFollowFlightFeature } from "./flights"
 import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
 import { intersects } from "ol/extent"
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
 
 export const handleHover = (event: MapBrowserEvent<UIEvent>) => {
     if (!mapStorage.map) return

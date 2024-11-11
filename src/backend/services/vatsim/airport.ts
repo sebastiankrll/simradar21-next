@@ -1,21 +1,21 @@
-import { vatsimDataStorage } from "@/storage/singleton/vatsim";
-import { AirportData, GeneralData, StatusData } from "@/types/vatsim";
+import { vatsimDataStorage } from "@/storage/backend/vatsim";
+import { VatsimStorageAirportData, VatsimStorageGeneralData, VatsimStorageStatusData } from "@/types/vatsim";
 
 export function updateAirport() {
-    if (!vatsimDataStorage.general || !vatsimDataStorage.status) return
+    if (!vatsimDataStorage.generals || !vatsimDataStorage.statuss) return
 
-    const newAirports: { [key: string]: AirportData } = {}
+    const newAirports: { [key: string]: VatsimStorageAirportData } = {}
 
-    for (const general of vatsimDataStorage.general) {
-        const status = vatsimDataStorage.status.find(status => status.index.callsign === general.index.callsign) ?? null
+    for (const general of vatsimDataStorage.generals) {
+        const status = vatsimDataStorage.statuss.find(status => status.index.callsign === general.index.callsign) ?? null
         setAirportData(newAirports, general, status)
     }
     setBusiestsAndRouteData(newAirports)
 
-    vatsimDataStorage.airport = Object.values(newAirports)
+    vatsimDataStorage.airports = Object.values(newAirports)
 }
 
-function setAirportData(newAirports: { [key: string]: AirportData }, general: GeneralData, status: StatusData | null) {
+function setAirportData(newAirports: { [key: string]: VatsimStorageAirportData }, general: VatsimStorageGeneralData, status: VatsimStorageStatusData | null) {
     const depIcao = general.airport?.dep.properties?.icao
     const arrIcao = general.airport?.arr.properties?.icao
 
@@ -55,7 +55,7 @@ function setAirportData(newAirports: { [key: string]: AirportData }, general: Ge
     }
 }
 
-function getFlightDelay(status: StatusData | null): number[] {
+function getFlightDelay(status: VatsimStorageStatusData | null): number[] {
     if (!status) return [0, 0]
 
     const depDelay = Math.round((status.times.actDep.getTime() - status.times.schedDep.getTime()) / 1000 / 60)
@@ -69,7 +69,7 @@ function limitDelay(delay: number) {
     return delay
 }
 
-function initAirport(icao: string): AirportData {
+function initAirport(icao: string): VatsimStorageAirportData {
     return {
         icao: icao,
         departures: {
@@ -88,7 +88,7 @@ function initAirport(icao: string): AirportData {
     }
 }
 
-function setBusiestsAndRouteData(newAirports: { [key: string]: AirportData }) {
+function setBusiestsAndRouteData(newAirports: { [key: string]: VatsimStorageAirportData }) {
     Object.values(newAirports).forEach(airport => {
         let busiestRoute = null
         let maxFlights = 0

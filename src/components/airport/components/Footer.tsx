@@ -1,6 +1,6 @@
 'use client'
 
-import { useSliderStore } from "@/storage/state/slider"
+import { useSliderStore } from "@/storage/zustand/slider"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 

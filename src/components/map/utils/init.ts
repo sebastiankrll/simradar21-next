@@ -11,13 +11,13 @@ import { StyleLike } from "ol/style/Style"
 import { getFIRStyle } from "./style"
 import { initSunLayer } from "./sun"
 import { fetcher } from "@/utils/api/api"
-import { VatsimDataWS } from "@/types/vatsim"
 import { updateFlightFeatures } from "./flights"
-import { DatabaseDataStorage } from "@/types/database"
-import { checkAndUpdateData } from "@/storage/client-database"
 import { initAirportFeatures } from "./airports"
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
 import { handlePathChange } from "./misc"
+import { VatsimMinimalData } from "@/types/vatsim"
+import { ClientDatabaseDataStorage } from "@/types/database"
+import { checkAndUpdateData } from "@/storage/client/database"
 
 export function initLayers() {
     if (!mapStorage.map) return
@@ -114,7 +114,7 @@ export function initLayers() {
 
 export async function initData(pathname: string, handleNotFound: (found: boolean, path?: string) => void) {
     if (!mapStorage.view.viewInit) {
-        const initData: { vatsim: VatsimDataWS, database: DatabaseDataStorage } = await fetcher('/api/data/init')
+        const initData: { vatsim: VatsimMinimalData, database: ClientDatabaseDataStorage } = await fetcher('/api/data/init')
 
         // Init indexed-db
         checkAndUpdateData(initData.database)

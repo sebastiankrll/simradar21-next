@@ -1,9 +1,9 @@
-import { StatusFlightData } from "@/types/panel"
-import { FlightData } from "@/types/vatsim"
+import { FlightPanelStatusData } from "@/types/panel"
+import { VatsimFlightData } from "@/types/vatsim"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 
-export function getFlightStatus(data: FlightData | undefined | null): StatusFlightData {
-    const flightStatus: StatusFlightData = {
+export function getFlightStatus(data: VatsimFlightData | undefined | null): FlightPanelStatusData {
+    const flightStatus: FlightPanelStatusData = {
         callsign: data?.general?.index.callsign,
         depStatus: 'EST',
         arrStatus: 'EST',

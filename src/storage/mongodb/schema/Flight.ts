@@ -1,7 +1,7 @@
-import { MongoFlightSchema } from "@/types/database"
+import { MongoDbFlightSchema } from "@/types/database"
 import { Schema } from "mongoose"
 
-const FlightSchema: Schema = new Schema<MongoFlightSchema>({
+const FlightSchema: Schema = new Schema<MongoDbFlightSchema>({
     hash: String,
     general: Object,
     status: Object,

@@ -5,20 +5,20 @@ import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
 import './components/Overlay.css'
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
 import { onMessage } from "@/utils/ws"
 import { updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
-import { VatsimDataWS } from "@/types/vatsim"
 import { handleClick, handleFlightPanelAction, handleHover } from "./utils/misc"
 import { initData, initLayers } from "./utils/init"
 import { usePathname, useRouter } from "next/navigation"
 import BaseEvent from "ol/events/Event"
-import { useSliderStore } from "@/storage/state/slider"
-import { useFlightStore } from "@/storage/state/panel"
+import { useSliderStore } from "@/storage/zustand/slider"
+import { useFlightStore } from "@/storage/zustand/panel"
 import { initTrack } from "./utils/track"
 import { setAirportFeaturesByExtent, updateAirportFeatures } from "./utils/airports"
 import NotFound from "./components/NotFound"
+import { VatsimMinimalData } from "@/types/vatsim"
 
 export default function OlMap({ }) {
     const router = useRouter()
@@ -48,8 +48,8 @@ export default function OlMap({ }) {
 
         // Init websocket updates
         const unMessage = onMessage((message: WsMessage) => {
-            updateFlightFeatures(message.data as VatsimDataWS)
-            updateAirportFeatures(message.data as VatsimDataWS)
+            updateFlightFeatures(message.data as VatsimMinimalData)
+            updateAirportFeatures(message.data as VatsimMinimalData)
         })
 
         // Init hover events

@@ -1,26 +1,26 @@
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim";
-import { GeneralData, PositionAirline, PositionData, VatsimPilot, VatsimTransceiver } from "@/types/vatsim";
+import { rawDataStorage, vatsimDataStorage } from "@/storage/backend/vatsim";
+import { VatsimPilot, VatsimStorageGeneralData, VatsimStoragePositionAirline, VatsimStoragePositionData, VatsimTransceiver } from "@/types/vatsim";
 import airlinesJSON from '@/assets/data/airlines.json'
 import aircraftsJSON from '@/assets/data/aircrafts.json'
 import airlineColorsJSON from '@/assets/data/airline_colors.json'
-import { Aircrafts, Airlines } from "@/types/misc";
 import { calculateDistance, toDegrees, toRadians } from "@/utils/common";
+import { AirlinesJSON } from "@/types/misc";
 
-const airlines = airlinesJSON as Airlines[]
-const aircrafts = aircraftsJSON as Aircrafts
+const airlines = airlinesJSON as AirlinesJSON[]
+const aircrafts = aircraftsJSON as Record<string, number>
 const airlineColors = airlineColorsJSON as Record<string, { bg: string, font: string }>
 
 export function updatePosition() {
     if (!rawDataStorage.vatsim?.pilots) return
 
     const newPositions = []
-    const disconnected = vatsimDataStorage.position?.filter(position => !rawDataStorage.vatsim?.pilots.some(pilot => position.callsign === pilot.callsign))
+    const disconnected = vatsimDataStorage.positions?.filter(position => !rawDataStorage.vatsim?.pilots.some(pilot => position.callsign === pilot.callsign))
 
     if (disconnected) {
         for (const position of disconnected) {
             if (checkDisconnectType(position)) continue
 
-            const generalData = vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null
+            const generalData = vatsimDataStorage.generals?.find(general => general.index.callsign === position.callsign) ?? null
             const newPosition = estimatePosition(position, generalData, vatsimDataStorage.timestamp)
             if (newPosition) newPositions.push(newPosition)
         }
@@ -30,17 +30,17 @@ export function updatePosition() {
         const transceivers = rawDataStorage.transveivers?.find(tx => tx.callsign === pilot.callsign)
         const transceiver = transceivers ? transceivers.transceivers[0] : null
 
-        const prevPosition = vatsimDataStorage.position?.find(pos => pos.callsign === pilot.callsign) ?? null
+        const prevPosition = vatsimDataStorage.positions?.find(pos => pos.callsign === pilot.callsign) ?? null
         const dT = vatsimDataStorage.timestamp ? Date.now() - vatsimDataStorage.timestamp?.getTime() : 0
 
         newPositions.push(getPositionData(prevPosition, pilot, transceiver, dT))
     }
 
-    vatsimDataStorage.position = newPositions
+    vatsimDataStorage.positions = newPositions
     vatsimDataStorage.timestamp = new Date()
 }
 
-function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, transceiver: VatsimTransceiver | null, dT: number): PositionData {
+function getPositionData(prevPosition: VatsimStoragePositionData | null, pilot: VatsimPilot, transceiver: VatsimTransceiver | null, dT: number): VatsimStoragePositionData {
 
     const kpm = prevPosition?.groundspeeds ? (pilot.groundspeed - prevPosition.groundspeeds[0]) / (dT / 1000) * 60 : 0
     const fpm = prevPosition?.altitudes ? (pilot.altitude - prevPosition?.altitudes[0]) / (dT / 1000) * 60 : 0
@@ -64,7 +64,7 @@ function getPositionData(prevPosition: PositionData | null, pilot: VatsimPilot, 
     }
 }
 
-function getAirlineColor(pilot: VatsimPilot): PositionAirline {
+function getAirlineColor(pilot: VatsimPilot): VatsimStoragePositionAirline {
     const airline = airlines.find(airline => airline.icao === pilot.callsign.substring(0, 3))
     const iata = airline?.iata && airline.iata !== '' ? airline.iata : pilot.callsign.substring(0, 3)
 
@@ -92,12 +92,12 @@ function getAircraftType(pilot: VatsimPilot): number {
     return type
 }
 
-function checkDisconnectType(position: PositionData): boolean {
+function checkDisconnectType(position: VatsimStoragePositionData): boolean {
     if (position.altitudes[2] < 1000) return true
     return false
 }
 
-function estimatePosition(prevPosition: PositionData, general: GeneralData | null, timestamp: Date): PositionData | null {
+function estimatePosition(prevPosition: VatsimStoragePositionData, general: VatsimStorageGeneralData | null, timestamp: Date): VatsimStoragePositionData | null {
     if (!general?.airport || !general.flightplan) return null
 
     const depLoc = general.airport.dep.geometry.coordinates

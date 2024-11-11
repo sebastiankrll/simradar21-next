@@ -1,4 +1,4 @@
-import { DatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
+import { ClientDatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
 import { MultiPolygon } from "geojson"
 
@@ -18,7 +18,7 @@ dbFir.version(1).stores({
     versions: "id"
 })
 
-export async function insertFIRs(newData: DatabaseDataStorage) {
+export async function insertFIRs(newData: ClientDatabaseDataStorage) {
     const inserts: IndexedDBData<MultiPolygon>[] = []
     newData.firs.data?.forEach(feature => {
         if (feature.id && feature.properties) {

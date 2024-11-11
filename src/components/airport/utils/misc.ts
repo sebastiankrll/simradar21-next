@@ -1,8 +1,8 @@
-import { AirportFlight } from "@/types/panel"
-import { AirportAPIData } from "@/types/vatsim"
+import { AirportPanelData } from "@/types/panel"
+import { VatsimAirportFlightData } from "@/types/vatsim"
 import { getUtcString } from "@/utils/common"
 
-export function getAirportTime(airport: AirportAPIData | null | undefined): string {
+export function getAirportTime(airport: AirportPanelData | null | undefined): string {
     const getFallback = (): string => {
         const now = new Date()
         const hh = now.getUTCHours().toString().padStart(2, '0')
@@ -49,7 +49,7 @@ export function checkIfNewDay(date1: Date, date2: Date) {
     return year1 !== year2 || month1 !== month2 || day1 !== day2
 }
 
-export function getFlightDelayColor(data: AirportFlight, direction: string): string {
+export function getFlightDelayColor(data: VatsimAirportFlightData, direction: string): string {
     const times = data.status.times
     if (!times || data.status.progress.status === 'prefile') return 'rgb(183, 190, 206)'
 
@@ -63,7 +63,7 @@ export function getFlightDelayColor(data: AirportFlight, direction: string): str
     return 'rgb(234, 89, 121)'
 }
 
-export function getFlightTimesArray(data: AirportFlight, direction: string): string[] {
+export function getFlightTimesArray(data: VatsimAirportFlightData, direction: string): string[] {
     if (!data.status.times) return ['xx:xx', 'N/A']
 
     const now = new Date()

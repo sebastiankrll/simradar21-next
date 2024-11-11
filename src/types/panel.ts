@@ -1,6 +1,34 @@
-import { GeneralData, StatusData } from "./vatsim"
+import { VatsimStorageAirportData, VatsimStorageGeneralData, VatsimStoragePositionData, VatsimStorageStatusData } from "./vatsim"
 
-export interface LiveFlightData {
+export interface AirportPanelWeather {
+    condition: string,
+    temperature: string,
+    dewPoint: string,
+    wind: string,
+    altimeters: string,
+    raw: string
+}
+
+export interface AirportPanelTimezone {
+    abbreviation: string,
+    utc_offset: string,
+}
+
+export interface AirportPanelData {
+    data: VatsimStorageAirportData | null,
+    weather: AirportPanelWeather | null,
+    timezone: AirportPanelTimezone | null
+}
+
+export interface AirportPanelFlightsSearchParams {
+    pagination: string,
+    icao: string,
+    direction: string,
+    timestamp: Date,
+    n: number
+}
+
+export interface FlightPanelLiveData {
     altitude: number,
     radar: number,
     groundspeed: number,
@@ -8,7 +36,7 @@ export interface LiveFlightData {
     fpm: string
 }
 
-export interface StatusFlightData {
+export interface FlightPanelStatusData {
     callsign: string | undefined,
     depStatus: string,
     arrStatus: string,
@@ -18,20 +46,4 @@ export interface StatusFlightData {
     startToEnd: string[]
 }
 
-export interface PanelStates {
-    [key: string]: boolean
-}
-
-export interface FlightsSearchParam {
-    pagination: string,
-    icao: string,
-    direction: string,
-    timestamp: Date,
-    n: number
-}
-
-export interface AirportFlight {
-    general: GeneralData,
-    status: StatusData,
-    completed: boolean
-}
+export type PanelStates = Record<string, boolean>

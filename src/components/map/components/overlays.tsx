@@ -1,11 +1,11 @@
 'use client'
 
 import { Feature } from 'ol'
-import { useControllerStore, useFlightStore } from '@/storage/state/panel'
+import { useControllerStore, useFlightStore } from '@/storage/zustand/panel'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
-import { ControllerIndex, PositionAirline } from '@/types/vatsim'
 import { getInAndOutBounds } from '../utils/airports'
+import { VatsimStorageControllerIndex, VatsimStoragePositionAirline } from '@/types/vatsim'
 
 export function FlightOverlay({ feature, click }: { feature: Feature, click: boolean }) {
     const { liveData: sharedliveData, setLiveData: setSharedLiveData } = useFlightStore()
@@ -30,7 +30,7 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
     }, [feature, click, setSharedLiveData])
 
     const airports = feature.get('airports')
-    const airline = feature.get('airline') as PositionAirline
+    const airline = feature.get('airline') as VatsimStoragePositionAirline
 
     return (
         <div className='popup popup-tip'>
@@ -63,12 +63,12 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
 export function AirportOverlay({ feature, click }: { feature: Feature, click: boolean }) {
     const [active, setActive] = useState<string | null>(null)
     const { stationsData: sharedStationsData, setStationsData: setSharedStationsData } = useControllerStore()
-    const [privateStationsData, setPrivateStationsData] = useState<ControllerIndex[]>([])
+    const [privateStationsData, setPrivateStationsData] = useState<VatsimStorageControllerIndex[]>([])
 
     const stationsData = click ? sharedStationsData : privateStationsData
 
     useEffect(() => {
-        const stations: ControllerIndex[] | null = feature.get('stations')
+        const stations: VatsimStorageControllerIndex[] | null = feature.get('stations')
         stations?.sort((a, b) => a.facility - b.facility)
 
         if (click) {
@@ -94,7 +94,7 @@ export function AirportOverlay({ feature, click }: { feature: Feature, click: bo
                                 station.facility === -1 || !station.text ?
                                     <p>{!station.text ? 'Currently not available.' : station.text.join(' ')}</p>
                                     :
-                                    station.text.map((text, i) => {
+                                    station.text.map((text: string, i: number) => {
                                         return <p key={station.callsign + '_' + i}>{text === '' ? 'Currently not available.' : text}</p>
                                     })
                             }</div>

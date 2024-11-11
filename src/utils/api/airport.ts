@@ -1,10 +1,10 @@
-import { AirportTimezone, AirportWeather } from "@/types/vatsim"
 import axios from "axios"
 import { CloudQuantity, IMetar, IWeatherCondition, parseMetar } from "metar-taf-parser"
 import airportTimezonesJSON from '@/assets/data/airports_tz.json'
 import { WorldTimeData } from "@/types/misc"
-import { AirportFlight, FlightsSearchParam } from "@/types/panel"
-import globalThis from "@/storage/singleton/next/global"
+import globalThis from "@/storage/global"
+import { AirportPanelFlightsSearchParams, AirportPanelTimezone, AirportPanelWeather } from "@/types/panel"
+import { VatsimAirportFlightData } from "@/types/vatsim"
 
 interface CachedMetar {
     raw: string,
@@ -18,14 +18,14 @@ interface CachedWorldTime {
 
 const metarCache: { [key: string]: CachedMetar | undefined } = {}
 
-export async function getAirportWeather(icao: string): Promise<AirportWeather | null> {
+export async function getAirportWeather(icao: string): Promise<AirportPanelWeather | null> {
     const cachedMetar = metarCache[icao]
     if (!cachedMetar || Date.now() - cachedMetar.t.getTime() > 1000 * 60 * 15) await updateMetarCache(icao)
 
     return extractMetar(icao)
 }
 
-function extractMetar(icao: string): AirportWeather | null {
+function extractMetar(icao: string): AirportPanelWeather | null {
     const metar = metarCache[icao]?.raw
     if (!metar) return null
 
@@ -153,14 +153,14 @@ function getMetarIntensity(intensity: string, cond: string): string {
 const airportTimezones = airportTimezonesJSON as { [key: string]: string | undefined }
 const worldtimeCache: { [key: string]: CachedWorldTime | undefined } = {}
 
-export async function getAirportTimezone(icao: string): Promise<AirportTimezone | null> {
+export async function getAirportTimezone(icao: string): Promise<AirportPanelTimezone | null> {
     const cachedWorldtime = getCachedWorldtime(icao)
     if (!cachedWorldtime || Date.now() - cachedWorldtime.t.getTime() > 1000 * 60 * 60 * 24) await updateWorldtimeCache(icao)
 
     return getWorldtime(icao)
 }
 
-function getWorldtime(icao: string): AirportTimezone | null {
+function getWorldtime(icao: string): AirportPanelTimezone | null {
     const timezone = airportTimezones[icao]
     if (!timezone) return null
 
@@ -208,7 +208,7 @@ async function fetchWorldtime(timezone: string): Promise<WorldTimeData | null> {
     return null
 }
 
-export async function getAirportFlights(params: FlightsSearchParam): Promise<AirportFlight[] | undefined> {
+export async function getAirportFlights(params: AirportPanelFlightsSearchParams): Promise<VatsimAirportFlightData[] | undefined> {
     try {
         const flights = await fetchAirportFlights(params)
         const reversed = params.pagination === 'next' ? flights : flights?.reverse()
@@ -226,7 +226,7 @@ export async function getAirportFlights(params: FlightsSearchParam): Promise<Air
     }
 }
 
-async function fetchAirportFlights(params: FlightsSearchParam) {
+async function fetchAirportFlights(params: AirportPanelFlightsSearchParams) {
     if (params.direction === 'departure') {
         return await globalThis.FlightModel.find({
             'general.airport.dep.properties.icao': params.icao,

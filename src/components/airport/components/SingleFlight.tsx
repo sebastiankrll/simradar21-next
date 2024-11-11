@@ -1,11 +1,11 @@
-import { AirportFlight } from "@/types/panel"
 import { getUtcString } from "@/utils/common"
 import { getFlightDelayColor, getFlightTimesArray } from "../utils/misc"
-import { useFlightStore } from "@/storage/state/panel"
+import { useFlightStore } from "@/storage/zustand/panel"
 import { useRouter } from "next/navigation"
-import { useSliderStore } from "@/storage/state/slider"
+import { useSliderStore } from "@/storage/zustand/slider"
+import { VatsimAirportFlightData } from "@/types/vatsim"
 
-export function SingleFlight({ data, timeMode, direction }: { data: AirportFlight, timeMode: boolean, direction: string }) {
+export function SingleFlight({ data, timeMode, direction }: { data: VatsimAirportFlightData, timeMode: boolean, direction: string }) {
     const { setAction } = useFlightStore()
     const { setPage } = useSliderStore()
     const router = useRouter()

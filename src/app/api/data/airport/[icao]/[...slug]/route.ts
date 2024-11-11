@@ -1,4 +1,4 @@
-import { FlightsSearchParam } from "@/types/panel";
+import { AirportPanelFlightsSearchParams } from "@/types/panel";
 import { getAirportFlights } from "@/utils/api/airport";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,7 @@ export async function GET(
     const timestamp = searchParams.get('t')
     const n = searchParams.get('n')
 
-    const flightSearchParams: FlightsSearchParam = {
+    const flightSearchParams: AirportPanelFlightsSearchParams = {
         icao: params.icao,
         direction: params.slug[0],
         pagination: pagination ? pagination : 'next',

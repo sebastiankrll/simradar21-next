@@ -1,11 +1,11 @@
-import { Attitude } from "@/types/map"
 import { Feature, Overlay } from "ol"
 import { createRoot } from "react-dom/client"
 import { AirportOverlay, FlightOverlay } from "../components/overlays"
 import { Point } from "ol/geom"
-import { LiveFlightData } from "@/types/panel"
 import { roundNumToX } from "@/utils/common"
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
+import { FlightPanelLiveData } from "@/types/panel"
+import { OlFlightFeatureAttitude } from "@/types/map"
 
 export function createFlightOverlay(feature: Feature<Point>, click: boolean): Overlay | null {
     if (!mapStorage.map) return null
@@ -57,9 +57,9 @@ export function updateFlightOverlay() {
     }
 }
 
-export function getLiveData(feature: Feature | null): LiveFlightData | null {
+export function getLiveData(feature: Feature | null): FlightPanelLiveData | null {
     const timestamp = feature?.get('timestamp')
-    const attitude = feature?.get('attitude') as Attitude
+    const attitude = feature?.get('attitude') as OlFlightFeatureAttitude
     if (!timestamp || !attitude) return null
 
     const elapsedTime = Date.now() - new Date(timestamp).getTime()

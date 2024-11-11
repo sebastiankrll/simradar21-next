@@ -1,21 +1,21 @@
 import { Feature, MultiPolygon, Point } from "geojson"
 import { Document } from "mongoose"
-import { GeneralData, StatusData } from "./vatsim"
+import { VatsimStorageGeneralData, VatsimStorageStatusData } from "./vatsim"
 
-export interface DatabaseAirports {
+export interface ClientDatabaseAirports {
     version: string,
     data: Feature<Point>[] | null
 }
 
-export interface DatabaseSectors {
+export interface ClientDatabaseSectors {
     version: string,
     data: Feature<MultiPolygon>[] | null
 }
 
-export interface DatabaseDataStorage {
-    airports: DatabaseAirports,
-    firs: DatabaseSectors,
-    tracons: DatabaseSectors
+export interface ClientDatabaseDataStorage {
+    airports: ClientDatabaseAirports,
+    firs: ClientDatabaseSectors,
+    tracons: ClientDatabaseSectors
 }
 
 export interface IndexedDBData<G extends Point | MultiPolygon> {
@@ -29,9 +29,9 @@ export interface IndexedDBVersion {
     version: string
 }
 
-export interface MongoFlightSchema extends Document {
+export interface MongoDbFlightSchema extends Document {
     hash: string,
-    general: GeneralData,
-    status: StatusData,
+    general: VatsimStorageGeneralData,
+    status: VatsimStorageStatusData,
     createdAt: Date
 }

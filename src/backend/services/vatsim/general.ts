@@ -1,15 +1,25 @@
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
-import { GeneralAircraft, GeneralAirline, GeneralAirport, GeneralData, GeneralFlightPlan, GeneralIndex, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/backend/vatsim"
+import { VatsimPilot, VatsimPrefile, VatsimStorageGeneralAircraft, VatsimStorageGeneralAirline, VatsimStorageGeneralAirport, VatsimStorageGeneralData, VatsimStorageGeneralFlightPlan, VatsimStorageGeneralIndex } from "@/types/vatsim"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import airportsJSON from '@/assets/data/airports_full.json'
 import fleetsJSON from '@/assets/data/fleets.json'
-import { Airlines, Fleet } from "@/types/misc"
 import airlinesJSON from '@/assets/data/airlines.json'
 import { calculateDistance, convertVatsimDate } from "@/utils/common"
 import { createHash } from "crypto"
 import airlineColorsJSON from '@/assets/data/airline_colors.json'
+import { AirlinesJSON } from "@/types/misc"
 
-const airlines = airlinesJSON as Airlines[]
+interface Fleet {
+    built?: string,
+    country?: string,
+    operatorIcao?: string,
+    registration?: string,
+    serialNumber?: string,
+    typecode?: string,
+    model?: string
+}
+
+const airlines = airlinesJSON as AirlinesJSON[]
 const airports = airportsJSON as FeatureCollection
 const fleets = fleetsJSON as Fleet[]
 const airlineColors = airlineColorsJSON as Record<string, { bg: string, font: string }>
@@ -20,12 +30,12 @@ export function updateGeneral() {
 }
 
 export function updateGeneralData() {
-    if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position) return
+    if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.positions) return
 
     const newGenerals = []
 
-    for (const position of vatsimDataStorage.position) {
-        const prevGeneral = vatsimDataStorage.general?.find(general => general.index.callsign === position.callsign) ?? null
+    for (const position of vatsimDataStorage.positions) {
+        const prevGeneral = vatsimDataStorage.generals?.find(general => general.index.callsign === position.callsign) ?? null
         if (!position.connected && prevGeneral) {
             newGenerals.push(prevGeneral)
             continue
@@ -34,7 +44,7 @@ export function updateGeneralData() {
         const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign)
         if (!pilot) continue
 
-        const newGeneral: GeneralData = {
+        const newGeneral: VatsimStorageGeneralData = {
             index: getIndexData(pilot),
             airport: getAirportData(pilot),
             flightplan: getFlightPlanData(pilot),
@@ -50,7 +60,7 @@ export function updateGeneralData() {
         newGenerals.push(newGeneral)
     }
 
-    vatsimDataStorage.general = newGenerals
+    vatsimDataStorage.generals = newGenerals
 }
 
 export function updateGeneralDataPrefile() {
@@ -59,7 +69,7 @@ export function updateGeneralDataPrefile() {
     const newGenerals = []
 
     for (const prefile of rawDataStorage.vatsim.prefiles) {
-        const newGeneral: GeneralData = {
+        const newGeneral: VatsimStorageGeneralData = {
             index: getIndexData(prefile),
             airport: getAirportData(prefile),
             flightplan: getFlightPlanData(prefile),
@@ -75,7 +85,7 @@ export function updateGeneralDataPrefile() {
         newGenerals.push(newGeneral)
     }
 
-    vatsimDataStorage.generalPre = newGenerals
+    vatsimDataStorage.generalPres = newGenerals
 }
 
 // function checkSameData(pilot: VatsimPilot, prevGeneral: GeneralData): boolean {
@@ -86,7 +96,7 @@ export function updateGeneralDataPrefile() {
 //     return airportsChange && flightplanChange && cidChange
 // }
 
-function getIndexData(pilot: VatsimPilot | VatsimPrefile): GeneralIndex {
+function getIndexData(pilot: VatsimPilot | VatsimPrefile): VatsimStorageGeneralIndex {
     if ('pilot_rating' in pilot) {
         return {
             hash: null,
@@ -127,7 +137,7 @@ function getRating(rating: number): string {
     }
 }
 
-function getAirportData(pilot: VatsimPilot | VatsimPrefile): GeneralAirport | null {
+function getAirportData(pilot: VatsimPilot | VatsimPrefile): VatsimStorageGeneralAirport | null {
     if (!pilot.flight_plan) return null
 
     const dep = pilot.flight_plan?.departure ? fetchAirport(pilot.flight_plan.departure) : null
@@ -157,7 +167,7 @@ function fetchAirport(icao: string): Feature<Point, GeoJsonProperties> {
     }
 }
 
-function getFlightPlanData(pilot: VatsimPilot | VatsimPrefile): GeneralFlightPlan | null {
+function getFlightPlanData(pilot: VatsimPilot | VatsimPrefile): VatsimStorageGeneralFlightPlan | null {
     if (!pilot.flight_plan) return null
 
     return {
@@ -191,7 +201,7 @@ function getFlightRule(rule: string | undefined): string {
     }
 }
 
-function getAircraftData(pilot: VatsimPilot | VatsimPrefile): GeneralAircraft | null {
+function getAircraftData(pilot: VatsimPilot | VatsimPrefile): VatsimStorageGeneralAircraft | null {
     if (!pilot.flight_plan) return null
 
     const typecode = pilot.flight_plan.aircraft_short
@@ -233,7 +243,7 @@ function calculateAge(date: Date): number {
     return age
 }
 
-function getAirlineData(pilot: VatsimPilot | VatsimPrefile): GeneralAirline {
+function getAirlineData(pilot: VatsimPilot | VatsimPrefile): VatsimStorageGeneralAirline {
     const icao = pilot.callsign.substring(0, 3)
     const airline = airlines.find(airline => airline.icao === icao)
 
@@ -258,7 +268,7 @@ function getAirlineColor(icao: string): { bg: string, font: string } | null {
     }
 }
 
-function generateHash(general: GeneralData) {
+function generateHash(general: VatsimStorageGeneralData) {
     const depIcao = general.airport?.dep.properties?.icao
     const arrIcao = general.airport?.arr.properties?.icao
     const cid = general.index.cid

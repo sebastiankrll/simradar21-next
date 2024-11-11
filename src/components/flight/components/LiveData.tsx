@@ -1,9 +1,9 @@
 'use client'
 
-import { useFlightStore } from "@/storage/state/panel"
-import { FlightData } from "@/types/vatsim"
+import { useFlightStore } from "@/storage/zustand/panel"
+import { VatsimFlightData } from "@/types/vatsim"
 
-export default function LiveData({ data }: { data: FlightData }) {
+export default function LiveData({ data }: { data: VatsimFlightData }) {
     const { liveData } = useFlightStore()
 
     return (

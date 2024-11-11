@@ -1,12 +1,12 @@
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
-import { ControllerIndex, VatsimController, VatsimTransceiver, VatsimTransceiversData } from "@/types/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/backend/vatsim"
+import { VatsimController, VatsimStorageControllerIndex, VatsimTransceiver, VatsimTransceiversData } from "@/types/vatsim"
 import airportsJSON from '@/assets/data/airports_full.json'
 import { FeatureCollection } from "geojson"
 import { calculateDistance } from "@/utils/common"
 
 const airports = airportsJSON as FeatureCollection
 
-type ControllerMap = Record<string, ControllerIndex>
+type ControllerMap = Record<string, VatsimStorageControllerIndex>
 type TransceiverFrequencyMap = Record<string, { callsign: string, transceiver: VatsimTransceiver }[]>
 
 export function updateController() {
@@ -30,14 +30,14 @@ export function updateController() {
     const transceiversByFrequency = getTransceiversByFrequency(rawDataStorage.transveivers)
     addControllerConnectionCounts(newControllers, transceiversByFrequency)
 
-    vatsimDataStorage.controller = {
+    vatsimDataStorage.controllers = {
         airports: filterAirports(newControllers),
         firs: {},
         tracons: {}
     }
 }
 
-function getControllerData(controller: VatsimController): ControllerIndex | null {
+function getControllerData(controller: VatsimController): VatsimStorageControllerIndex | null {
     if (controller.frequency === '199.998') {
         return null
     }
@@ -125,8 +125,8 @@ function addControllerConnectionCounts(controllers: ControllerMap, transceiversB
 //     return filteredTracons
 // }
 
-function filterAirports(controllers: ControllerMap): Record<string, ControllerIndex[]> {
-    const filteredAirports: Record<string, ControllerIndex[]> = {}
+function filterAirports(controllers: ControllerMap): Record<string, VatsimStorageControllerIndex[]> {
+    const filteredAirports: Record<string, VatsimStorageControllerIndex[]> = {}
 
     for (const callsign of Object.keys(controllers)) {
         if (controllers[callsign].type !== 'airport') continue

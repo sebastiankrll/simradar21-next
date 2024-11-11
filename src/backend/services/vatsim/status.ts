@@ -1,6 +1,6 @@
 import { calculateDistance, roundXMin } from "@/utils/common"
-import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
-import { GeneralData, PositionData, StatusData, StatusIndex, StatusProgress, StatusTimes, VatsimPilot, VatsimPrefile } from "@/types/vatsim"
+import { rawDataStorage, vatsimDataStorage } from "@/storage/backend/vatsim"
+import { VatsimPilot, VatsimPrefile, VatsimStorageGeneralData, VatsimStoragePositionData, VatsimStorageStatusData, VatsimStorageStatusIndex, VatsimStorageStatusProgress, VatsimStorageStatusTimes } from "@/types/vatsim"
 
 const taxiTime = 10 * 60000
 let now = new Date()
@@ -12,13 +12,13 @@ export function updateStatus() {
 }
 
 export function updateStatusData() {
-    if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.position || !vatsimDataStorage.general) return
+    if (!rawDataStorage.vatsim?.pilots || !vatsimDataStorage.positions || !vatsimDataStorage.generals) return
 
     const newStatuses = []
 
-    for (const position of vatsimDataStorage.position) {
-        const general = vatsimDataStorage.general.find(general => general.index.callsign === position.callsign) ?? null
-        const prevStatus = vatsimDataStorage.status?.find(status => status.index.hash === general?.index.hash) ?? null
+    for (const position of vatsimDataStorage.positions) {
+        const general = vatsimDataStorage.generals.find(general => general.index.callsign === position.callsign) ?? null
+        const prevStatus = vatsimDataStorage.statuss?.find(status => status.index.hash === general?.index.hash) ?? null
         const pilot = rawDataStorage.vatsim.pilots.find(pilot => pilot.callsign === position.callsign) ?? null
 
         const newStatus = getStatusData(prevStatus, position, general, pilot)
@@ -26,16 +26,16 @@ export function updateStatusData() {
         newStatuses.push(newStatus)
     }
 
-    vatsimDataStorage.status = newStatuses
+    vatsimDataStorage.statuss = newStatuses
 }
 
 export function updateStatusDataPrefile() {
-    if (!rawDataStorage.vatsim?.prefiles || !vatsimDataStorage.generalPre) return
+    if (!rawDataStorage.vatsim?.prefiles || !vatsimDataStorage.generalPres) return
 
     const newStatuses = []
 
     for (const prefile of rawDataStorage.vatsim.prefiles) {
-        const general = structuredClone(vatsimDataStorage.generalPre.find(general => general.index.callsign === prefile.callsign) ?? null)
+        const general = structuredClone(vatsimDataStorage.generalPres.find(general => general.index.callsign === prefile.callsign) ?? null)
 
         const newStatus = getPrefileStatus(prefile, general)
         if (!newStatus) continue
@@ -43,10 +43,10 @@ export function updateStatusDataPrefile() {
         newStatuses.push(newStatus)
     }
 
-    vatsimDataStorage.statusPre = newStatuses
+    vatsimDataStorage.statusPres = newStatuses
 }
 
-function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): StatusData | undefined {
+function getPrefileStatus(prefile: VatsimPrefile, general: VatsimStorageGeneralData | null): VatsimStorageStatusData | undefined {
     if (!general?.flightplan?.depTime || !general.airport) return
 
     const depLoc = general.airport?.dep.geometry.coordinates as number[]
@@ -54,12 +54,12 @@ function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): 
 
     const arrDist = calculateDistance(depLoc, arrLoc) * 1.1
 
-    const index: StatusIndex = {
+    const index: VatsimStorageStatusIndex = {
         hash: general.index.hash,
         callsign: prefile.callsign,
         altitude: 0
     }
-    const times: StatusTimes = {
+    const times: VatsimStorageStatusTimes = {
         offBlock: roundXMin(new Date(general.flightplan?.depTime.getTime() - taxiTime), 5),
         schedDep: roundXMin(general.flightplan?.depTime, 5),
         actDep: roundXMin(general.flightplan?.depTime, 5),
@@ -67,7 +67,7 @@ function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): 
         actArr: roundXMin(new Date(general.flightplan?.depTime.getTime() + general.flightplan.enrouteTime), 5),
         onBlock: roundXMin(new Date(general.flightplan?.depTime.getTime() + general.flightplan.enrouteTime + taxiTime), 5)
     }
-    const progress: StatusProgress = {
+    const progress: VatsimStorageStatusProgress = {
         status: 'prefile',
         stops: 0,
         depDist: 0,
@@ -81,7 +81,7 @@ function getPrefileStatus(prefile: VatsimPrefile, general: GeneralData | null): 
     }
 }
 
-function getStatusData(prevStatus: StatusData | null, position: PositionData, general: GeneralData | null, pilot: VatsimPilot | null): StatusData | undefined {
+function getStatusData(prevStatus: VatsimStorageStatusData | null, position: VatsimStoragePositionData, general: VatsimStorageGeneralData | null, pilot: VatsimPilot | null): VatsimStorageStatusData | undefined {
     if (!general?.flightplan || !general.airport) return
 
     const currentPosition = position.coordinates
@@ -92,9 +92,9 @@ function getStatusData(prevStatus: StatusData | null, position: PositionData, ge
     const arrDist = calculateDistance(currentPosition, arrLoc) * 1.1
     const totalDist = depDist + arrDist
 
-    let index: StatusIndex
-    let progress: StatusProgress
-    let times: StatusTimes
+    let index: VatsimStorageStatusIndex
+    let progress: VatsimStorageStatusProgress
+    let times: VatsimStorageStatusTimes
 
     // Init StatusData
     if (prevStatus?.times && prevStatus.progress.status !== 'prefile') {
@@ -282,7 +282,7 @@ function getStatusData(prevStatus: StatusData | null, position: PositionData, ge
 
 }
 
-function inFlightETA(times: StatusTimes, position: PositionData, general: GeneralData): StatusTimes {
+function inFlightETA(times: VatsimStorageStatusTimes, position: VatsimStoragePositionData, general: VatsimStorageGeneralData): VatsimStorageStatusTimes {
     const currentPosition = position.coordinates
     const depLoc = general.airport?.dep.geometry.coordinates as number[]
     const arrLoc = general.airport?.arr.geometry.coordinates as number[]

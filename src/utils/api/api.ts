@@ -1,4 +1,5 @@
-import { AirportAPIData, FlightData, TrackData } from "@/types/vatsim"
+import { AirportPanelData } from "@/types/panel"
+import { VatsimFlightData, VatsimStorageTrackData } from "@/types/vatsim"
 import useSWR, { SWRConfiguration } from "swr"
 import useSWRImmutable from "swr/immutable"
 
@@ -15,7 +16,7 @@ const SWR_CONFIG: SWRConfiguration = {
 }
 
 export function useAirport(icao: string) {
-    const { data, isLoading, error } = useSWR<AirportAPIData | undefined | null>(`/api/data/airport/${icao}`, fetcher, SWR_CONFIG)
+    const { data, isLoading, error } = useSWR<AirportPanelData | undefined | null>(`/api/data/airport/${icao}`, fetcher, SWR_CONFIG)
 
     return {
         airport: data,
@@ -25,7 +26,7 @@ export function useAirport(icao: string) {
 }
 
 export function useFlight(callsign: string) {
-    const { data, isLoading, error } = useSWR<FlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, SWR_CONFIG)
+    const { data, isLoading, error } = useSWR<VatsimFlightData | undefined | null>(`/api/data/flight/${callsign}`, fetcher, SWR_CONFIG)
 
     return {
         flight: data,
@@ -35,7 +36,7 @@ export function useFlight(callsign: string) {
 }
 
 export function useTrack(callsign: string) {
-    const { data, isLoading, error } = useSWRImmutable<TrackData | undefined | null>(`/api/data/track/${callsign}`, fetcher)
+    const { data, isLoading, error } = useSWRImmutable<VatsimStorageTrackData | undefined | null>(`/api/data/track/${callsign}`, fetcher)
 
     return {
         track: data,

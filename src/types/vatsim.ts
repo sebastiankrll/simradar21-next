@@ -128,13 +128,18 @@ export interface VatsimData {
     transceivers: VatsimTransceiversData[]
 }
 
-export interface PositionAirline {
+export interface RawDataStorage {
+    vatsim: null | VatsimData,
+    transveivers: null | VatsimTransceiversData[]
+}
+
+export interface VatsimStoragePositionAirline {
     iata: string,
     bg?: string,
     font?: string
 }
 
-export interface PositionData {
+export interface VatsimStoragePositionData {
     callsign: string,
     aircraft: string | null,
     coordinates: number[],
@@ -143,13 +148,13 @@ export interface PositionData {
     groundspeeds: number[],
     frequency: string,
     airports: string[] | null,
-    airline: PositionAirline,
+    airline: VatsimStoragePositionAirline,
     type: number,
     connected: boolean,
     timestamp: Date
 }
 
-export interface GeneralIndex {
+export interface VatsimStorageGeneralIndex {
     hash: string | null,
     cid: number,
     callsign: string,
@@ -158,12 +163,12 @@ export interface GeneralIndex {
     server?: string,
 }
 
-export interface GeneralAirport {
+export interface VatsimStorageGeneralAirport {
     dep: Feature<Point, GeoJsonProperties>,
     arr: Feature<Point, GeoJsonProperties>
 }
 
-export interface GeneralFlightPlan {
+export interface VatsimStorageGeneralFlightPlan {
     filedSpeed: number,
     filedLevel: number,
     depTime: Date | null,
@@ -174,7 +179,7 @@ export interface GeneralFlightPlan {
     rules: string
 }
 
-export interface GeneralAircraft {
+export interface VatsimStorageGeneralAircraft {
     icao: string,
     type: string,
     registration?: string,
@@ -183,7 +188,7 @@ export interface GeneralAircraft {
     age?: number
 }
 
-export interface GeneralAirline {
+export interface VatsimStorageGeneralAirline {
     icao: string,
     iata: string,
     name: string,
@@ -192,15 +197,15 @@ export interface GeneralAirline {
     font?: string
 }
 
-export interface GeneralData {
-    index: GeneralIndex,
-    airport: GeneralAirport | null,
-    flightplan: GeneralFlightPlan | null,
-    aircraft: GeneralAircraft | null,
-    airline: GeneralAirline
+export interface VatsimStorageGeneralData {
+    index: VatsimStorageGeneralIndex,
+    airport: VatsimStorageGeneralAirport | null,
+    flightplan: VatsimStorageGeneralFlightPlan | null,
+    aircraft: VatsimStorageGeneralAircraft | null,
+    airline: VatsimStorageGeneralAirline
 }
 
-export interface StatusIndex {
+export interface VatsimStorageStatusIndex {
     hash: string | null,
     callsign: string,
     transponder?: string,
@@ -208,14 +213,14 @@ export interface StatusIndex {
     altitude: number
 }
 
-export interface StatusProgress {
+export interface VatsimStorageStatusProgress {
     status: string,
     stops: 0,
     depDist: number,
     arrDist: number
 }
 
-export interface StatusTimes {
+export interface VatsimStorageStatusTimes {
     offBlock: Date,
     schedDep: Date,
     actDep: Date,
@@ -224,13 +229,13 @@ export interface StatusTimes {
     onBlock: Date
 }
 
-export interface StatusData {
-    index: StatusIndex,
-    progress: StatusProgress,
-    times: StatusTimes
+export interface VatsimStorageStatusData {
+    index: VatsimStorageStatusIndex,
+    progress: VatsimStorageStatusProgress,
+    times: VatsimStorageStatusTimes
 }
 
-export interface TrackPoint {
+export interface VatsimStorageTrackPoint {
     coordinates: number[],
     altitudes: number[],
     groundspeed: number,
@@ -238,12 +243,12 @@ export interface TrackPoint {
     timestamp: Date
 }
 
-export interface TrackData {
+export interface VatsimStorageTrackData {
     callsign: string,
-    points: TrackPoint[]
+    points: VatsimStorageTrackPoint[]
 }
 
-export interface ControllerIndex {
+export interface VatsimStorageControllerIndex {
     callsign: string,
     type: string,
     facility: number,
@@ -253,13 +258,13 @@ export interface ControllerIndex {
     logon: Date
 }
 
-export interface ControllerData {
-    airports: { [key: string]: ControllerIndex[] },
-    firs: { [key: string]: ControllerIndex[] },
-    tracons: { [key: string]: ControllerIndex[] }
+export interface VatsimStorageControllerData {
+    airports: { [key: string]: VatsimStorageControllerIndex[] },
+    firs: { [key: string]: VatsimStorageControllerIndex[] },
+    tracons: { [key: string]: VatsimStorageControllerIndex[] }
 }
 
-export interface AirportData {
+export interface VatsimStorageAirportData {
     icao: string,
     departures: {
         n: number,
@@ -277,57 +282,31 @@ export interface AirportData {
 }
 
 export interface VatsimDataStorage {
-    position: PositionData[],
-    general: GeneralData[],
-    status: StatusData[],
-    generalPre: GeneralData[],
-    statusPre: StatusData[],
-    track: TrackData[],
-    controller: ControllerData | null,
-    airport: AirportData[]
+    positions: VatsimStoragePositionData[],
+    generals: VatsimStorageGeneralData[],
+    statuss: VatsimStorageStatusData[],
+    generalPres: VatsimStorageGeneralData[],
+    statusPres: VatsimStorageStatusData[],
+    tracks: VatsimStorageTrackData[],
+    controllers: VatsimStorageControllerData | null,
+    airports: VatsimStorageAirportData[]
     timestamp: Date
 }
 
-export interface VatsimDisconnected {
-    position: PositionData[],
-    general: GeneralData[],
-    status: StatusData[],
-    track: TrackData[]
-}
-
-export interface VatsimDataWS {
-    flights: PositionData[] | null,
-    controllers: ControllerData | null,
+export interface VatsimMinimalData {
+    positions: VatsimStoragePositionData[] | null,
+    controllers: VatsimStorageControllerData | null,
     timestamp: Date
 }
 
-export interface RawDataStorage {
-    vatsim: null | VatsimData,
-    transveivers: null | VatsimTransceiversData[]
+export interface VatsimFlightData {
+    position: VatsimStoragePositionData | null,
+    general: VatsimStorageGeneralData | null,
+    status: VatsimStorageStatusData | null
 }
 
-export interface FlightData {
-    position: PositionData | null,
-    general: GeneralData | null,
-    status: StatusData | null
-}
-
-export interface AirportWeather {
-    condition: string,
-    temperature: string,
-    dewPoint: string,
-    wind: string,
-    altimeters: string,
-    raw: string
-}
-
-export interface AirportTimezone {
-    abbreviation: string,
-    utc_offset: string,
-}
-
-export interface AirportAPIData {
-    data: AirportData | null,
-    weather: AirportWeather | null,
-    timezone: AirportTimezone | null
+export interface VatsimAirportFlightData {
+    general: VatsimStorageGeneralData,
+    status: VatsimStorageStatusData,
+    completed: boolean
 }

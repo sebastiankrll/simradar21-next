@@ -1,10 +1,10 @@
 'use client'
 
-import { useFlightStore } from "@/storage/state/panel"
-import { FlightData } from "@/types/vatsim"
+import { useFlightStore } from "@/storage/zustand/panel"
+import { VatsimFlightData } from "@/types/vatsim"
 import { useState } from "react"
 
-export default function Footer({ data }: { data: FlightData | undefined | null }) {
+export default function Footer({ data }: { data: VatsimFlightData | undefined | null }) {
     const [copied, setCopied] = useState(false)
     const { setAction, action } = useFlightStore()
 

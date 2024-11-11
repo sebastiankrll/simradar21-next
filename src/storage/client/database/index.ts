@@ -1,14 +1,14 @@
-import { DatabaseDataStorage } from "@/types/database";
 import { fetcher } from "@/utils/api/api";
 import { dbAirport, insertAirports } from "./airport";
 import { dbFir, insertFIRs } from "./fir";
 import { dbTracon, insertTRACONs } from "./tracon";
 import { Feature, Point } from "geojson";
+import { ClientDatabaseDataStorage } from "@/types/database";
 
 let dbReady: boolean = false
 let dbPromise: Promise<void> | null = null
 
-export async function checkAndUpdateData(versionData: DatabaseDataStorage) {
+export async function checkAndUpdateData(versionData: ClientDatabaseDataStorage) {
     dbPromise = new Promise<void>(async (resolve, reject) => {
         try {
             // const now = Date.now()
@@ -23,7 +23,7 @@ export async function checkAndUpdateData(versionData: DatabaseDataStorage) {
 
 
             if (isOutdated) {
-                const newData: DatabaseDataStorage = await fetcher('/api/database')
+                const newData: ClientDatabaseDataStorage = await fetcher('/api/database')
                 if ((!airportVersion || airportVersion.version < versionData.airports.version)) {
                     await insertAirports(newData)
                 }

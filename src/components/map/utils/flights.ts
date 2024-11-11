@@ -1,5 +1,3 @@
-import { PositionData, VatsimDataWS } from "@/types/vatsim"
-import { Attitude, FlightFeature } from "@/types/map"
 import { fromLonLat } from "ol/proj"
 import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
@@ -7,15 +5,17 @@ import { Point } from "ol/geom"
 import { createFlightOverlay, moveFlightOverlay, updateFlightOverlay } from "./overlay"
 import { moveTrack, updateTrack } from "./track"
 import { moveViewToFeature } from "./misc"
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
+import { VatsimMinimalData, VatsimStoragePositionData } from "@/types/vatsim"
+import { OlFlightFeature, OlFlightFeatureAttitude } from "@/types/map"
 
-export function updateFlightFeatures(vatsimData: VatsimDataWS | null) {
-    if (!vatsimData?.flights) return
+export function updateFlightFeatures(vatsimData: VatsimMinimalData | null) {
+    if (!vatsimData?.positions) return
 
     const tOffset = (Date.now() - mapStorage.layerInit.getTime()) / 1000
-    const flights = structuredClone(vatsimData.flights)
+    const flights = structuredClone(vatsimData.positions)
     const prevFeatures = mapStorage.sources.flights.getFeatures()
-    const checked: PositionData[] = []
+    const checked: VatsimStoragePositionData[] = []
 
     for (const feature of prevFeatures as Feature<Point>[]) {
         const newData = flights.find(flight => flight.callsign === feature.get('callsign'))
@@ -25,7 +25,7 @@ export function updateFlightFeatures(vatsimData: VatsimDataWS | null) {
             continue
         }
 
-        const attitude: Attitude = {
+        const attitude: OlFlightFeatureAttitude = {
             coordinates: newData.coordinates,
             altitudes: newData.altitudes,
             groundspeeds: newData.groundspeeds,
@@ -52,8 +52,8 @@ export function updateFlightFeatures(vatsimData: VatsimDataWS | null) {
     }
 
     const inserts = flights.filter(flight => !checked.includes(flight))
-    const newFeatures: FlightFeature[] = inserts.map(insert => {
-        const attitude: Attitude = {
+    const newFeatures: OlFlightFeature[] = inserts.map(insert => {
+        const attitude: OlFlightFeatureAttitude = {
             coordinates: insert.coordinates,
             altitudes: insert.altitudes,
             groundspeeds: insert.groundspeeds,
@@ -102,15 +102,15 @@ export function updateFlightFeatures(vatsimData: VatsimDataWS | null) {
     updateFlightOverlay()
 }
 
-function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
-    const spd = position.groundspeeds[0] * 0.514444
+function getInterpolatedPosition(attitude: OlFlightFeatureAttitude, timeElapsed: number): number[] {
+    const spd = attitude.groundspeeds[0] * 0.514444
     const dist = spd * timeElapsed / 1000
 
-    const dx = dist * Math.sin(position.heading * Math.PI / 180)
-    const dy = dist * Math.cos(position.heading * Math.PI / 180)
+    const dx = dist * Math.sin(attitude.heading * Math.PI / 180)
+    const dy = dist * Math.cos(attitude.heading * Math.PI / 180)
 
-    const newLat = position.coordinates[1] + (dy / 6378) * (180 / Math.PI)
-    const newLon = position.coordinates[0] + (dx / 6378) * (180 / Math.PI) / Math.cos(position.coordinates[1] * Math.PI / 180)
+    const newLat = attitude.coordinates[1] + (dy / 6378) * (180 / Math.PI)
+    const newLon = attitude.coordinates[0] + (dx / 6378) * (180 / Math.PI) / Math.cos(attitude.coordinates[1] * Math.PI / 180)
 
     return [newLon, newLat]
 }

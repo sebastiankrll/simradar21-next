@@ -13,9 +13,9 @@ import { getFlightStatus } from './utils/update'
 import { useFlight, useTrack } from '@/utils/api/api'
 import Spinner from '../common/spinner/Spinner'
 import { useEffect } from 'react'
-import { useFlightStore } from '@/storage/state/panel'
+import { useFlightStore } from '@/storage/zustand/panel'
 import { useRouter } from 'next/navigation'
-import { useSliderStore } from '@/storage/state/slider'
+import { useSliderStore } from '@/storage/zustand/slider'
 import Marquee from '../common/marquee/Marquee'
 
 export default function Flight({ callsign }: { callsign: string }) {

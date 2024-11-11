@@ -1,4 +1,4 @@
-import { mapStorage } from "@/storage/singleton/map"
+import { mapStorage } from "@/storage/client/map"
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
 import { circular } from "ol/geom/Polygon"

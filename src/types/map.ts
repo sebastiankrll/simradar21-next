@@ -3,17 +3,13 @@ import { LineString, Point as oPoint } from "ol/geom";
 import VectorSource from "ol/source/Vector";
 import { Feature, Point } from "geojson";
 import { Extent } from "ol/extent";
-import { PositionAirline } from "./vatsim";
+import { VatsimStoragePositionAirline } from "./vatsim";
 
-export interface VectorSources {
-    [key: string]: VectorSource
-}
-
-export interface MapStorage {
+export interface OlMapStorage {
     map: Map | null,
     animate: boolean,
     layerInit: Date,
-    sources: VectorSources,
+    sources: Record<string, VectorSource>,
     overlays: {
         click: Overlay | null,
         hover: Overlay | null
@@ -29,14 +25,14 @@ export interface MapStorage {
     }
 }
 
-export interface Attitude {
+export interface OlFlightFeatureAttitude {
     coordinates: number[],
     altitudes: number[],
     groundspeeds: number[],
     heading: number
 }
 
-interface FlightProperties {
+export interface OlFlightFeatureProperties {
     callsign: string,
     type: string,
     hover: number,
@@ -44,23 +40,15 @@ interface FlightProperties {
     rotation: number,
     prevRotation: number,
     tOffset: number,
-    attitude: Attitude,
+    attitude: OlFlightFeatureAttitude,
     altitude: number,
     frequency: string,
-    airline: PositionAirline,
+    airline: VatsimStoragePositionAirline,
     airports: string[] | null,
     connected: number,
     timestamp: Date
 }
 
-export interface FlightFeature extends Feature<Point> {
-    properties: FlightProperties
-}
-
-export interface IndexedAirportFeature {
-    minX: number
-    minY: number
-    maxX: number
-    maxY: number
-    feature: Feature<Point>
+export interface OlFlightFeature extends Feature<Point> {
+    properties: OlFlightFeatureProperties
 }

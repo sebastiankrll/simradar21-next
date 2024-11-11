@@ -1,5 +1,5 @@
 import { ChartJsConfig } from "@/components/common/chart/Chart"
-import { FlightData, TrackPoint } from "@/types/vatsim"
+import { VatsimFlightData, VatsimStorageTrackPoint } from "@/types/vatsim"
 
 export const flightChartConfig: ChartJsConfig = {
     data: {
@@ -50,7 +50,7 @@ export const flightChartConfig: ChartJsConfig = {
     names: ['BAROMETRIC ALTITUDE', 'GROUND SPEED']
 }
 
-export function setFlightChartData(points: TrackPoint[] | null) {
+export function setFlightChartData(points: VatsimStorageTrackPoint[] | null) {
     // const filteredPoints = points.filter((value, index) => (index + 1) % 4 === 0)
     // Make a filter, that filters out same points and only keeps differences
 
@@ -61,7 +61,7 @@ export function setFlightChartData(points: TrackPoint[] | null) {
     flightChartConfig.data.datasets[1].data = points.map((point) => point.groundspeed)
 }
 
-export function updateFlightChartData(newPoint: FlightData | null) {
+export function updateFlightChartData(newPoint: VatsimFlightData | null) {
     if (!newPoint?.position || flightChartConfig.data.labels?.length === 0) return
 
     flightChartConfig.data.labels?.push(new Date(newPoint.position.timestamp))

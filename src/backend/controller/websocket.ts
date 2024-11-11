@@ -1,5 +1,5 @@
-import { getVatsimWsData, setVatsimStorage } from "@/storage/singleton/vatsim";
-import { subRedis } from "@/utils/redis";
+import { getVatsimWsData, setVatsimStorage } from "@/storage/backend/vatsim";
+import Redis from "ioredis";
 import { WebSocket, WebSocketServer } from "ws";
 import { createGzip } from "zlib";
 
@@ -21,7 +21,7 @@ function sendWsData(data: string) {
 
     const gzip = createGzip()
     const storage = getVatsimWsData()
-    
+
     gzip.write(JSON.stringify({
         event: 'set_vatsim',
         data: storage,
@@ -44,4 +44,18 @@ function sendWsData(data: string) {
     })
 }
 
-subRedis('vatsim_storage', sendWsData)
+const redisSub = new Redis()
+
+redisSub.subscribe('vatsim_storage', (err, count) => {
+    if (err) {
+        console.error("Failed to subscribe: %s", err.message)
+    } else {
+        console.log(
+            `Subscribed successfully! This client is currently subscribed to ${count} channels.`
+        )
+    }
+})
+
+redisSub.on("message", (data) => {
+    sendWsData(data)
+})

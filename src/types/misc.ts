@@ -1,20 +1,11 @@
-import { VatsimDataWS } from "./vatsim"
+import { VatsimMinimalData } from "./vatsim"
 
-export interface Aircrafts {
-    [key: string]: number
+export interface WsMessage {
+    event: string,
+    data: VatsimMinimalData
 }
 
-export interface Fleet {
-    built?: string,
-    country?: string,
-    operatorIcao?: string,
-    registration?: string,
-    serialNumber?: string,
-    typecode?: string,
-    model?: string
-}
-
-export interface Airlines {
+export interface AirlinesJSON {
     id?: string,
     name?: string,
     alias?: string,
@@ -23,11 +14,6 @@ export interface Airlines {
     callsign?: string,
     country?: string,
     active?: string
-}
-
-export interface WsMessage {
-    event: string,
-    data: VatsimDataWS
 }
 
 export interface WorldTimeData {

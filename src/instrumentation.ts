@@ -1,10 +1,10 @@
 import { Redis } from "ioredis";
-import { setVatsimStorage } from "./storage/singleton/next/vatsim";
-import { setDatabaseStorage } from "./storage/singleton/next/database";
+import { setVatsimStorage } from "./storage/vatsim";
+import { setDatabaseStorage } from "./storage/database";
 import mongoose from "mongoose";
-import { MongoFlightSchema } from "./types/database";
-import FlightSchema from "./storage/database/schema/Flight";
-import globalThis from "./storage/singleton/next/global";
+import FlightSchema from "./storage/mongodb/schema/Flight";
+import globalThis from "./storage/global";
+import { MongoDbFlightSchema } from "./types/database";
 
 export async function register() {
     const redisSub = new Redis()
@@ -38,5 +38,5 @@ export async function register() {
     conn.on('error', console.error.bind(console, 'MongoDB connection error:'))
     conn.on('connected', () => console.log('Connected to mongodb: flights'))
 
-    globalThis.FlightModel = conn.model<MongoFlightSchema>('Flight', FlightSchema)
+    globalThis.FlightModel = conn.model<MongoDbFlightSchema>('Flight', FlightSchema)
 }

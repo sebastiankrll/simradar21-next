@@ -1,7 +1,7 @@
-import { MapStorage } from "@/types/map";
+import { OlMapStorage } from "@/types/map";
 import VectorSource from "ol/source/Vector";
 
-export const mapStorage: MapStorage = {
+export const mapStorage: OlMapStorage = {
     map: null,
     layerInit: new Date(),
     animate: true,
