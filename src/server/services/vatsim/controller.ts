@@ -1,9 +1,8 @@
 import { rawDataStorage, vatsimDataStorage } from "@/storage/singleton/vatsim"
-import { ControllerData, ControllerIndex, VatsimATIS, VatsimController, VatsimTransceiver, VatsimTransceiversData } from "@/types/vatsim"
+import { ControllerIndex, VatsimController, VatsimTransceiver, VatsimTransceiversData } from "@/types/vatsim"
 import airportsJSON from '@/assets/data/airports_full.json'
 import { FeatureCollection } from "geojson"
 import { calculateDistance } from "@/utils/common"
-import { distance } from "ol/coordinate"
 
 const airports = airportsJSON as FeatureCollection
 

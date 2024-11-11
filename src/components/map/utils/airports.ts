@@ -8,11 +8,10 @@ import { RefObject } from "react";
 import GeoJSON from 'ol/format/GeoJSON'
 import { VatsimDataWS } from "@/types/vatsim";
 import { Feature } from "ol";
-import { LineString, Point } from "ol/geom";
+import { Point } from "ol/geom";
 import { createAirportOverlay, updateAirportOverlay } from "./overlay";
 import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
-import { Style } from "ol/style";
 import { toggleDestinationSegment } from "./track";
 
 const rbush = new RBush<IndexedAirportFeature>()

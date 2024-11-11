@@ -1,5 +1,4 @@
 import { Feature, GeoJsonProperties, Point } from "geojson"
-import { IMetar } from "metar-taf-parser"
 
 export interface VatsimGeneral {
     version: number
