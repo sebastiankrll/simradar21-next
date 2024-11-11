@@ -1,4 +1,5 @@
-import { FlightData, StatusFlightData } from "@/types/panel"
+import { StatusFlightData } from "@/types/panel"
+import { FlightData } from "@/types/vatsim"
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 
 export function getFlightStatus(data: FlightData | undefined | null): StatusFlightData {

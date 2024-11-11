@@ -29,7 +29,7 @@ export default function Airport({ icao, children }: { icao: string, children: Re
         }
 
         initAirportFeature()
-    }, [])
+    }, [icao])
 
     useEffect(() => {
         setTime(getAirportTime(airport))

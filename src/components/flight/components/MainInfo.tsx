@@ -2,7 +2,6 @@
 
 import { convertLengthUnit, getDurationString } from "@/utils/common"
 import { useState } from "react"
-import Image from "next/image"
 import LiveData from "./LiveData"
 import AttitudeChart from "./AttitudeChart"
 import FlagSprite from '@/assets/images/sprites/flagSprite.png'

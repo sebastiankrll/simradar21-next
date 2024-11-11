@@ -1,9 +1,7 @@
 import { mapStorage } from "@/storage/singleton/map"
-import { MapStorage } from "@/types/map"
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
 import { circular } from "ol/geom/Polygon"
-import { RefObject } from "react"
 
 let sunInterval: number | NodeJS.Timeout
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { Feature } from 'ol'
-import Image from 'next/image'
 import { useControllerStore, useFlightStore } from '@/storage/state/panel'
 import { useEffect, useState } from 'react'
 import { getLiveData } from '../utils/overlay'
@@ -15,26 +14,20 @@ export function FlightOverlay({ feature, click }: { feature: Feature, click: boo
     const liveData = click ? sharedliveData : privateLiveData
 
     useEffect(() => {
-        if (click) return
-
-        const interval = setInterval(() => {
+        let interval: NodeJS.Timeout
+        if (click) {
+            setSharedLiveData(feature)
+        } else {
             setPrivateLiveData(getLiveData(feature))
-        })
+            interval = setInterval(() => {
+                setPrivateLiveData(getLiveData(feature))
+            })
+        }
 
         return () => {
             clearInterval(interval)
         }
-    }, [click, feature])
-
-    useEffect(() => {
-        if (!click) return
-
-        setSharedLiveData(feature)
-
-        return () => {
-            setSharedLiveData(null)
-        }
-    }, [click, feature, setSharedLiveData])
+    }, [feature, click, setSharedLiveData])
 
     const airports = feature.get('airports')
     const airline = feature.get('airline') as PositionAirline
@@ -85,7 +78,7 @@ export function AirportOverlay({ feature, click }: { feature: Feature, click: bo
         }
 
         return () => { }
-    }, [feature, click])
+    }, [feature, click, setSharedStationsData])
 
     const airportCode = feature.get('iata') ? feature.get('iata') + '/' + feature.get('icao') : feature.get('icao')
     const inOutBounds = getInAndOutBounds(feature.get('icao'))

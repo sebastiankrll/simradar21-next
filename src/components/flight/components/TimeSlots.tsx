@@ -1,6 +1,7 @@
 'use client'
 
-import { FlightData, StatusFlightData } from "@/types/panel"
+import { StatusFlightData } from "@/types/panel"
+import { FlightData } from "@/types/vatsim"
 import { getUtcString } from "@/utils/common"
 
 export default function TimeSlots({ data, flightStatus }: { data: FlightData, flightStatus: StatusFlightData }) {

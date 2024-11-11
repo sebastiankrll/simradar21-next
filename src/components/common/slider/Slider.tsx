@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import "./Slider.css"
 import { useSliderStore } from "@/storage/state/slider"
 import { usePathname, useRouter } from "next/navigation"
@@ -13,28 +13,32 @@ export default function Slider({
     const router = useRouter()
     const pathname = usePathname()
     const { page } = useSliderStore()
-    const [hide, setHide] = useState<string | null>(null)
+    const [isSliding, setIsSliding] = useState<boolean>(false)
+
+    const currentTypeRef = useRef<string | null>(null)
 
     useEffect(() => {
         const type = page.split('/')[1]
 
-        if (type === hide) {
+        if (type === currentTypeRef.current) {
             router.replace(page)
-        } else {
-            setHide(null)
-            setTimeout(() => {
-                router.replace(page)
-            }, 300)
+            return
         }
+
+        setIsSliding(true)
+        currentTypeRef.current = type
+
+        setTimeout(() => {
+            router.replace(page)
+        }, 300)
     }, [page, router])
 
     useEffect(() => {
-        const type = pathname.split('/')[1]
-        setHide(type)
+        setIsSliding(false)
     }, [pathname])
 
     return (
-        <div className={`slider ${hide === null ? 'hide' : ''}`}>
+        <div className={`slider ${isSliding ? 'hide' : ''}`}>
             {children}
         </div>
     )

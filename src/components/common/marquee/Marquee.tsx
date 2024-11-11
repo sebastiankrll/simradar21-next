@@ -11,7 +11,7 @@ export default function Marquee({ children, speed = 20, delay = 5 }: { children:
         const contentWidth = contentRef.current?.offsetWidth ?? 0
 
         setMaxTranslate(contentWidth - containerWidth)
-    })
+    }, [children])
 
     const animationDuration = maxTranslate > 0 ? maxTranslate / speed + delay * 2 : 0
     const animationTimingFunction = animationDuration > 0 ? `linear(0 0%, 0 ${Math.round(delay * 2 / animationDuration * 100)}%, 1 100%)` : 'linear'

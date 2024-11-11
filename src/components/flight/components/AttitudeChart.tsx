@@ -4,7 +4,7 @@ import Chart from "@/components/common/chart/Chart";
 import { flightChartConfig, setFlightChartData, updateFlightChartData } from "../utils/chart";
 import { useFlightStore } from "@/storage/state/panel";
 import { useEffect } from "react";
-import { FlightData } from "@/types/panel";
+import { FlightData } from "@/types/vatsim";
 
 export default function AttitudeChart({ data }: { data: FlightData | null }) {
     const { trackPoints } = useFlightStore()

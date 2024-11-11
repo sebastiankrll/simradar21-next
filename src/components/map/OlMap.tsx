@@ -7,7 +7,7 @@ import './Map.css'
 import './components/Overlay.css'
 import { mapStorage } from "@/storage/singleton/map"
 import { onMessage } from "@/utils/ws"
-import { animateFlightFeatures, updateFlightFeatures } from "./utils/flights"
+import { updateFlightFeatures } from "./utils/flights"
 import { WsMessage } from "@/types/misc"
 import { VatsimDataWS } from "@/types/vatsim"
 import { handleClick, handleFlightPanelAction, handleHover, handlePathChange } from "./utils/misc"
@@ -66,11 +66,11 @@ export default function OlMap({ }) {
         map.on(['moveend'], onMoveEnd)
 
         // Init flight feature animation
-        let animationFrameId: number
-        const animate = () => {
-            animateFlightFeatures()
-            animationFrameId = window.requestAnimationFrame(animate)
-        }
+        // let animationFrameId: number
+        // const animate = () => {
+        //     animateFlightFeatures()
+        //     animationFrameId = window.requestAnimationFrame(animate)
+        // }
         // animationFrameId = window.requestAnimationFrame(animate)
 
 
@@ -79,9 +79,9 @@ export default function OlMap({ }) {
             map.un(['pointermove'], onPointerMove)
             map.un(['moveend'], onMoveEnd)
             unMessage()
-            if (animationFrameId) {
-                window.cancelAnimationFrame(animationFrameId)
-            }
+            // if (animationFrameId) {
+            //     window.cancelAnimationFrame(animationFrameId)
+            // }
         }
     }, [])
 
@@ -125,7 +125,7 @@ export default function OlMap({ }) {
 
         initData()
         handlePathChange(pathname, handleNotFound)
-    }, [pathname])
+    }, [pathname, router, setPage])
 
     // Draw track when flight is loaded
     useEffect(() => {

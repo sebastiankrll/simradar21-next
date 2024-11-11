@@ -32,8 +32,8 @@ export function updateController() {
 
     vatsimDataStorage.controller = {
         airports: filterAirports(newControllers),
-        firs: filterFirs(newControllers),
-        tracons: filterTracons(newControllers)
+        firs: {},
+        tracons: {}
     }
 }
 
@@ -115,15 +115,15 @@ function addControllerConnectionCounts(controllers: ControllerMap, transceiversB
     }
 }
 
-function filterFirs(controllers: ControllerMap): Record<string, ControllerIndex[]> {
-    const filteredFirs: Record<string, ControllerIndex[]> = {}
-    return filteredFirs
-}
+// function filterFirs(controllers: ControllerMap): Record<string, ControllerIndex[]> {
+//     const filteredFirs: Record<string, ControllerIndex[]> = {}
+//     return filteredFirs
+// }
 
-function filterTracons(controllers: ControllerMap): Record<string, ControllerIndex[]> {
-    const filteredTracons: Record<string, ControllerIndex[]> = {}
-    return filteredTracons
-}
+// function filterTracons(controllers: ControllerMap): Record<string, ControllerIndex[]> {
+//     const filteredTracons: Record<string, ControllerIndex[]> = {}
+//     return filteredTracons
+// }
 
 function filterAirports(controllers: ControllerMap): Record<string, ControllerIndex[]> {
     const filteredAirports: Record<string, ControllerIndex[]> = {}

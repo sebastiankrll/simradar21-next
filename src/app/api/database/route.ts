@@ -1,8 +1,7 @@
-import { getDatabaseStorage } from "@/storage/singleton/database"
-import { DatabaseDataStorage } from "@/types/database"
+import { getDatabaseStorage } from "@/storage/singleton/next/database"
 import { NextResponse } from "next/server"
 
 export async function GET() {
-    const data: DatabaseDataStorage = getDatabaseStorage()
+    const data = getDatabaseStorage()
     return NextResponse.json(data)
 }

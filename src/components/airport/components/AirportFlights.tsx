@@ -8,17 +8,16 @@ import { checkIfNewDay } from "../utils/misc";
 import { SingleFlight } from "./SingleFlight";
 import Spinner from '@/components/common/spinner/Spinner';
 import Delayboard from './Delayboard';
-import { flushSync } from 'react-dom';
 
 const FETCH_PARAMS = {
     n: 10
 }
 
 export default function AirportFlights({ icao, direction }: { icao: string, direction: string }) {
-    const [storedFlights, setStoredFlights] = useState<AirportFlight[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const [timeMode, setTimeMode] = useState<boolean>(false)
 
+    const storedFlightsRef = useRef<AirportFlight[]>([])
     const initialFetchRef = useRef<boolean>(false) // Handle component mounting twice in strict mode
     const scrollRef = useRef<HTMLDivElement | null>(null)
     const limitsReachedRef = useRef({
@@ -38,10 +37,10 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
             url.searchParams.append('p', pagination)
             url.searchParams.append('n', (FETCH_PARAMS.n + 1).toString())
 
-            if (storedFlights.length === 0) {
+            if (storedFlightsRef.current.length === 0) {
                 url.searchParams.append('t', new Date().toISOString())
             } else {
-                const edgeFlight = pagination === 'next' ? storedFlights[storedFlights.length - 1] : storedFlights[0]
+                const edgeFlight = pagination === 'next' ? storedFlightsRef.current[storedFlightsRef.current.length - 1] : storedFlightsRef.current[0]
                 const edgeTime = direction === 'departure' ? edgeFlight.status.times.schedDep : edgeFlight.status.times.schedArr
                 url.searchParams.append('t', new Date(edgeTime).toISOString())
             }
@@ -52,7 +51,7 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
 
             if (pagination === 'previous' && scrollDiv) {
                 flights.shift()
-                flushSync(() => setStoredFlights((prev) => [...flights, ...prev]))
+                storedFlightsRef.current = [...flights, ...storedFlightsRef.current]
 
                 setTimeout(() => {
                     const newScrollHeight = scrollDiv.scrollHeight
@@ -60,23 +59,21 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
                 }, 0)
             } else {
                 flights.pop()
-                setStoredFlights((prev) =>
-                    pagination === 'next' ? [...prev, ...flights] : [...flights, ...prev]
-                )
+                storedFlightsRef.current = pagination === 'next' ? [...storedFlightsRef.current, ...flights] : [...flights, ...storedFlightsRef.current]
             }
         } catch (error) {
             console.error('Error fetching flights:', error)
         } finally {
             setLoading(false)
         }
-    }, [setLoading, setStoredFlights])
+    }, [icao, direction])
 
     const renderFlights = () => {
-        if (storedFlights.length < 1) return
+        if (storedFlightsRef.current.length < 1) return
 
         let latestDay = new Date(0)
 
-        return storedFlights.map(flight => {
+        return storedFlightsRef.current.map(flight => {
             const date = direction === 'departure' ? new Date(flight.status.times.schedDep) : new Date(flight.status.times.schedArr)
             const isNewDay = checkIfNewDay(latestDay, date)
 
@@ -101,13 +98,15 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
             setTimeMode(prev => !prev)
         }, 2000)
 
+        return () => {
+            clearInterval(timeModeInterval)
+        }
+    }, [])
+
+    useEffect(() => {
         if (!initialFetchRef.current) {
             fetchFlights()
             initialFetchRef.current = true
-        }
-
-        return () => {
-            clearInterval(timeModeInterval)
         }
     }, [fetchFlights])
 
@@ -118,12 +117,12 @@ export default function AirportFlights({ icao, direction }: { icao: string, dire
                 {loading && <div className='loader-absolute overlay'><Spinner show={loading} /></div>}
                 {!limitsReachedRef.current.previous && <button className="airport-flights-pagination" onClick={() => fetchFlights('previous')}>Load earlier flights</button>}
                 <div className="airport-flights-wrapper">
-                    {storedFlights.length > 0 ?
+                    {storedFlightsRef.current.length > 0 ?
                         renderFlights() :
                         <p>No flights found. Try earlier flights.</p>
                     }
                 </div>
-                {(storedFlights.length !== 0 && !limitsReachedRef.current.next) && <button className="airport-flights-pagination" onClick={() => fetchFlights('next')}>Load later flights</button>}
+                {(storedFlightsRef.current.length !== 0 && !limitsReachedRef.current.next) && <button className="airport-flights-pagination" onClick={() => fetchFlights('next')}>Load later flights</button>}
             </div>
         </>
     )

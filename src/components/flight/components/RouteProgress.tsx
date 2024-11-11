@@ -1,6 +1,7 @@
 'use client'
 
-import { FlightData, StatusFlightData } from "@/types/panel"
+import { StatusFlightData } from "@/types/panel"
+import { FlightData } from "@/types/vatsim"
 
 export default function RouteProgress({ data, flightStatus }: { data: FlightData, flightStatus: StatusFlightData }) {
     if (!data) return
