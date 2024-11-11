@@ -1,14 +1,14 @@
-import { Attitude, MapStorage } from "@/types/map"
+import { Attitude } from "@/types/map"
 import { Feature, Overlay } from "ol"
-import { RefObject } from "react"
 import { createRoot } from "react-dom/client"
 import { AirportOverlay, FlightOverlay } from "../components/overlays"
 import { Point } from "ol/geom"
 import { LiveFlightData } from "@/types/panel"
 import { roundNumToX } from "@/utils/common"
+import { mapStorage } from "@/storage/singleton/map"
 
-export function createFlightOverlay(mapRef: RefObject<MapStorage | null>, feature: Feature<Point>, click: boolean): Overlay | null {
-    if (!mapRef.current?.map) return null
+export function createFlightOverlay(feature: Feature<Point>, click: boolean): Overlay | null {
+    if (!mapStorage.map) return null
 
     const element = document.createElement('div')
     const root = createRoot(element)
@@ -22,14 +22,14 @@ export function createFlightOverlay(mapRef: RefObject<MapStorage | null>, featur
         id: feature.get('callsign')
     })
     overlay.set('root', root)
-    mapRef.current?.map.addOverlay(overlay)
+    mapStorage.map.addOverlay(overlay)
 
     return overlay
 }
 
-export function moveFlightOverlay(mapRef: RefObject<MapStorage | null>) {
-    const overlays = mapRef.current?.overlays
-    const features = mapRef.current?.features
+export function moveFlightOverlay() {
+    const overlays = mapStorage.overlays
+    const features = mapStorage.features
 
     if (overlays?.hover && features?.hover) {
         const feature = features.hover as Feature<Point>
@@ -42,9 +42,9 @@ export function moveFlightOverlay(mapRef: RefObject<MapStorage | null>) {
     }
 }
 
-export function updateFlightOverlay(mapRef: RefObject<MapStorage | null>) {
-    const overlays = mapRef.current?.overlays
-    const features = mapRef.current?.features
+export function updateFlightOverlay() {
+    const overlays = mapStorage.overlays
+    const features = mapStorage.features
 
     if (overlays?.hover && features?.hover?.get('type') === 'flight') {
         const root = overlays.hover.get('root')
@@ -73,11 +73,11 @@ export function getLiveData(feature: Feature | null): LiveFlightData | null {
     }
 }
 
-export function createAirportOverlay(mapRef: RefObject<MapStorage | null>, feature: Feature<Point>, click: boolean): Overlay | null {
-    if (!mapRef.current?.map) return null
+export function createAirportOverlay(feature: Feature<Point>, click: boolean): Overlay | null {
+    if (!mapStorage.map) return null
 
     const id = feature.getId()
-    const labelFeature = id ? mapRef.current.sources.airportLabels.getFeatureById(id) : null
+    const labelFeature = id ? mapStorage.sources.airportLabels.getFeatureById(id) : null
 
     const element = document.createElement('div')
     const root = createRoot(element)
@@ -91,18 +91,18 @@ export function createAirportOverlay(mapRef: RefObject<MapStorage | null>, featu
         id: feature.get('callsign')
     })
     overlay.set('root', root)
-    mapRef.current?.map.addOverlay(overlay)
+    mapStorage.map.addOverlay(overlay)
 
     return overlay
 }
 
-export function updateAirportOverlay(mapRef: RefObject<MapStorage | null>) {
-    const overlays = mapRef.current?.overlays
-    const features = mapRef.current?.features
+export function updateAirportOverlay() {
+    const overlays = mapStorage.overlays
+    const features = mapStorage.features
 
     if (overlays?.hover && features?.hover?.get('type')?.includes('airport')) {
         const id = features.hover.getId()
-        const labelFeature = id ? mapRef.current!.sources.airportLabels.getFeatureById(id) : null
+        const labelFeature = id ? mapStorage.sources.airportLabels.getFeatureById(id) : null
 
         const root = overlays.hover.get('root')
         root.render(<AirportOverlay feature={labelFeature ?? features.hover} click={false} />)
@@ -110,7 +110,7 @@ export function updateAirportOverlay(mapRef: RefObject<MapStorage | null>) {
 
     if (overlays?.click && features?.click?.get('type')?.includes('airport')) {
         const id = features.click.getId()
-        const labelFeature = id ? mapRef.current!.sources.airportLabels.getFeatureById(id) : null
+        const labelFeature = id ? mapStorage.sources.airportLabels.getFeatureById(id) : null
 
         const root = overlays.click.get('root')
         root.render(<AirportOverlay feature={labelFeature ?? features.click} click={true} />)

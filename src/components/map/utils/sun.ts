@@ -1,3 +1,4 @@
+import { mapStorage } from "@/storage/singleton/map"
 import { MapStorage } from "@/types/map"
 import { Feature } from "ol"
 import { MultiPolygon } from "ol/geom"
@@ -6,16 +7,16 @@ import { RefObject } from "react"
 
 let sunInterval: number | NodeJS.Timeout
 
-export function initSunLayer(mapRef: RefObject<MapStorage | null>) {
+export function initSunLayer() {
     clearInterval(sunInterval)
     sunInterval = setInterval(() => {
-        updateSunFeatures(mapRef)
+        updateSunFeatures()
     }, 5000)
-    updateSunFeatures(mapRef)
+    updateSunFeatures()
 }
 
-const updateSunFeatures = (mapRef: RefObject<MapStorage | null>) => {
-    if (!mapRef.current?.sources.sun) return
+const updateSunFeatures = () => {
+    if (!mapStorage.sources.sun) return
 
     const angles = [0.566666, 6, 12, 18]
     const center = getShadowPosition(new Date())
@@ -27,8 +28,8 @@ const updateSunFeatures = (mapRef: RefObject<MapStorage | null>) => {
         return new Feature(polygon.transform('EPSG:4326', 'EPSG:3857'))
     })
 
-    mapRef.current?.sources.sun.clear()
-    mapRef.current?.sources.sun.addFeatures(newFeatures)
+    mapStorage.sources.sun.clear()
+    mapStorage.sources.sun.addFeatures(newFeatures)
 }
 
 const createCircularPolygon = (center: number[], radius: number) => {

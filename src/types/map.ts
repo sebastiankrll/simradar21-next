@@ -3,6 +3,7 @@ import { LineString, Point as oPoint } from "ol/geom";
 import VectorSource from "ol/source/Vector";
 import { Feature, Point } from "geojson";
 import { Extent } from "ol/extent";
+import { PositionAirline } from "./vatsim";
 
 export interface VectorSources {
     [key: string]: VectorSource
@@ -46,7 +47,7 @@ interface FlightProperties {
     attitude: Attitude,
     altitude: number,
     frequency: string,
-    airline: string | null,
+    airline: PositionAirline,
     airports: string[] | null,
     connected: number,
     timestamp: Date

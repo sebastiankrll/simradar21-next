@@ -1,19 +1,18 @@
-import { MapStorage } from "@/types/map"
 import { Feature, MapBrowserEvent } from "ol"
-import { RefObject } from "react"
 import { createAirportOverlay, createFlightOverlay } from "./overlay"
 import { Point } from "ol/geom"
 import { webglConfig } from "./webgl"
 import { followFlightFeature, setActiveFlightFeature, unFollowFlightFeature } from "./flights"
 import { hideFlightRoute, setClickedAirportFeature, showFlightRoute } from "./airports"
 import { intersects } from "ol/extent"
+import { mapStorage } from "@/storage/singleton/map"
 
-export const handleHover = (mapRef: RefObject<MapStorage | null>, event: MapBrowserEvent<UIEvent>) => {
-    if (!mapRef.current?.map) return
+export const handleHover = (event: MapBrowserEvent<UIEvent>) => {
+    if (!mapStorage.map) return
 
-    const map = mapRef.current.map
-    const overlays = mapRef.current.overlays
-    const features = mapRef.current.features
+    const map = mapStorage.map
+    const overlays = mapStorage.overlays
+    const features = mapStorage.features
 
     if (!(event.originalEvent.target instanceof HTMLCanvasElement)) {
         map.getTargetElement().style.cursor = ''
@@ -41,17 +40,17 @@ export const handleHover = (mapRef: RefObject<MapStorage | null>, event: MapBrow
     const id = features.hover?.getId()
 
     if (features.hover?.get('type')?.includes('airport') && id) {
-        const atcFeature = mapRef.current.sources.airports.getFeatureById(id)
+        const atcFeature = mapStorage.sources.airports.getFeatureById(id)
         atcFeature?.set('hover', 0)
     }
 
     if (features.hover?.get('type') === 'fir' && id) {
-        const polygon = mapRef.current.sources.firs.getFeatureById(id)
+        const polygon = mapStorage.sources.firs.getFeatureById(id)
         polygon?.set('hover', 0)
     }
 
     if (features.hover?.get('type') === 'tracon' && id) {
-        const polygon = mapRef.current.sources.tracons.getFeatureById(id)
+        const polygon = mapStorage.sources.tracons.getFeatureById(id)
         polygon?.set('hover', 0)
     }
 
@@ -69,12 +68,12 @@ export const handleHover = (mapRef: RefObject<MapStorage | null>, event: MapBrow
     features.hover = feature
 
     if (feature?.get('type') === 'flight') {
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, false)
+        const overlay = createFlightOverlay(feature as Feature<Point>, false)
         overlays.hover = overlay
     }
 
     if (feature?.get('type')?.includes('airport')) {
-        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>, false)
+        const overlay = createAirportOverlay(feature as Feature<Point>, false)
         overlays.hover = overlay
     }
 
@@ -93,12 +92,12 @@ export const handleHover = (mapRef: RefObject<MapStorage | null>, event: MapBrow
     // }
 }
 
-export function handleClick(mapRef: RefObject<MapStorage | null>, event: MapBrowserEvent<UIEvent>): string {
-    if (!mapRef.current?.map) return '/'
+export function handleClick(event: MapBrowserEvent<UIEvent>): string {
+    if (!mapStorage.map) return '/'
 
-    const map = mapRef.current.map
-    const overlays = mapRef.current.overlays
-    const features = mapRef.current.features
+    const map = mapStorage.map
+    const overlays = mapStorage.overlays
+    const features = mapStorage.features
 
     const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => feature, {
         layerFilter: function (layer) {
@@ -110,23 +109,23 @@ export function handleClick(mapRef: RefObject<MapStorage | null>, event: MapBrow
         return '/'
     }
 
-    resetMap(mapRef)
+    resetMap()
 
     feature.set('hover', 1)
     features.click = feature
 
     if (feature?.get('type') === 'flight') {
-        const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, true)
+        const overlay = createFlightOverlay(feature as Feature<Point>, true)
         overlays.click = overlay
 
         return '/flight/' + feature.get('callsign')
     }
 
     if (feature?.get('type')?.includes('airport')) {
-        const overlay = createAirportOverlay(mapRef, feature as Feature<Point>, true)
+        const overlay = createAirportOverlay(feature as Feature<Point>, true)
         overlays.click = overlay
 
-        setClickedAirportFeature(mapRef, feature.get('icao'), feature)
+        setClickedAirportFeature(feature.get('icao'), feature)
 
         return '/airport/' + feature.get('icao')
     }
@@ -140,14 +139,14 @@ export function handleClick(mapRef: RefObject<MapStorage | null>, event: MapBrow
     return '/'
 }
 
-export function resetMap(mapRef: RefObject<MapStorage | null>) {
-    if (!mapRef.current?.map) return
+export function resetMap() {
+    if (!mapStorage.map) return
 
-    mapRef.current.features.track = null
-    mapRef.current.sources.tracks.clear()
+    mapStorage.features.track = null
+    mapStorage.sources.tracks.clear()
 
-    if (mapRef.current.view.lastView) {
-        mapRef.current.map.getView().fit(mapRef.current.view.lastView, {
+    if (mapStorage.view.lastView) {
+        mapStorage.map.getView().fit(mapStorage.view.lastView, {
             duration: 200
         })
 
@@ -155,64 +154,64 @@ export function resetMap(mapRef: RefObject<MapStorage | null>) {
         webglConfig.shadows.variables.callsign = 'all'
         webglConfig.airports.variables.show = ''
 
-        mapRef.current.view.lastView = null
+        mapStorage.view.lastView = null
     }
 
-    mapRef.current.sources.airportTops.clear()
+    mapStorage.sources.airportTops.clear()
 
-    if (mapRef.current.features.click?.get('type') === 'tracon') {
-        const polygon = mapRef.current.sources.tracons.getFeatureById(mapRef.current.features.click.get('id'))
+    if (mapStorage.features.click?.get('type') === 'tracon') {
+        const polygon = mapStorage.sources.tracons.getFeatureById(mapStorage.features.click.get('id'))
         polygon?.set('hover', 0)
     }
 
-    if (mapRef.current.features.click?.get('type') === 'fir') {
-        const polygon = mapRef.current.sources.firs.getFeatureById(mapRef.current.features.click.get('id'))
+    if (mapStorage.features.click?.get('type') === 'fir') {
+        const polygon = mapStorage.sources.firs.getFeatureById(mapStorage.features.click.get('id'))
         polygon?.set('hover', 0)
     }
 
-    if (mapRef.current.features.hover) {
-        mapRef.current.features.hover.set('hover', 0)
-        mapRef.current.features.hover = null
+    if (mapStorage.features.hover) {
+        mapStorage.features.hover.set('hover', 0)
+        mapStorage.features.hover = null
     }
-    mapRef.current.features.click?.set('hover', 0)
-    mapRef.current.features.click = null
+    mapStorage.features.click?.set('hover', 0)
+    mapStorage.features.click = null
 
-    if (mapRef.current.overlays.hover) {
-        const root = mapRef.current.overlays.hover.get('root')
+    if (mapStorage.overlays.hover) {
+        const root = mapStorage.overlays.hover.get('root')
         setTimeout(() => {
             root?.unmount()
         }, 0)
 
-        mapRef.current.map.removeOverlay(mapRef.current.overlays.hover)
-        mapRef.current.overlays.hover = null
+        mapStorage.map.removeOverlay(mapStorage.overlays.hover)
+        mapStorage.overlays.hover = null
     }
-    if (mapRef.current.overlays.click) {
-        const root = mapRef.current.overlays.click.get('root')
+    if (mapStorage.overlays.click) {
+        const root = mapStorage.overlays.click.get('root')
         setTimeout(() => {
             root?.unmount()
         }, 0)
 
-        mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
-        mapRef.current.overlays.click = null
+        mapStorage.map.removeOverlay(mapStorage.overlays.click)
+        mapStorage.overlays.click = null
     }
 }
 
-export async function handlePathChange(mapRef: RefObject<MapStorage | null>, path: string, handleNotFound: (found: boolean, path?: string) => void) {
-    if ((path === '/' && mapRef.current?.view.viewInit) || !mapRef.current) {
-        resetMap(mapRef)
+export async function handlePathChange(path: string, handleNotFound: (found: boolean, path?: string) => void) {
+    if ((path === '/' && mapStorage.view.viewInit)) {
+        resetMap()
         return
     }
 
-    if (path.includes('flight') && mapRef.current.features.click?.get('type') !== 'flight') {
-        const found = setActiveFlightFeature(mapRef, path.split('/')[2])
-        moveViewToFeature(mapRef, mapRef.current.features.click, 8)
+    if (path.includes('flight') && mapStorage.features.click?.get('type') !== 'flight') {
+        const found = setActiveFlightFeature(path.split('/')[2])
+        moveViewToFeature(mapStorage.features.click, 8)
 
         handleNotFound(found, path)
         return
     }
-    if (path.includes('airport') && !mapRef.current.features.click?.get('type')?.includes('airport')) {
-        const found = await setClickedAirportFeature(mapRef, path.split('/')[2], null)
-        moveViewToFeature(mapRef, mapRef.current.features.click, 13)
+    if (path.includes('airport') && !mapStorage.features.click?.get('type')?.includes('airport')) {
+        const found = await setClickedAirportFeature(path.split('/')[2], null)
+        moveViewToFeature(mapStorage.features.click, 13)
 
         handleNotFound(found, path)
         return
@@ -223,10 +222,10 @@ export async function handlePathChange(mapRef: RefObject<MapStorage | null>, pat
     }
 }
 
-export function moveViewToFeature(mapRef: RefObject<MapStorage | null>, feature: Feature | null, zoom?: number) {
-    if (!mapRef.current?.map || !feature) return
+export function moveViewToFeature(feature: Feature | null, zoom?: number) {
+    if (!mapStorage.map || !feature) return
 
-    const map = mapRef.current.map
+    const map = mapStorage.map
     const view = map.getView()
     if (!zoom) { zoom = view.getZoom() }
 
@@ -243,47 +242,47 @@ export function moveViewToFeature(mapRef: RefObject<MapStorage | null>, feature:
 }
 
 let prevAction: null | string | number = null
-export function handleFlightPanelAction(mapRef: RefObject<MapStorage | null>, action: number | string | null) {
-    const map = mapRef.current?.map
+export function handleFlightPanelAction(action: number | string | null) {
+    const map = mapStorage.map
     if (!map) return
 
     if (!action) {
         unFollowFlightFeature()
-        if (prevAction === 1) { hideFlightRoute(mapRef) }
+        if (prevAction === 1) { hideFlightRoute() }
 
-        if (mapRef.current?.view.lastView) {
-            map.getView().fit(mapRef.current.view.lastView, {
+        if (mapStorage.view.lastView) {
+            map.getView().fit(mapStorage.view.lastView, {
                 duration: 200
             })
         }
-        mapRef.current.view.lastView = null
+        mapStorage.view.lastView = null
 
-        if (mapRef.current.features.hover) {
-            mapRef.current.features.hover.set('hover', 0)
-            mapRef.current.features.hover = null
+        if (mapStorage.features.hover) {
+            mapStorage.features.hover.set('hover', 0)
+            mapStorage.features.hover = null
         }
 
-        if (mapRef.current.overlays.hover) {
-            const root = mapRef.current.overlays.hover.get('root')
+        if (mapStorage.overlays.hover) {
+            const root = mapStorage.overlays.hover.get('root')
             setTimeout(() => {
                 root?.unmount()
             }, 0)
 
-            mapRef.current.map?.removeOverlay(mapRef.current.overlays.hover)
-            mapRef.current.overlays.hover = null
+            mapStorage.map?.removeOverlay(mapStorage.overlays.hover)
+            mapStorage.overlays.hover = null
         }
     }
 
     if (action === 1) {
-        showFlightRoute(mapRef)
+        showFlightRoute()
     }
 
     if (action === 2) {
-        followFlightFeature(mapRef)
+        followFlightFeature()
     }
 
     if (typeof action === 'string') {
-        setActiveFlightFeature(mapRef, action, 'hover')
+        setActiveFlightFeature(action, 'hover')
     }
 
     prevAction = action

@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Map, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
 import './components/Overlay.css'
-import { MapStorage } from "@/types/map"
 import { mapStorage } from "@/storage/singleton/map"
 import { onMessage } from "@/utils/ws"
 import { animateFlightFeatures, updateFlightFeatures } from "./utils/flights"
@@ -28,8 +27,6 @@ export default function OlMap({ }) {
     const { trackPoints, action } = useFlightStore()
     const [notFound, setNotFound] = useState<null | string[]>(null)
 
-    const mapRef = useRef<MapStorage>(mapStorage)
-
     useEffect(() => {
         // Init map
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
@@ -46,32 +43,32 @@ export default function OlMap({ }) {
             }),
             controls: []
         })
-        mapRef.current.map = map
-        initLayers(mapRef)
+        mapStorage.map = map
+        initLayers()
 
         // Init websocket updates
         const unMessage = onMessage((message: WsMessage) => {
-            updateFlightFeatures(mapRef, message.data as VatsimDataWS)
-            updateAirportFeatures(mapRef, message.data as VatsimDataWS)
+            updateFlightFeatures(message.data as VatsimDataWS)
+            updateAirportFeatures(message.data as VatsimDataWS)
         })
 
         // Init hover events
         const onPointerMove = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
-            handleHover(mapRef, targetEvent)
+            handleHover(targetEvent)
         }
         map.on(['pointermove'], onPointerMove)
 
         // Init hover events
         const onMoveEnd = () => {
-            setAirportFeaturesByExtent(mapRef)
+            setAirportFeaturesByExtent()
         }
         map.on(['moveend'], onMoveEnd)
 
         // Init flight feature animation
         let animationFrameId: number
         const animate = () => {
-            animateFlightFeatures(mapRef)
+            animateFlightFeatures()
             animationFrameId = window.requestAnimationFrame(animate)
         }
         // animationFrameId = window.requestAnimationFrame(animate)
@@ -90,16 +87,16 @@ export default function OlMap({ }) {
 
     // Handle feature click events
     useEffect(() => {
-        const map = mapRef.current.map
+        const map = mapStorage.map
         if (!map) return
 
         const onClick = (event: BaseEvent | Event) => {
             const targetEvent = event as MapBrowserEvent<UIEvent>
-            mapRef.current.animate = false
+            mapStorage.animate = false
 
             setTimeout(() => {
-                const route = handleClick(mapRef, targetEvent)
-                mapRef.current.animate = true
+                const route = handleClick(targetEvent)
+                mapStorage.animate = true
 
                 router.prefetch(route)
                 setPage(route)
@@ -126,18 +123,18 @@ export default function OlMap({ }) {
             }
         }
 
-        initData(mapRef)
-        handlePathChange(mapRef, pathname, handleNotFound)
+        initData()
+        handlePathChange(pathname, handleNotFound)
     }, [pathname])
 
     // Draw track when flight is loaded
     useEffect(() => {
-        initTrack(mapRef, trackPoints)
+        initTrack(trackPoints)
     }, [trackPoints])
 
     // Handle flight panel actions
     useEffect(() => {
-        handleFlightPanelAction(mapRef, action)
+        handleFlightPanelAction(action)
     }, [action])
 
     return (

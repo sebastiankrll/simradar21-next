@@ -1,10 +1,9 @@
 import { getAllAirports, getSelectedAirports } from "@/storage/client-database";
-import { IndexedAirportFeature, MapStorage } from "@/types/map";
+import { IndexedAirportFeature } from "@/types/map";
 import bbox from "@turf/bbox";
 import { BBox } from "geojson";
 import { fromLonLat, transformExtent } from "ol/proj";
 import RBush from "rbush";
-import { RefObject } from "react";
 import GeoJSON from 'ol/format/GeoJSON'
 import { VatsimDataWS } from "@/types/vatsim";
 import { Feature } from "ol";
@@ -13,11 +12,12 @@ import { createAirportOverlay, updateAirportOverlay } from "./overlay";
 import { boundingExtent } from "ol/extent";
 import { webglConfig } from "./webgl";
 import { toggleDestinationSegment } from "./track";
+import { mapStorage } from "@/storage/singleton/map";
 
 const rbush = new RBush<IndexedAirportFeature>()
 let inOutBounds: { [key: string]: number[] } = {}
 
-export async function initAirportFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
+export async function initAirportFeatures(vatsimData: VatsimDataWS | null) {
     const airportFeatures = await getAllAirports()
     if (!airportFeatures) return
 
@@ -32,15 +32,15 @@ export async function initAirportFeatures(mapRef: RefObject<MapStorage | null>, 
         }
     })
     rbush.load(indexedFeatures)
-    setAirportFeaturesByExtent(mapRef)
-    updateAirportFeatures(mapRef, vatsimData)
+    setAirportFeaturesByExtent()
+    updateAirportFeatures(vatsimData)
 }
 
-export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage | null>) {
-    const map = mapRef.current?.map
+export function setAirportFeaturesByExtent() {
+    const map = mapStorage.map
     const resolution = map?.getView().getResolution()
     if (!resolution || !map) {
-        mapRef.current?.sources.airports.clear()
+        mapStorage.sources.airports.clear()
         return
     }
 
@@ -59,7 +59,7 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage | null>)
     }
 
     if (!sizeArray) {
-        mapRef.current?.sources.airports.clear()
+        mapStorage.sources.airports.clear()
         return
     }
 
@@ -67,8 +67,8 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage | null>)
     const featuresByExtent = rbush.search({ minX, minY, maxX, maxY }).map((entry) => entry.feature)
     const featuresBySize = sizeArray ? featuresByExtent.filter(feature => sizeArray.includes(feature.properties?.type)) : []
 
-    mapRef.current?.sources.airports.clear()
-    mapRef.current?.sources.airports.addFeatures(
+    mapStorage.sources.airports.clear()
+    mapStorage.sources.airports.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
             features: featuresBySize
@@ -78,7 +78,7 @@ export function setAirportFeaturesByExtent(mapRef: RefObject<MapStorage | null>)
     )
 }
 
-export async function updateAirportFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
+export async function updateAirportFeatures(vatsimData: VatsimDataWS | null) {
     const controllers = vatsimData?.controllers?.airports
     if (!controllers) return
 
@@ -115,8 +115,8 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage | null>
         newFeatures.push(feature)
     }
 
-    mapRef.current?.sources.airportLabels.clear()
-    mapRef.current?.sources.airportLabels.addFeatures(
+    mapStorage.sources.airportLabels.clear()
+    mapStorage.sources.airportLabels.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
             features: newFeatures
@@ -126,7 +126,7 @@ export async function updateAirportFeatures(mapRef: RefObject<MapStorage | null>
     )
 
     calculateInAndOutBounds(vatsimData)
-    updateAirportOverlay(mapRef)
+    updateAirportOverlay()
 }
 
 function calculateInAndOutBounds(vatsimData: VatsimDataWS) {
@@ -156,11 +156,11 @@ export function getInAndOutBounds(icao: string): number[] {
     return inOutBounds[icao] ? inOutBounds[icao] : [0, 0]
 }
 
-export async function setClickedAirportFeature(mapRef: RefObject<MapStorage | null>, icao: string, feature: Feature<Point> | null): Promise<boolean> {
-    if (!mapRef.current?.map) return false
+export async function setClickedAirportFeature(icao: string, feature: Feature<Point> | null): Promise<boolean> {
+    if (!mapStorage.map) return false
 
     if (feature) {
-        mapRef.current.sources.airportTops.addFeature(feature)
+        mapStorage.sources.airportTops.addFeature(feature)
         return true
     }
 
@@ -172,36 +172,36 @@ export async function setClickedAirportFeature(mapRef: RefObject<MapStorage | nu
     }) as Feature<Point>
 
     // Clean up old previous overlay first (dev mode only due to strict mode)
-    if (mapRef.current.overlays.click && process.env.NODE_ENV === 'development') {
-        const root = mapRef.current.overlays.click.get('root')
+    if (mapStorage.overlays.click && process.env.NODE_ENV === 'development') {
+        const root = mapStorage.overlays.click.get('root')
         setTimeout(() => {
             root?.unmount()
         }, 0)
 
-        mapRef.current.map.removeOverlay(mapRef.current.overlays.click)
-        mapRef.current.overlays.click = null
+        mapStorage.map.removeOverlay(mapStorage.overlays.click)
+        mapStorage.overlays.click = null
     }
 
-    if (mapRef.current.features.click && process.env.NODE_ENV === 'development') {
-        mapRef.current?.sources.airportTops.removeFeature(mapRef.current.features.click)
+    if (mapStorage.features.click && process.env.NODE_ENV === 'development') {
+        mapStorage.sources.airportTops.removeFeature(mapStorage.features.click)
     }
 
     newFeature.set('hover', 1)
-    mapRef.current?.sources.airportTops.addFeature(newFeature)
-    mapRef.current.features.click = newFeature
+    mapStorage.sources.airportTops.addFeature(newFeature)
+    mapStorage.features.click = newFeature
 
-    const overlay = createAirportOverlay(mapRef, newFeature as Feature<Point>, true)
-    mapRef.current.overlays.click = overlay
+    const overlay = createAirportOverlay(newFeature as Feature<Point>, true)
+    mapStorage.overlays.click = overlay
 
     return true
 }
 
-export async function showFlightRoute(mapRef: RefObject<MapStorage | null>) {
-    const clickedFeature = mapRef.current?.features.click
-    const map = mapRef.current?.map
+export async function showFlightRoute() {
+    const clickedFeature = mapStorage.features.click
+    const map = mapStorage.map
     if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
 
-    mapRef.current.view.lastView = map.getView().calculateExtent(map.getSize())
+    mapStorage.view.lastView = map.getView().calculateExtent(map.getSize())
 
     const airportIcaos: string[] | null = clickedFeature.get('airports')
     if (!airportIcaos || airportIcaos.length < 2) return
@@ -229,7 +229,7 @@ export async function showFlightRoute(mapRef: RefObject<MapStorage | null>) {
     newFeatures.forEach(feature => {
         feature.set('hover', 1)
     })
-    mapRef.current.sources.airportTops.addFeatures(newFeatures)
+    mapStorage.sources.airportTops.addFeatures(newFeatures)
 
     webglConfig.flights.variables.callsign = clickedFeature.get('callsign')
     webglConfig.shadows.variables.callsign = clickedFeature.get('callsign')
@@ -237,11 +237,11 @@ export async function showFlightRoute(mapRef: RefObject<MapStorage | null>) {
     webglConfig.airportLabels.variables.dep = airportIcaos[0]
     webglConfig.airportLabels.variables.arr = airportIcaos[1]
 
-    toggleDestinationSegment(mapRef, true)
+    toggleDestinationSegment(true)
 }
 
-export async function hideFlightRoute(mapRef: RefObject<MapStorage | null>) {
-    mapRef.current?.sources.airportTops.clear()
+export async function hideFlightRoute() {
+    mapStorage.sources.airportTops.clear()
 
     webglConfig.flights.variables.callsign = 'all'
     webglConfig.shadows.variables.callsign = 'all'
@@ -249,5 +249,5 @@ export async function hideFlightRoute(mapRef: RefObject<MapStorage | null>) {
     webglConfig.airportLabels.variables.dep = ''
     webglConfig.airportLabels.variables.arr = ''
 
-    toggleDestinationSegment(mapRef, false)
+    toggleDestinationSegment(false)
 }

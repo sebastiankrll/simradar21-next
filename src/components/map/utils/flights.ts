@@ -1,27 +1,27 @@
 import { PositionData, VatsimDataWS } from "@/types/vatsim"
-import { Attitude, FlightFeature, MapStorage } from "@/types/map"
+import { Attitude, FlightFeature } from "@/types/map"
 import { fromLonLat } from "ol/proj"
-import { RefObject } from "react"
 import GeoJSON from 'ol/format/GeoJSON'
 import { Feature } from "ol"
 import { Point } from "ol/geom"
 import { createFlightOverlay, moveFlightOverlay, updateFlightOverlay } from "./overlay"
 import { moveTrack, updateTrack } from "./track"
 import { moveViewToFeature } from "./misc"
+import { mapStorage } from "@/storage/singleton/map"
 
-export function updateFlightFeatures(mapRef: RefObject<MapStorage | null>, vatsimData: VatsimDataWS | null) {
-    if (!mapRef.current || !vatsimData?.flights) return
+export function updateFlightFeatures(vatsimData: VatsimDataWS | null) {
+    if (!vatsimData?.flights) return
 
-    const tOffset = (Date.now() - mapRef.current.layerInit.getTime()) / 1000
+    const tOffset = (Date.now() - mapStorage.layerInit.getTime()) / 1000
     const flights = structuredClone(vatsimData.flights)
-    const prevFeatures = mapRef.current.sources.flights.getFeatures()
+    const prevFeatures = mapStorage.sources.flights.getFeatures()
     const checked: PositionData[] = []
 
     for (const feature of prevFeatures as Feature<Point>[]) {
         const newData = flights.find(flight => flight.callsign === feature.get('callsign'))
 
         if (!newData) {
-            mapRef.current!.sources.flights.removeFeature(feature)
+            mapStorage.sources.flights.removeFeature(feature)
             continue
         }
 
@@ -88,7 +88,7 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage | null>, vatsi
         }
     })
 
-    mapRef.current.sources.flights.addFeatures(
+    mapStorage.sources.flights.addFeatures(
         new GeoJSON().readFeatures({
             type: 'FeatureCollection',
             features: newFeatures
@@ -97,9 +97,9 @@ export function updateFlightFeatures(mapRef: RefObject<MapStorage | null>, vatsi
         })
     )
 
-    updateTrack(mapRef)
-    moveFlightOverlay(mapRef)
-    updateFlightOverlay(mapRef)
+    updateTrack()
+    moveFlightOverlay()
+    updateFlightOverlay()
 }
 
 function getInterpolatedPosition(position: Attitude, timeElapsed: number): number[] {
@@ -115,8 +115,8 @@ function getInterpolatedPosition(position: Attitude, timeElapsed: number): numbe
     return [newLon, newLat]
 }
 
-export function moveFlightFeatures(mapRef: RefObject<MapStorage | null>) {
-    const features = mapRef.current?.sources.flights.getFeatures() as Feature<Point>[]
+export function moveFlightFeatures() {
+    const features = mapStorage.sources.flights.getFeatures() as Feature<Point>[]
 
     features.forEach(feature => {
         const timeElapsed = (Date.now() - new Date(feature.get('timestamp')).getTime()) / 1000
@@ -124,13 +124,13 @@ export function moveFlightFeatures(mapRef: RefObject<MapStorage | null>) {
         feature.getGeometry()?.setCoordinates(fromLonLat(interpolatedPosition))
     })
 
-    moveTrack(mapRef)
-    moveFlightOverlay(mapRef)
+    moveTrack()
+    moveFlightOverlay()
 }
 
 let then: number = Date.now()
-export function animateFlightFeatures(mapRef: RefObject<MapStorage | null>) {
-    if (!mapRef.current?.map) return
+export function animateFlightFeatures() {
+    if (!mapStorage.map) return
 
     const fpsInterval = 1000 / 30
     const limit = true
@@ -138,24 +138,24 @@ export function animateFlightFeatures(mapRef: RefObject<MapStorage | null>) {
     const elapsed = now - then
 
     if (elapsed > fpsInterval || !limit) {
-        if (mapRef.current.animate) moveFlightFeatures(mapRef)
-        mapRef.current.map.render()
+        if (mapStorage.animate) moveFlightFeatures()
+        mapStorage.map.render()
 
         then = now - (elapsed % fpsInterval)
     }
 }
 
 let followInterval: NodeJS.Timeout
-export function followFlightFeature(mapRef: RefObject<MapStorage | null>) {
-    const clickedFeature = mapRef.current?.features.click
-    const map = mapRef.current?.map
+export function followFlightFeature() {
+    const clickedFeature = mapStorage.features.click
+    const map = mapStorage.map
     if (!clickedFeature || clickedFeature.get('type') !== 'flight' || !map) return
 
-    mapRef.current.view.lastView = map.getView().calculateExtent(map.getSize())
-    moveViewToFeature(mapRef, clickedFeature)
+    mapStorage.view.lastView = map.getView().calculateExtent(map.getSize())
+    moveViewToFeature(clickedFeature)
 
     followInterval = setInterval(() => {
-        moveViewToFeature(mapRef, clickedFeature)
+        moveViewToFeature(clickedFeature)
     }, 5000)
 }
 
@@ -163,33 +163,33 @@ export function unFollowFlightFeature() {
     clearInterval(followInterval)
 }
 
-export function setActiveFlightFeature(mapRef: RefObject<MapStorage | null>, callsign: string, type: 'click' | 'hover' = 'click'): boolean {
-    if (!mapRef.current?.map) return false
+export function setActiveFlightFeature(callsign: string, type: 'click' | 'hover' = 'click'): boolean {
+    if (!mapStorage.map) return false
 
-    const features = mapRef.current.sources.flights.getFeatures() as Feature<Point>[]
+    const features = mapStorage.sources.flights.getFeatures() as Feature<Point>[]
     if (features.length < 1) return false
 
     const feature = features.find(feature => feature.get('callsign') === callsign)
     if (!feature) return false
 
     // Clean up old previous overlay first (dev mode only due to strict mode)
-    if (mapRef.current.overlays[type] && process.env.NODE_ENV === 'development') {
-        const root = mapRef.current.overlays[type].get('root')
+    if (mapStorage.overlays[type] && process.env.NODE_ENV === 'development') {
+        const root = mapStorage.overlays[type].get('root')
         setTimeout(() => {
             root?.unmount()
         }, 0)
 
-        mapRef.current.map.removeOverlay(mapRef.current.overlays[type])
-        mapRef.current.overlays[type] = null
+        mapStorage.map.removeOverlay(mapStorage.overlays[type])
+        mapStorage.overlays[type] = null
     }
 
-    mapRef.current.features[type]?.set('hover', 0)
+    mapStorage.features[type]?.set('hover', 0)
 
     feature.set('hover', 1)
-    mapRef.current.features[type] = feature
+    mapStorage.features[type] = feature
 
-    const overlay = createFlightOverlay(mapRef, feature as Feature<Point>, type === 'click' ? true : false)
-    mapRef.current.overlays[type] = overlay
+    const overlay = createFlightOverlay(feature as Feature<Point>, type === 'click' ? true : false)
+    mapStorage.overlays[type] = overlay
 
     return true
 }
