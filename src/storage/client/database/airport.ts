@@ -1,4 +1,4 @@
-import { ClientDatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
+import { ClientDatabaseAirports, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
 import { Point } from "geojson"
 
@@ -18,9 +18,12 @@ dbAirport.version(1).stores({
     versions: "id"
 })
 
-export async function insertAirports(newData: ClientDatabaseDataStorage) {
+export async function insertAirports(newData: ClientDatabaseAirports | null) {
+    if (!newData) return
+
     const inserts: IndexedDBData<Point>[] = []
-    newData.airports.data?.forEach(feature => {
+    
+    newData.data?.forEach(feature => {
         if (feature.id && feature.properties) {
             inserts.push({
                 id: typeof feature.id === 'string' ? parseInt(feature.id) : feature.id,
@@ -31,5 +34,5 @@ export async function insertAirports(newData: ClientDatabaseDataStorage) {
     })
 
     await dbAirport.data.bulkPut(inserts)
-    await dbAirport.versions.put({ id: 1, version: newData.airports.version })
+    await dbAirport.versions.put({ id: 1, version: newData.version })
 }

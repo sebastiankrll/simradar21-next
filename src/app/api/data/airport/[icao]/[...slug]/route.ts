@@ -6,8 +6,8 @@ export async function GET(
     request: NextRequest,
     props: { params: Promise<{ icao: string, slug: string[] }> }
 ) {
-    const params = await props.params;
-    if (params.slug[0] !== 'departure' && params.slug[0] !== 'arrival') return NextResponse.json(null)
+    const params = await props.params
+    if (params.slug[0] !== 'departure' && params.slug[0] !== 'arrival') { return NextResponse.json(null) }
 
     const searchParams = request.nextUrl.searchParams
     const pagination = searchParams.get('p')

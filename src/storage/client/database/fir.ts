@@ -1,4 +1,4 @@
-import { ClientDatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
+import { ClientDatabaseDataStorage, ClientDatabaseSectors, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
 import { MultiPolygon } from "geojson"
 
@@ -18,9 +18,12 @@ dbFir.version(1).stores({
     versions: "id"
 })
 
-export async function insertFIRs(newData: ClientDatabaseDataStorage) {
+export async function insertFIRs(newData: ClientDatabaseSectors | null) {
+    if (!newData) return
+
     const inserts: IndexedDBData<MultiPolygon>[] = []
-    newData.firs.data?.forEach(feature => {
+
+    newData.data?.forEach(feature => {
         if (feature.id && feature.properties) {
             inserts.push({
                 id: typeof feature.id === 'string' ? parseInt(feature.id) : feature.id,
@@ -31,5 +34,5 @@ export async function insertFIRs(newData: ClientDatabaseDataStorage) {
     })
 
     await dbFir.data.bulkPut(inserts)
-    await dbFir.versions.put({ id: 1, version: newData.firs.version })
+    await dbFir.versions.put({ id: 1, version: newData.version })
 }

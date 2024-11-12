@@ -1,4 +1,4 @@
-import { ClientDatabaseDataStorage, IndexedDBData, IndexedDBVersion } from "@/types/database"
+import { ClientDatabaseDataStorage, ClientDatabaseSectors, IndexedDBData, IndexedDBVersion } from "@/types/database"
 import Dexie, { EntityTable } from "dexie"
 import { MultiPolygon } from "geojson"
 
@@ -18,9 +18,12 @@ dbTracon.version(1).stores({
     versions: "id"
 })
 
-export async function insertTRACONs(newData: ClientDatabaseDataStorage) {
+export async function insertTRACONs(newData: ClientDatabaseSectors | null) {
+    if (!newData) return
+
     const inserts: IndexedDBData<MultiPolygon>[] = []
-    newData.tracons.data?.forEach(feature => {
+
+    newData.data?.forEach(feature => {
         if (feature.id && feature.properties) {
             inserts.push({
                 id: typeof feature.id === 'string' ? parseInt(feature.id) : feature.id,
@@ -31,5 +34,5 @@ export async function insertTRACONs(newData: ClientDatabaseDataStorage) {
     })
 
     await dbTracon.data.bulkPut(inserts)
-    await dbTracon.versions.put({ id: 1, version: newData.tracons.version })
+    await dbTracon.versions.put({ id: 1, version: newData.version })
 }

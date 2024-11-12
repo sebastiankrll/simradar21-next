@@ -114,14 +114,14 @@ export function initLayers() {
 
 export async function initData(pathname: string, handleNotFound: (found: boolean, path?: string) => void) {
     if (!mapStorage.view.viewInit) {
-        const initData: { vatsim: VatsimMinimalData, database: ClientDatabaseDataStorage } = await fetcher('/api/data/init')
-
         // Init indexed-db
-        checkAndUpdateData(initData.database)
+        checkAndUpdateData()
+
+        const initData = await fetcher('/api/data/init') as VatsimMinimalData
 
         // Init features (flights, airports, sectors)
-        updateFlightFeatures(initData.vatsim)
-        initAirportFeatures(initData.vatsim)
+        updateFlightFeatures(initData)
+        initAirportFeatures(initData)
 
         mapStorage.view.viewInit = true
     }

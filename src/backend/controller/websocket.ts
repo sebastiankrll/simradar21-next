@@ -46,7 +46,7 @@ function sendWsData(data: string) {
 
 const redisSub = new Redis()
 
-redisSub.subscribe('vatsim_storage', (err, count) => {
+redisSub.subscribe("vatsim_storage", (err, count) => {
     if (err) {
         console.error("Failed to subscribe: %s", err.message)
     } else {
@@ -56,6 +56,6 @@ redisSub.subscribe('vatsim_storage', (err, count) => {
     }
 })
 
-redisSub.on("message", (data) => {
+redisSub.on("message", (channel, data) => {
     sendWsData(data)
 })

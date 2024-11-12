@@ -4,12 +4,12 @@ import { VatsimStorageGeneralData, VatsimStorageStatusData } from "./vatsim"
 
 export interface ClientDatabaseAirports {
     version: string,
-    data: Feature<Point>[] | null
+    data?: Feature<Point>[] | null
 }
 
 export interface ClientDatabaseSectors {
     version: string,
-    data: Feature<MultiPolygon>[] | null
+    data?: Feature<MultiPolygon>[] | null
 }
 
 export interface ClientDatabaseDataStorage {
