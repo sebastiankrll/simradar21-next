@@ -1,7 +1,7 @@
 import { MapLibreLayer } from "@geoblocks/ol-maplibre-layer"
 import mapLibreStyle from '@/assets/styles/positron.json'
 import { StyleSpecification } from "maplibre-gl"
-import { webglConfig, WebGLLayer } from "./webgl"
+import { webglConfig } from "./webgl"
 import VectorSource from "ol/source/Vector"
 import { VectorStyle } from "ol/render/webgl/VectorStyleRenderer"
 import VectorLayer from "ol/layer/Vector"
@@ -16,8 +16,8 @@ import { initAirportFeatures } from "./airports"
 import { mapStorage } from "@/storage/client/map"
 import { handlePathChange } from "./misc"
 import { VatsimMinimalData } from "@/types/vatsim"
-import { ClientDatabaseDataStorage } from "@/types/database"
 import { checkAndUpdateData } from "@/storage/client/database"
+import { WebGLLayer } from "./WebGLLayer"
 
 export function initLayers() {
     if (!mapStorage.map) return

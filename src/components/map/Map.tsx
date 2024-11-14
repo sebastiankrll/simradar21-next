@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { Map, MapBrowserEvent, View } from "ol"
+import { Map as oMap, MapBrowserEvent, View } from "ol"
 import { fromLonLat, transformExtent } from "ol/proj"
 import './Map.css'
 import './components/Overlay.css'
@@ -20,7 +20,7 @@ import { setAirportFeaturesByExtent, updateAirportFeatures } from "./utils/airpo
 import NotFound from "./components/NotFound"
 import { VatsimMinimalData } from "@/types/vatsim"
 
-export default function OlMap({ }) {
+export default function Map({ }) {
     const router = useRouter()
     const pathname = usePathname()
     const { setPage } = useSliderStore()
@@ -32,7 +32,7 @@ export default function OlMap({ }) {
         const view = localStorage.getItem('MAP_VIEW')?.split(',')
         const zoom = view ? parseFloat(view[2]) : 3
         const center = view ? view.slice(0, 2).map(parseFloat) : [0, 0]
-        const map = new Map({
+        const map = new oMap({
             target: "map",
             view: new View({
                 center: fromLonLat(center),
